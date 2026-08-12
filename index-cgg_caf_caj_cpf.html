@@ -1,0 +1,1969 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CGG x CAF x CAJ x CPF</title>
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1"></script>
+    
+    <script src="cgg_caf_caj_cpf.js"></script>
+    
+    <style>
+		/* Estilos do Botão Duplo / Split Button */
+        .split-action-container {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            background: #fff;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            height: 26px;
+            box-sizing: border-box;
+            margin-left: 5px;
+            vertical-align: middle;
+        }
+        .split-main-btn {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 0 8px;
+            height: 100%;
+            font-size: 14px;
+            line-height: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .split-main-btn:hover {
+            background: rgba(0,0,0,0.03);
+            border-top-left-radius: 4px;
+            border-bottom-left-radius: 4px;
+        }
+        .split-arrow-btn {
+            background: transparent;
+            border: none;
+            border-left: 1px solid #ccc;
+            cursor: pointer;
+            padding: 0 6px;
+            height: 100%;
+            font-size: 10px;
+            color: #555;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .split-arrow-btn:hover {
+            background: rgba(0,0,0,0.05);
+            border-top-right-radius: 4px;
+            border-bottom-right-radius: 4px;
+        }
+        /* Menu Suspenso (Dropdown de Emojis) */
+        .split-dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 4px;
+            background: #fff;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            display: none;
+            flex-direction: column;
+            padding: 4px;
+            z-index: 1000;
+            min-width: 40px;
+        }
+        .split-dropdown-menu.show {
+            display: flex;
+        }
+        .split-dropdown-item {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 6px 10px;
+            font-size: 16px;
+            text-align: center;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+        .split-dropdown-item:hover {
+            background: #f1f3f5;
+        }
+        :root {
+            --bg-color: #faf8f5;
+            --card-bg: #ffffff;
+            --text-main: #333333;
+            --text-muted: #666666;
+            --border: #e0e0e0;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .dashboard-container {
+            width: 100%;
+            max-width: 1200px;
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.05);
+            padding: 10px;
+            box-sizing: border-box;
+        }
+        .header-title {
+            margin-top: 0;
+            font-size: 30px;
+            font-weight: 1000;
+            color: var(--text-main);
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 5px;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+		.chart-container {
+            position: relative;
+            height: calc(100vh - 175px); /* Usa 100% da altura da tela (vh), descontando o tamanho do painel de botões */
+            min-height: 425px; /* Garante que nunca fique esmagado em telas pequenas */
+            width: 100%;
+        }
+        
+        /* Modalzinho de Atalhos (Toast) */
+        .toast-shortcuts {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: rgba(30, 35, 45, 0.95);
+            color: #ffffff;
+            padding: 15px 20px;
+            border-radius: 8px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 14px;
+            line-height: 1.6;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+            pointer-events: none; /* Não atrapalha o clique do usuário nas coisas por trás */
+            z-index: 9999;
+        }
+        .toast-shortcuts.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .toast-mono {
+            font-family: 'Consolas', 'Courier New', monospace;
+            color: #F1C40F;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <div id="toast-shortcuts" class="toast-shortcuts"></div>
+    
+        <h1 class="header-title"><span title="Carreiras de Gestão Governamental">CGG</span> x <span title="Carreiras de Auditoria Federal">CAF</span> x <span title="Carreiras da Área Jurídica">CAJ</span> x <span title="Carreira Policial Federal">CPF</span></h1>
+
+        <div class="controls-grid" style="display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-end; background: #ededed; padding: 0px 20px 10px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 10px; width: 100%; box-sizing: border-box;">
+            
+            <!-- Grupo 1: Seleção de Séries -->
+            <div id="container-series1" style="display: flex; flex-direction: column; gap: 2px; flex-shrink: 0;">
+                <u><b><label id="label-series1" style="font-size: 13px; font-weight: 666; color: var(--text-muted); cursor: default;">Desafiante</label></b></u>
+                <select id="series1" style="width: 180px; padding: 4px 8px; border-radius: 4px; border: 1px solid #ccc; font-size: 14px; background: #fff; height: 30px; outline: none; box-sizing: border-box;"></select>
+            </div>
+
+            <!-- Botões Swap/Navegação -->
+            <div id="wrapper-nav-btns" style="display: flex; align-items: center; gap: 2px; height: 30px; flex-shrink: 0;">
+                <button id="btn-swap" style="cursor:pointer; padding: 0px 5px; background:#fff; border:1px solid #ccc; border-radius:4px; width:30px; height:30px; font-size:24px;" title="Inverter">⇄</button>
+                <button id="btn-prev" style="display:none; cursor:pointer; padding: 0px 8px; background:#fff; border:1px solid #ccc; border-radius:4px; width:30px; height:30px; font-size:16px;" title="Anterior">◀</button>
+                <button id="btn-next" style="display:none; cursor:pointer; padding: 0px 10px; background:#fff; border:1px solid #ccc; border-radius:4px; width:30px; height:30px; font-size:16px;" title="Próximo">▶</button>
+                <button id="btn-clear1" style="cursor:pointer; padding: 0px 6px; background:#fff; border:1px solid #ccc; border-radius:4px; width:30px; height:30px; font-weight:bold; font-size:18px;" title="Limpar">✖</button>
+            </div>
+
+            <!-- Grupo 2: Desafiado (Apenas Comparativo) -->
+            <div id="container-series2" style="display: flex; flex-direction: column; gap: 2px; flex-shrink: 0;">
+                <u><b><label style="font-size: 13px; font-weight: 666; color: var(--text-muted); cursor: default;">Desafiado</label></b></u>
+                <select id="series2" style="width: 180px; padding: 4px 8px; border-radius: 4px; border: 1px solid #ccc; font-size: 14px; background: #fff; height: 30px; outline: none; box-sizing: border-box;"></select>
+            </div>
+            
+            <div id="wrapper-clear2" style="display: flex; align-items: center; height: 30px; flex-shrink: 0;">
+                <button id="btn-clear2" style="cursor:pointer; padding: 0px 6px; background:#fff; border:1px solid #ccc; border-radius:4px; width:30px; height:30px; font-weight:bold; font-size:18px;" title="Limpar">✖</button>
+            </div>
+
+            <!-- Grupo Filtros: Período (Avulso) -->
+            <div id="container-datas" style="display: none; flex-direction: column; gap: 2px; flex-shrink: 0;">
+                <u><b><label style="font-size: 13px; font-weight: 666; color: var(--text-muted); cursor: default;">Período</label></b></u>
+                <div style="display: flex; gap: 2px; align-items: center; height: 30px;">
+                    <select id="data-inicio" style="width: 80px; padding: 4px 5px; border-radius: 4px; border: 1px solid #ccc; font-size: 14px; background: #fff; height: 30px; outline: none; box-sizing: border-box;"></select>
+                    <select id="data-fim" style="width: 80px; padding: 4px 5px; border-radius: 4px; border: 1px solid #ccc; font-size: 14px; background: #fff; height: 30px; outline: none; box-sizing: border-box;"></select>
+                </div>
+            </div>
+
+            <!-- Grupo Filtros: Nível (Comparativo) -->
+            <div id="container-nivel" style="display: flex; flex-direction: column; gap: 2px; flex-shrink: 0;">
+                <u><b><label style="font-size: 13px; font-weight: 666; color: var(--text-muted); cursor: default;">Nível</label></b></u>
+                <div style="display: flex; gap: 6px; align-items: center; height: 30px;">
+                    <label style="display: flex; align-items: center; gap: 1px; cursor: pointer; font-size: 14px; color: var(--text-main); margin: 0;"><input type="radio" name="nivel" value="base"> base</label>
+                    <label style="display: flex; align-items: center; gap: 1px; cursor: pointer; font-size: 14px; color: var(--text-main); margin: 0;"><input type="radio" name="nivel" value="meio"> meio</label>
+                    <label style="display: flex; align-items: center; gap: 1px; cursor: pointer; font-size: 14px; color: var(--text-main); margin: 0;"><input type="radio" name="nivel" value="topo" checked> topo</label>
+                </div>
+            </div>
+
+            <!-- Grupo: Escala (Ambos) -->
+            <div id="container-escala" style="display: flex; flex-direction: column; gap: 2px; flex-shrink: 0;">
+                <u><b><label style="font-size: 13px; font-weight: 666; color: var(--text-muted); cursor: default;">Escala</label></b></u>
+                <div style="display: flex; gap: 7px; align-items: center; height: 30px;">
+                    <label style="display: flex; align-items: center; gap: 1px; cursor: pointer; font-size: 14px; color: var(--text-main); margin: 0;"><input type="radio" name="visao" value="valor" checked> absoluto <i>(R$)</i></label>
+                    <label style="display: flex; align-items: center; gap: 1px; cursor: pointer; font-size: 14px; color: var(--text-main); margin: 0;"><input type="radio" name="visao" value="percentual"> relativo <i>(%)</i></label>
+                </div>
+            </div>
+
+            <!-- Grupo: Opções (Ambos) -->
+            <div id="wrapper-opcoes" style="display: flex; flex-direction: column; gap: 2px; flex-shrink: 0;">
+                <u><b><label style="font-size: 13px; font-weight: 666; color: var(--text-muted); cursor: default;">Opções</label></b></u>
+                <div style="display: flex; gap: 3px; align-items: center; height: 30px; padding-left: 3px">
+                    <label style="display: flex; align-items: center; gap: 3px; cursor: pointer; font-size: 14px; color: var(--text-main); margin: 0;"><input type="checkbox" id="comparativo" checked> desafio</label>
+                    <div style="display: flex; align-items: center; gap: 5px;">
+                        <label style="display: flex; align-items: center; gap: 3px; cursor: pointer; font-size: 14px; color: var(--text-main); margin: 0;"><input type="checkbox" id="rotulos"> rótulos</label>
+                        <button id="btn-font-minus" style="cursor:pointer; padding: 0px; background:#fff; border:1px solid #ccc; border-radius:4px; width:22px; height:22px; font-weight:bold; display:none; line-height:1; font-size:18px;" title="Diminuir fonte">–</button>
+                        <button id="btn-font-plus" style="cursor:pointer; padding: 0px; background:#fff; border:1px solid #ccc; border-radius:4px; width:22px; height:22px; font-weight:bold; display:none; line-height:1; font-size:18px;" title="Aumentar fonte">+</button>
+                        
+						<div class="split-action-container" id="split-container" style="position: relative; display: inline-flex; align-items: center; background: #fff; border: 1px solid #ccc; border-radius: 4px; height: 45px; margin-left: 10px; margin-bottom: 12px;">
+							<button id="btn-active-action" style="background: transparent; border: none; cursor: pointer; padding: 0 0px; padding-bottom: 10px; line-height: 1; font-size: 40px; height: 100%; display: flex; align-items: center; justify-content: center;" title="Capturar em PNG">📷</button>
+							<button id="btn-toggle-menu" style="background: transparent; border: none; border-left: 1px solid #ccc; cursor: pointer; padding: 0 6px; font-size: 15px; color: #555; height: 100%;" title="Selecionar função">▼</button>
+							
+							<div id="split-menu" style="position: absolute; top: 100%; right: 0; margin-top: 4px; background: #fff; border: 1px solid #ccc; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); display: none; flex-direction: column; padding: 4px; z-index: 1000; min-width: 40px;">
+								<button class="split-dropdown-item" data-action="snapshot" 	title="Capturar em PNG" style="background: transparent; border: none; cursor: pointer; padding: 6px 10px; font-size: 25px; transition: background 0.2s; border-radius: 4px;">📷</button>
+								<button class="split-dropdown-item" data-action="audio" 	title="Áudio em TTS"    style="background: transparent; border: none; cursor: pointer; padding: 6px 10px; font-size: 25px; transition: background 0.2s; border-radius: 4px;">🔈</button>
+								<button class="split-dropdown-item" data-action="prompt" 	title="Prompt para IA"  style="background: transparent; border: none; cursor: pointer; padding: 6px 10px; font-size: 25px; transition: background 0.2s; border-radius: 4px;">🤖</button>
+								<button class="split-dropdown-item" data-action="summary" 	title="Legenda em MD"   style="background: transparent; border: none; cursor: pointer; padding: 6px 10px; font-size: 25px; transition: background 0.2s; border-radius: 4px;">📋</button>
+								<button class="split-dropdown-item" data-action="csv" 		title="Extrair em CSV"  style="background: transparent; border: none; cursor: pointer; padding: 6px 10px; font-size: 25px; transition: background 0.2s; border-radius: 4px;">💾</button>
+							</div>
+						</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="chart-container">
+            <canvas id="mainChart"></canvas>
+        </div>
+        
+        <div class="footer-container" style="margin-top: 40px; border-top: 1px solid var(--border); padding-top: 20px; width: 100%; font-size: 13px;">
+            <h3 style="margin-top: 0; color: var(--text-muted); font-size: 15px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Fontes Gerais</h3>
+            
+            <ul style="list-style-type: none; padding-left: 0; margin-bottom: 15px; line-height: 1.8;">
+                <li>🔗 <a href="https://portaldatransparencia.gov.br/download-de-dados/servidores" target="_blank" style="color: #3498DB; text-decoration: none; font-weight: 500;">Dados Abertos do Portal da Transparência (Servidores)</a></li>
+                <li>🔗 <a href="https://www4.planalto.gov.br/legislacao" target="_blank" style="color: #3498DB; text-decoration: none; font-weight: 500;">Portal de Legislação do Palácio do Planalto (Leis, Medidas Provisórias e Decretos)</a></li>
+                <li>🔗 <a href="https://www.gov.br/receitafederal/pt-br/acesso-a-informacao/participacao-social/conselhos-e-orgaos-colegiados/comite-gestor-do-programa-de-produtividade-da-receita-federal" target="_blank" style="color: #3498DB; text-decoration: none; font-weight: 500;">Comitê Gestor do Programa de Produtividade da Receita Federal do Brasil (CGPP-RFB)</a></li>
+                <li>🔗 <a href="https://www.gov.br/agu/pt-br/comunicacao/noticias/painel-amplia-transparencia-de-informacoes-sobre-honorarios-sucumbenciais" target="_blank" style="color: #3498DB; text-decoration: none; font-weight: 500;">Painel do Conselho Curador dos Honorários Advocatícios de Sucumbência e da eficiência institucional da Advocacia-Geral da União (CCHA-AGU)</a></li>
+            </ul>
+
+            <details style="cursor: pointer; outline: none;">
+                <summary style="font-weight: 600; color: var(--text-muted); user-select: none; display: inline-block; padding: 5px 10px; background: #fdfbf7; border: 1px solid var(--border); border-radius: 4px;">
+                    Fontes Específicas ▾
+                </summary>
+                
+                <div style="margin-top: 10px; padding: 20px; background-color: #fdfbf7; border: 1px solid var(--border); border-radius: 8px; color: var(--text-main);">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+                        <div>
+                            <strong style="color: var(--text-muted);">Portal da Transparência</strong>
+                            <ul style="padding-left: 20px; margin-top: 5px; margin-bottom: 0;">
+                                <li><a href="#" target="_blank" style="color: #666; text-decoration: underline;">Tabelas de Remuneração Mensal (ZIP)</a></li>
+                                <li><a href="#" target="_blank" style="color: #666; text-decoration: underline;">Dicionário de Dados do Cadastro</a></li>
+                            </ul>
+                        </div>
+                        <div>
+                            <strong style="color: var(--text-muted);">Portal do Planalto</strong>
+                            <ul style="padding-left: 20px; margin-top: 5px; margin-bottom: 0;">
+                                <li><a href="#" target="_blank" style="color: #666; text-decoration: underline;">Lei nº 13.464, de 10 de julho de 2017</a></li>
+                                <li><a href="#" target="_blank" style="color: #666; text-decoration: underline;">Decreto nº 11.545, de 5 de junho de 2023</a></li>
+                            </ul>
+                        </div>
+                        <div>
+                            <strong style="color: var(--text-muted);">CGPP-RFB</strong>
+                            <ul style="padding-left: 20px; margin-top: 5px; margin-bottom: 0;">
+                                <li><a href="#" target="_blank" style="color: #666; text-decoration: underline;">Resoluções CGPP (2024 e 2025)</a></li>
+                                <li><a href="#" target="_blank" style="color: #666; text-decoration: underline;">Memória de Cálculo do Índice de Eficiência Institucional</a></li>
+                            </ul>
+                        </div>
+                        <div>
+                            <strong style="color: var(--text-muted);">CCHA-AGU</strong>
+                            <ul style="padding-left: 20px; margin-top: 5px; margin-bottom: 0;">
+                                <li><a href="#" target="_blank" style="color: #666; text-decoration: underline;">Relatórios de Arrecadação de Honorários</a></li>
+                                <li><a href="#" target="_blank" style="color: #666; text-decoration: underline;">Resoluções CCHA Ativas</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </details>
+        </div>
+    </div>
+
+    <script>
+/*
+// 1. Dicionário Único de URLs (Índice = ID)
+const fontesUrls = [
+	"https://www.planalto.gov.br/ccivil_03/_ato2007-2010/2008/mpv/anexos/anmpv440.htm#AnexoIV", // 0
+	"https://www.planalto.gov.br/ccivil_03/_ato2007-2010/2008/mpv/anexos/anmpv440.htm#AnexoII", // 1
+	"https://www.planalto.gov.br/ccivil_03/_ato2007-2010/2008/mpv/anexos/anmpv440.htm#AnexoIII", // 2
+	"https://www.planalto.gov.br/ccivil_03/_ato2007-2010/2008/lei/anexos/anl11890-01-10a.htm#AnexoIV", // 3
+	"https://www.planalto.gov.br/ccivil_03/_ato2007-2010/2008/lei/anexos/anl11890-01-10a.htm#AnexoII", // 4
+	"https://www.planalto.gov.br/ccivil_03/_ato2007-2010/2008/lei/anexos/anl11890-01-10a.htm#AnexoIII", // 5
+	"https://www.planalto.gov.br/ccivil_03/_ato2011-2014/2012/lei/l12775.htm#AnexoIV", // 6
+	"https://www.planalto.gov.br/ccivil_03/_ato2011-2014/2013/lei/l12808.htm#anexoi", // 7
+	"https://www.planalto.gov.br/ccivil_03/_ato2011-2014/2012/lei/l12775.htm#AnexoXII", // 8
+	"https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2016/lei/l13327.htm#anexoi", // 9
+	"https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2016/lei/l13327.htm#anexoxxxv", // 10
+	"https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2016/mpv/mpv765.htm#Art20", // 11
+	"https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2016/mpv/mpv765.htm#AnexoVII", // 12
+	"https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2017/lei/l13464.htm#anexo7", // 13
+	"https://www.planalto.gov.br/ccivil_03/_ato2023-2026/2023/mpv/mpv1170anexo2.htm#anexo134", // 14
+	"https://www.planalto.gov.br/ccivil_03/_ato2023-2026/2023/mpv/mpv1170anexo2.htm#anexo127", // 15
+	"https://www.planalto.gov.br/ccivil_03/_ato2023-2026/2023/lei/l14673anexo4.htm#anexo150", // 16
+	"https://www.planalto.gov.br/ccivil_03/_ato2023-2026/2023/decreto/d11545.htm#Art8%C2%A72", // 17
+	"https://www.planalto.gov.br/ccivil_03/_ato2023-2026/2024/mpv/anexos/mpv1286anexo254a321.htm#anexo320", // 18
+	"https://www.planalto.gov.br/ccivil_03/_ato2023-2026/2024/mpv/anexos/mpv1286anexo254a321.htm#anexo321", // 19
+	"https://www.planalto.gov.br/ccivil_03/_ato2023-2026/2025/lei/anexo/anexo254a323-lei15141.htm#anexo320", // 20
+	"https://www.planalto.gov.br/ccivil_03/_ato2023-2026/2026/lei/l15367.htm#anexo12", // 21
+	"https://www.planalto.gov.br/ccivil_03/_ato2023-2026/2025/lei/anexo/anexo254a323-lei15141.htm#anexo321", // 22
+	"https://www.gov.br/receitafederal/pt-br/acesso-a-informacao/participacao-social/conselhos-e-orgaos-colegiados/comite-gestor-do-programa-de-produtividade-da-receita-federal/resolucoes/resolucao-cgpp-no-11-de-02-de-julho-de-2026-bs.pdf/@@download/file", // 23
+	"https://www.gov.br/receitafederal/pt-br/acesso-a-informacao/participacao-social/conselhos-e-orgaos-colegiados/comite-gestor-do-programa-de-produtividade-da-receita-federal/resolucoes/resolucao-cgpp-no-11-de-02-de-julho-de-2026-bs.pdf/view" // 24
+];
+
+// 2. Mapeamento CSV Célula:ID_URL
+const mapaCelulasCSV = "B2:0,C2:0,D2:0,E2:0,F2:1,G2:1,H2:1,I2:1,J2:2,K2:2,B3:3,C3:3,D3:3,E3:3,B4:3,C4:3,D4:3,E4:3,B7:3,C7:3,D7:3,E7:3,F3:4,G3:4,H3:4,I3:4,F4:4,G4:4,H4:4,I4:4,J3:5,K3:5,J4:5,K4:5,B5:6,C5:6,D5:6,E5:6,B6:6,C6:6,D6:6,E6:6,F5:7,G5:7,H5:7,I5:7,F6:7,G6:7,H6:7,I6:7,F7:7,G7:7,H7:7,I7:7,J5:8,K5:8,J6:8,K6:8,J7:8,K7:8,B8:9,C8:9,D8:9,E8:9,B11:9,C11:9,D11:9,E11:9,B12:9,C12:9,D12:9,E12:9,B13:9,C13:9,D13:9,E13:9,J8:10,K8:10,J11:10,K11:10,J12:10,K12:10,J13:10,K13:10,G9:11,I9:11,F10:12,G10:12,H10:12,I10:12,F11:12,G11:12,H11:12,I11:12,F12:13,G12:13,H12:13,I12:13,F13:13,G13:13,H13:13,I13:13,B19:14,C19:14,D19:14,E19:14,F19:15,G19:15,H19:15,I19:15,J19:16,K19:16,G20:17,I20:17,G21:17,I21:17,G23:17,I23:17,G25:17,I25:17,B22:18,C22:18,D22:18,E22:18,J22:19,K24:19,B26:20,C26:20,D26:20,E26:20,G26:21,I26:21,J26:22,K26:22,G27:23,I27:24";
+
+// 3. Tradutor de Colunas (Batalha Naval)
+const dicionarioColunas = {
+	'B': 'TFFC (base)',
+	'C': 'TFFC (topo)',
+	'D': 'AFFC (base)',
+	'E': 'AFFC (topo)',
+	'F': 'ATRFB (base)',
+	'G': 'ATRFB (topo)',
+	'H': 'AFRFB (base)',
+	'I': 'AFRFB (topo)',
+	'J': 'PFN (base)',
+	'K': 'PFN (topo)'
+};
+
+// 4. Tradutor de Linhas para Data (MM/AAAA)
+const dicionarioLinhas = {
+	'2': '07/2008', '3': '07/2009', '4': '07/2010', '5': '01/2013', '6': '01/2014',
+	'7': '01/2015', '8': '08/2016', '9': '09/2016', '10': '12/2016', '11': '01/2017',
+	'12': '01/2018', '13': '01/2019', '14': '01/2020', '15': '01/2021', '16': '01/2022',
+	'17': '02/2023', '18': '04/2023', '19': '05/2023', '20': '02/2024', '21': '08/2024',
+	'22': '01/2025', '23': '02/2025', '24': '06/2025', '25': '02/2026', '26': '04/2026',
+	'27': '02/2027'
+};
+
+// ==========================================
+// BASES DE DOMÍNIOS (Para otimização de strings)
+// ==========================================
+const dominioPlanalto = "https://www.planalto.gov.br/ccivil_03/_ato";
+const dominioReceitaFederal = "https://www.gov.br/receitafederal/pt-br/acesso-a-informacao/participacao-social/conselhos-e-orgaos-colegiados/comite-gestor-do-programa-de-produtividade-da-receita-federal";
+const baseCCHA = "https://app.powerbi.com/view?r=eyJrIjoiNjNkYWJkNmYtZGQ1OS00ZTQ1LTg3ZWUtNmI3ODU2YzhmNzJiIiwidCI6IjRkNzlkMzdhLTFlNGUtNGEzOS05ZmRlLWYxNjMxY2I2MDdkNCJ9";
+
+// ==========================================
+// MAPEAMENTO DO PORTAL DO PLANALTO
+// ==========================================
+const urlsPlanalto = [
+	`${dominioPlanalto}2007-2010/2008/mpv/anexos/anmpv440.htm#AnexoIV`,
+	`${dominioPlanalto}2007-2010/2008/mpv/anexos/anmpv440.htm#AnexoII`,
+	`${dominioPlanalto}2007-2010/2008/mpv/anexos/anmpv440.htm#AnexoIII`,
+	`${dominioPlanalto}2007-2010/2008/lei/anexos/anl11890-01-10a.htm#AnexoIV`,
+	`${dominioPlanalto}2007-2010/2008/lei/anexos/anl11890-01-10a.htm#AnexoII`,
+	`${dominioPlanalto}2007-2010/2008/lei/anexos/anl11890-01-10a.htm#AnexoIII`,
+	`${dominioPlanalto}2011-2014/2012/lei/l12775.htm#AnexoIV`,
+	`${dominioPlanalto}2011-2014/2013/lei/l12808.htm#anexoi`,
+	`${dominioPlanalto}2011-2014/2012/lei/l12775.htm#AnexoXII`,
+	`${dominioPlanalto}2015-2018/2016/lei/l13327.htm#anexoi`,
+	`${dominioPlanalto}2015-2018/2016/lei/l13327.htm#anexoxxxv`,
+	`${dominioPlanalto}2015-2018/2016/mpv/mpv765.htm#Art20`,
+	`${dominioPlanalto}2015-2018/2016/mpv/mpv765.htm#AnexoVII`,
+	`${dominioPlanalto}2015-2018/2017/lei/l13464.htm#anexo7`,
+	`${dominioPlanalto}2023-2026/2023/mpv/mpv1170anexo2.htm#anexo134`,
+	`${dominioPlanalto}2023-2026/2023/mpv/mpv1170anexo2.htm#anexo127`,
+	`${dominioPlanalto}2023-2026/2023/lei/l14673anexo4.htm#anexo150`,
+	`${dominioPlanalto}2023-2026/2023/decreto/d11545.htm#Art8%C2%A72`,
+	`${dominioPlanalto}2023-2026/2024/mpv/anexos/mpv1286anexo254a321.htm#anexo320`,
+	`${dominioPlanalto}2023-2026/2024/mpv/anexos/mpv1286anexo254a321.htm#anexo321`,
+	`${dominioPlanalto}2023-2026/2025/lei/anexo/anexo254a323-lei15141.htm#anexo320`,
+	`${dominioPlanalto}2023-2026/2026/lei/l15367.htm#anexo12`,
+	`${dominioPlanalto}2023-2026/2025/lei/anexo/anexo254a323-lei15141.htm#anexo321`
+];
+
+// ==========================================
+// MAPEAMENTO DO CGPP - RECEITA FEDERAL
+// ==========================================
+// Função auxiliar para gerar a URL dinâmica do PDF do Bônus de Eficiência (Ano a Ano)
+const getUrlBonusRFB = (ano, mes) => {
+	if (ano === 2023) return `${dominioReceitaFederal}/bonus-de-eficiencia-e-produtividade/2023/valores-do-bonus-de-eficiencia-ate-dezembro-2023.pdf`;
+	
+	// Converte mês '08' para nome completo 'agosto', por exemplo. (Você precisará de uma função mapMonth se não tiver uma).
+	const mapMonth = {'01':'janeiro', '02':'fevereiro', '03':'marco', '04':'abril', '05':'maio', '06':'junho', '07':'julho', '08':'agosto', '09':'setembro', '10':'outubro', '11':'novembro', '12':'dezembro'};
+	return `${dominioReceitaFederal}/bonus-de-eficiencia-e-produtividade/${ano}/valores-do-bonus-de-eficiencia-${mapMonth[mes]}-${ano}.pdf`;
+};
+
+// Outras URLs institucionais da Receita
+const urlsReceitaFederal = {
+	indiceEficiencia: `${dominioReceitaFederal}/indice-de-eficiencia-institucional`,
+	bonusEficiencia: `${dominioReceitaFederal}/bonus-de-eficiencia-e-produtividade`,
+	arrecadacaoFundaf: `${dominioReceitaFederal}/arrecadacao-fundaf`,
+	legislacao: `${dominioReceitaFederal}/legislacao`,
+	resolucoes: `${dominioReceitaFederal}/resolucoes`,
+	relatorios: `${dominioReceitaFederal}/relatorios`,
+	notas: `${dominioReceitaFederal}/notas`,
+	notasTecnicas: `${dominioReceitaFederal}/notas/NotasTecnicas`,
+	baseCalculo: `${dominioReceitaFederal}/notas/base-de-calculo-do-bonus-de-eficiencia-e-produtividade`,
+	atasReunioes: `https://www.gov.br/receitafederal/pt-br/centrais-de-conteudo/atas-e-pautas/comite-gestor-do-programa-de-produtividade-da-receita-federal/atas-de-reunioes-do-cgpp/`,
+	membros: `${dominioReceitaFederal}/membros`,
+	resolucao11: `${dominioReceitaFederal}/resolucoes/resolucao-cgpp-no-11-de-02-de-julho-de-2026-bs.pdf/@@download/file`,
+	resolucao11_view: `${dominioReceitaFederal}/resolucoes/resolucao-cgpp-no-11-de-02-de-julho-de-2026-bs.pdf/view`
+};
+
+// ==========================================
+// MAPEAMENTO DO CCHA - AGU (POWER BI)
+// ==========================================
+const urlsCCHA = {
+	painelPrincipal: `${baseCCHA}&pageName=951fb5b48411cd406c02`,
+	infoRelevantes: `${baseCCHA}&pageName=ReportSection`, 
+	honorariosResultados: `${baseCCHA}&pageName=ReportSection1`, 
+	detalhamentoDistribuicao: `${baseCCHA}&pageName=ReportSection2`  
+};
+
+// ==========================================
+// MATRIZ DE BATALHA NAVAL (Planilha -> URL)
+// ==========================================
+const mapaCelulasCSV = "B2:0,C2:0,D2:0,E2:0,F2:1,G2:1,H2:1,I2:1,J2:2,K2:2,B3:3,C3:3,D3:3,E3:3,B4:3,C4:3,D4:3,E4:3,B7:3,C7:3,D7:3,E7:3,F3:4,G3:4,H3:4,I3:4,F4:4,G4:4,H4:4,I4:4,J3:5,K3:5,J4:5,K4:5,B5:6,C5:6,D5:6,E5:6,B6:6,C6:6,D6:6,E6:6,F5:7,G5:7,H5:7,I5:7,F6:7,G6:7,H6:7,I6:7,F7:7,G7:7,H7:7,I7:7,J5:8,K5:8,J6:8,K6:8,J7:8,K7:8,B8:9,C8:9,D8:9,E8:9,B11:9,C11:9,D11:9,E11:9,B12:9,C12:9,D12:9,E12:9,B13:9,C13:9,D13:9,E13:9,J8:10,K8:10,J11:10,K11:10,J12:10,K12:10,J13:10,K13:10,G9:11,I9:11,F10:12,G10:12,H10:12,I10:12,F11:12,G11:12,H11:12,I11:12,F12:13,G12:13,H12:13,I12:13,F13:13,G13:13,H13:13,I13:13,B19:14,C19:14,D19:14,E19:14,F19:15,G19:15,H19:15,I19:15,J19:16,K19:16,G20:17,I20:17,G21:17,I21:17,G23:17,I23:17,G25:17,I25:17,B22:18,C22:18,D22:18,E22:18,J22:19,K24:19,B26:20,C26:20,D26:20,E26:20,G26:21,I26:21,J26:22,K26:22";
+
+// ==========================================
+// BASES DE DOMÍNIOS (Para otimização de strings)
+// ==========================================
+const dominioPlanalto = "https://www.planalto.gov.br/ccivil_03/_ato";
+const dominioReceitaFederal = "https://www.gov.br/receitafederal/pt-br/acesso-a-informacao/participacao-social/conselhos-e-orgaos-colegiados/comite-gestor-do-programa-de-produtividade-da-receita-federal";
+const dominioEnap = "https://repositorio.enap.gov.br";
+const baseCCHA = "https://app.powerbi.com/view?r=eyJrIjoiNjNkYWJkNmYtZGQ1OS00ZTQ1LTg3ZWUtNmI3ODU2YzhmNzJiIiwidCI6IjRkNzlkMzdhLTFlNGUtNGEzOS05ZmRlLWYxNjMxY2I2MDdkNCJ9";
+
+// ... (aqui ficam as urlsPlanalto, urlsReceitaFederal e urlsCCHA que já mapeamos) ...
+
+// ==========================================
+// MAPEAMENTO ESAF / ENAP / CGU (Histórico de Concursos)
+// ==========================================
+const urlsESAF = {
+	noticiaCGU2008: "https://www.gov.br/cgu/pt-br/assuntos/noticias/2008/05/sai-resultado-de-concurso-para-analista-e-tecnico-da-cgu",
+	repositorioEnap: `${dominioEnap}/handle/1/5504`,
+	editalRegulador: `${dominioEnap}/bitstream/1/5504/4/edital-2%20regulador.pdf`,
+	anexo1: `${dominioEnap}/bitstream/1/5504/3/anexo-i1.pdf`
+};		
+*/
+	
+        // 1. Cria a regra global de fundo branco para o Canvas
+        const customCanvasBackgroundColor = {
+            id: 'customCanvasBackgroundColor',
+            beforeDraw: (chart, args, options) => {
+                const {ctx} = chart;
+                ctx.save();
+                ctx.globalCompositeOperation = 'destination-over';
+                ctx.fillStyle = '#fcfcfc';
+                ctx.fillRect(0, 0, chart.width, chart.height);
+                ctx.restore();
+            }
+        };
+
+		// Dicionário Semântico para alimentar as IAs Externas
+        const glossarioSiglas = {
+			"CGG": "Carreiras de Gestão Governamental",
+            "CFC": "Carreira de Finanças e Controle",
+            "TFFC": "Técnico Federal de Finanças e Controle",
+            "AFFC": "Auditor Federal de Finanças e Controle",
+            "CAF": "Carreiras de Auditoria Federal",
+            "ATRFB": "Analista-Tributário da Receita Federal do Brasil",
+            "AFRFB": "Auditor-Fiscal da Receita Federal do Brasil",
+            "CAJ": "Carreiras da Área Jurídica",
+            "PFN": "Procurador da Fazenda Nacional",
+            "CPF": "Carreira Policial Federal",
+			"APF": "Agente de Polícia Federal",
+			"EPF": "Escrivão de Polícia Federal",
+			"PPF": "Papiloscopista Policial Federal",
+			"DPF": "Delegado de Polícia Federal",
+			"PCF": "Perito Criminal Federal",
+            "CGPP": "Comitê Gestor do Programa de Produtividade da Receita Federal",
+            "CCHA": "Conselho Curador dos Honorários Advocatícios",
+            "VB": "Vencimento Básico",
+            "BEP": "Bônus de Eficiência e Produtividade",
+            "HAS": "Honorários Advocatícios de Sucumbência",
+			"GCG": "Gratificação de Desempenho de Atividade do Ciclo de Gestão",
+			"GDAT": "Gratificação de Desempenho de Atividade Tributária",
+			"GDAJ": "Gratificação de Desempenho de Atividade Jurídica"
+        };
+
+        // 2. NOVO PLUGIN GLOBAL: Balão Flutuante de Resolução
+        const balaoResolucao = {
+            id: 'balaoResolucao',
+            afterDraw: (chart) => {
+                const comparativoEl = document.getElementById('comparativo');
+                const series1El = document.getElementById('series1');
+                
+                if (!comparativoEl || !series1El) return;
+                
+                // Exibe APENAS no modo avulso e na série específica
+                if (!comparativoEl.checked && series1El.value === 'CGPP | Dados da Apuração | Valor unitário por cota (=)') {
+                    const { ctx, chartArea } = chart;
+                    if (!chartArea) return; // Segurança caso o canvas ainda esteja carregando
+                    
+                    const text = "Apuração realizada de acordo com a Resolução CGPP nº 8, de 30 de abril de 2025";
+                    
+                    ctx.save();
+                    ctx.font = "bold 13px 'Segoe UI', Tahoma, sans-serif";
+                    
+                    // Calcula largura dinâmica da pílula (texto + bolinhas + margens)
+                    const textWidth = ctx.measureText(text).width;
+                    const boxWidth = textWidth + 50; 
+                    const boxHeight = 28; 
+                    
+                    // Posição: Centralizado horizontalmente e 20px abaixo do teto do gráfico
+                    const cx = chartArea.left + (chartArea.right - chartArea.left) / 2;
+                    const cy = chartArea.top + 20; 
+                    
+                    // Fundo do balão
+                    ctx.fillStyle = "rgba(248, 249, 250, 0.9)";
+                    ctx.strokeStyle = "#ced4da";
+                    ctx.lineWidth = 1;
+                    ctx.beginPath();
+                    if (ctx.roundRect) {
+                        ctx.roundRect(cx - (boxWidth/2), cy - (boxHeight/2), boxWidth, boxHeight, 14);
+                    } else {
+                        ctx.rect(cx - (boxWidth/2), cy - (boxHeight/2), boxWidth, boxHeight);
+                    }
+                    ctx.fill();
+                    ctx.stroke();
+                    
+                    const startX = cx - (boxWidth/2) + 15;
+                    
+                    // Bolinha Laranja
+                    ctx.fillStyle = '#F79646';
+                    ctx.beginPath();
+                    ctx.arc(startX, cy, 5, 0, 2 * Math.PI);
+                    ctx.fill();
+                    
+                    // Bolinha Roxa
+                    ctx.fillStyle = '#7030A0';
+                    ctx.beginPath();
+                    ctx.arc(startX + 14, cy, 5, 0, 2 * Math.PI);
+                    ctx.fill();
+                    
+                    // Texto
+                    ctx.fillStyle = "#495057"; 
+                    ctx.textAlign = "left";
+                    ctx.textBaseline = "middle";
+                    ctx.fillText(text, startX + 24, cy);
+                    
+                    ctx.restore();
+                }
+            }
+        };
+
+        // 3. Registra TODOS os plugins nativamente na raiz do Chart.js
+        Chart.register(ChartDataLabels, customCanvasBackgroundColor, balaoResolucao);
+
+        const ctx = document.getElementById('mainChart').getContext('2d');
+        let myChart;
+        
+        let currentLabelFontSize = 15;
+        let userFontOverridden = false;
+        
+        let toastShownAvulso = false;
+        let toastShownDesafio = false;
+        let toastTimeout;
+
+        // Função que exibe a colinha de atalhos
+        function showShortcutsToast(isComp) {
+            if (isComp && toastShownDesafio) return; // Se já mostrou no Desafio, não mostra mais
+            if (!isComp && toastShownAvulso) return; // Se já mostrou no Avulso, não mostra mais
+/*
+            if (isComp) toastShownDesafio = true;
+            else toastShownAvulso = true;
+*/
+            const toast = document.getElementById('toast-shortcuts');
+            
+            // Remove a visibilidade atual e limpa o timer anterior (se houver)
+            clearTimeout(toastTimeout);
+            toast.classList.remove('show');
+            
+            // Dá um respiro minúsculo pro navegador processar a saída e re-animar a entrada
+            setTimeout(() => {
+                let htmlContent = '<strong style="font-size: 15px;">ATALHOS</strong><br><br>'
+                                + ' Zoom:  <span class="toast-mono">⇧+▲|▼<i>(shift)</i></span><br>'   //⬆|⬇ 
+                                + ' Rolar: <span class="toast-mono">⇧+◀︎|▶︎<i>(shift)</i></span><br>'   //⬅|⮕
+                                + ' Escalas: <span class="toast-mono"><u>absoluto</u>:$(⇧+4) <u>relativo</u>:%(⇧+5)</span><br>'
+                                + ' Opções: <span class="toast-mono"><u>desafio</u>:#(⇧+3) <u>rótulos</u>:@(⇧+2)</span><br>';
+                if (isComp) {
+                    htmlContent += ' Inverter: <span class="toast-mono">␣<i>(space)</i></span><br>'
+                                 + ' Níveis: <span class="toast-mono"><u>base</u>:1 <u>meio</u>:2 <u>topo</u>:3</span><br>';
+                } else {
+                    htmlContent += ' Navegar: <span class="toast-mono">◀︎|▶︎</span><br>';
+                }
+                
+                htmlContent += ' Rótulos: <span class="toast-mono">–|+ </span><br>'   //➖|➕
+                             + ' Limpar: <span class="toast-mono">X</span><br>';   //✖️
+                    
+                toast.innerHTML = htmlContent;
+                toast.classList.add('show');
+    
+                clearTimeout(toastTimeout);
+                toastTimeout = setTimeout(() => {
+                    toast.classList.remove('show');
+                }, 10000); // O modalzinho some sozinho após 10 segundos
+            }, 500);
+        }
+		
+		function showCustomToast(htmlMessage, duration = 6000) {
+            const toast = document.getElementById('toast-shortcuts');
+            clearTimeout(toastTimeout);
+            toast.classList.remove('show');
+            setTimeout(() => {
+                toast.innerHTML = htmlMessage;
+                toast.classList.add('show');
+                toastTimeout = setTimeout(() => toast.classList.remove('show'), duration);
+            }, 100);
+        }
+		
+
+        const chavesTSV = Object.keys(dbData).filter(k => 
+            k !== 'Competencia' && 
+            !k.startsWith('CGPP') && 
+            !k.startsWith('CCHA') &&
+            dbData[k].every(v => v !== null)
+        );
+
+        const tsvCargos = [...new Set(chavesTSV.map(k => k.replace(/ \((base|meio|topo)\)$/i, '')))];
+        
+        const allSeriesKeys = Object.keys(dbData).filter(k => 
+            k !== 'Competencia' && 
+            !k.toLowerCase().includes('período analisado') && 
+            k !== 'CGPP | Dados da Apuração | Valor unitário máximo por cota (=)' &&
+            k !== 'CGPP | Dados da Apuração | Limite valor unitário da cota' &&
+            k !== 'CGPP | Dados da Apuração | Valor unitário por cota ajustado (=)' &&
+            dbData[k].some(v => typeof v === 'number')
+        );
+
+        const select1 = document.getElementById('series1');
+        const select2 = document.getElementById('series2');
+        const selectInicio = document.getElementById('data-inicio');
+        const selectFim = document.getElementById('data-fim');
+        
+        const chkComparativo = document.getElementById('comparativo');
+        const chkRotulos = document.getElementById('rotulos');
+        
+        const rdVisao = document.querySelectorAll('input[name="visao"]');
+
+        dbData.Competencia.forEach(d => {
+            selectInicio.add(new Option(d, d));
+            selectFim.add(new Option(d, d));
+        });
+        selectInicio.selectedIndex = 0;
+        selectFim.selectedIndex = selectFim.options.length - 1;
+
+        const intervalos = {
+            '50%': ' (12 < TA ≤ 24)', '75%': ' (24 < TA ≤ 36)', '100%': ' (TA > 36)',
+            '93%': ' (12 < T1 ≤ 24)', '86%': ' (24 < T1 ≤ 36)', '79%': ' (36 < T1 ≤ 48)',
+            '72%': ' (48 < T1 ≤ 60)', '65%': ' (60 < T1 ≤ 72)', '58%': ' (72 < T1 ≤ 84)',
+            '51%': ' (84 < T1 ≤ 96)', '44%': ' (96 < T1 ≤ 108)', '35%': ' (T1 > 108)',
+            '93,00%': ' (12 < T1 ≤ 24)', '86,49%': ' (24 < T1 ≤ 36)', '80,44%': ' (36 < T1 <= 48)',
+            '74,81%': ' (48 < T1 ≤ 60)', '69,57%': ' (60 < T1 ≤ 72)', '64,70%': ' (72 < T1 ≤ 84)',
+            '60,17%': ' (84 < T1 ≤ 96)', '55,96%': ' (96 < T1 ≤ 108)', '52,04%': ' (T1 > 108)'
+        };
+
+        function formatSerieOption(serie) {
+            let parts = serie.split(' | ');
+            if (parts.length > 2 && parts[parts.length-1].includes('%')) {
+                let pct = parts[parts.length-1].trim();
+                if (intervalos[pct]) return serie + intervalos[pct];
+            }
+            return serie;
+        }
+
+        function isQuantityOrIndex(s) {
+            let sl = s.toLowerCase();
+            return sl.includes('quantidade') || sl.includes('contagem') || sl.includes('índice') || sl.includes('indice');
+        }
+
+        function getRefSeries(serieName) {
+            if (serieName.includes('CGPP | AFRFB') && serieName.includes('%')) {
+                return "CGPP | Dados da Apuração | Bônus Mensal Máximo Auditor";
+            }
+            if (serieName.includes('CGPP | ATRFB') && serieName.includes('%')) {
+                return "CGPP | Dados da Apuração | Bônus Mensal Máximo Analista";
+            }
+            return null;
+        }
+
+        function updateNivelState() {
+            if (chkComparativo.checked) {
+                const s1 = select1.value, s2 = select2.value;
+                const hasLevel = (s1 && dbData[s1 + ' (topo)']) || (s2 && dbData[s2 + ' (topo)']);
+                document.querySelectorAll('input[name="nivel"]').forEach(el => el.disabled = !hasLevel);
+            }
+        }
+
+        function updateSelectOptions(isInitialization = false) {
+            const isComp = chkComparativo.checked;
+            const val1 = select1.value;
+            const val2 = select2.value;
+            select1.innerHTML = '';
+            select2.innerHTML = '';
+
+            // Adiciona a opção vazia no topo sempre
+            select1.add(new Option('', ''));
+            select2.add(new Option('', ''));
+
+            if (isComp) {
+                tsvCargos.forEach(cargo => {
+                    select1.add(new Option(cargo, cargo));
+                    select2.add(new Option(cargo, cargo));
+                });
+                
+                if (isInitialization) {
+                    select1.value = '';
+                    select2.value = '';
+                } else {
+                    select1.value = tsvCargos.includes(val1) ? val1 : (val1 ? val1 : '');
+                    select2.value = tsvCargos.includes(val2) && val2 !== select1.value ? val2 : (val2 ? val2 : '');
+                    
+                    Array.from(select2.options).forEach(opt => {
+                        if (opt.value && opt.value === select1.value) opt.disabled = true;
+                    });
+                    
+                    if (select2.options[select2.selectedIndex] && select2.options[select2.selectedIndex].disabled) {
+                        select2.value = Array.from(select2.options).find(o => !o.disabled && o.value !== '').value || '';
+                    }
+                    
+                    Array.from(select1.options).forEach(opt => {
+                        if (opt.value && opt.value === select2.value) opt.disabled = true;
+                    });
+                }
+                updateNivelState();
+            } else {
+                allSeriesKeys.forEach(serie => {
+                    select1.add(new Option(formatSerieOption(serie), serie));
+                });
+                
+                if (isInitialization) {
+                    select1.value = '';
+                } else {
+                    select1.value = dbData[val1] ? val1 : (val1 ? val1 : '');
+                }
+            }
+        }
+
+        function handleUI(isInitialization = false) {
+            const isComp = chkComparativo.checked;
+            const containerS1 = document.getElementById('container-series1');
+            const selectS1 = document.getElementById('series1');
+            
+            const btnSwap = document.getElementById('btn-swap');
+            const btnPrev = document.getElementById('btn-prev');
+            const btnNext = document.getElementById('btn-next');
+            const btnClear1 = document.getElementById('btn-clear1');
+            
+            const containerS2 = document.getElementById('container-series2');
+            const wClear2 = document.getElementById('wrapper-clear2');
+            
+            const labelSeries1 = document.getElementById('label-series1');
+            const containerNivel = document.getElementById('container-nivel');
+            const containerDatas = document.getElementById('container-datas');
+
+            if (isComp) {
+                labelSeries1.textContent = 'Desafiante';
+                
+                containerS1.style.flexGrow = '0';
+                selectS1.style.width = '180px';
+                
+                btnSwap.style.display = 'block';
+                btnPrev.style.display = 'none';
+                btnNext.style.display = 'none';
+                btnClear1.style.display = 'none';
+                
+                containerS2.style.display = 'flex';
+                wClear2.style.display = 'flex';
+                
+                containerNivel.style.display = 'flex';
+                containerDatas.style.display = 'none';
+
+                rdVisao[0].disabled = false;
+                rdVisao[1].disabled = false;
+            } else {
+                labelSeries1.textContent = 'Série';
+                
+                containerS1.style.flexGrow = '0';
+                selectS1.style.width = '347px';
+                
+                btnSwap.style.display = 'none';
+                btnPrev.style.display = 'block';
+                btnNext.style.display = 'block';
+                btnClear1.style.display = 'block';
+                
+                containerS2.style.display = 'none';
+                wClear2.style.display = 'none';
+                
+                containerNivel.style.display = 'none';
+                containerDatas.style.display = 'flex';
+
+                let s1 = selectS1.value;
+                if (s1 && isQuantityOrIndex(s1)) {
+                    rdVisao[0].checked = true; 
+                    rdVisao[0].disabled = true;
+                    rdVisao[1].disabled = true;
+                } else {
+                    rdVisao[0].disabled = false;
+                    rdVisao[1].disabled = false;
+                }
+            }
+            updateSelectOptions(isInitialization);
+            showShortcutsToast(isComp); // <--- INJETAR AQUI! Dispara a colinha de atalhos inteligente
+            updateChart();
+        }
+
+        select1.addEventListener('change', () => {
+            if (!chkComparativo.checked) {
+                let s1 = select1.value;
+                if (s1 && isQuantityOrIndex(s1)) {
+                    rdVisao[0].checked = true;
+                    rdVisao[0].disabled = true;
+                    rdVisao[1].disabled = true;
+                } else {
+                    rdVisao[0].disabled = false;
+                    rdVisao[1].disabled = false;
+                }
+            }
+            updateSelectOptions();
+            updateChart();
+        });
+
+        function formatYAxisNumber(value, isPercent, isQtd, isCont, isIndice) {
+            if (isIndice) return (value * 100).toLocaleString('pt-BR', {minimumFractionDigits: 4, maximumFractionDigits: 4}) + '%';
+            if (isCont) return new Intl.NumberFormat('pt-BR', {minimumFractionDigits: 4, maximumFractionDigits: 4}).format(value);
+            if (isQtd) return new Intl.NumberFormat('pt-BR').format(value);
+            if (isPercent) return value.toLocaleString('pt-BR', {minimumFractionDigits: 1, maximumFractionDigits: 1}) + '%';
+            if (value < 0) return 'R$ -' + new Intl.NumberFormat('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2}).format(Math.abs(value));
+            return 'R$ ' + new Intl.NumberFormat('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2}).format(value);
+        }
+
+        function formatDatalabel(value, isPercent, isQtd, isCont, isIndice) {
+            if (value === null || value === undefined) return '';
+            if (isIndice) return (value * 100).toLocaleString('pt-BR', {minimumFractionDigits: 4, maximumFractionDigits: 4});
+            if (isCont) return value.toLocaleString('pt-BR', {minimumFractionDigits: 4, maximumFractionDigits: 4});
+            if (isQtd) return value.toString();
+            if (isPercent) return value % 1 === 0 ? value.toFixed(0) : value.toLocaleString('pt-BR', {minimumFractionDigits: 1, maximumFractionDigits: 1});
+            let num = value / 1000;
+            return num.toLocaleString('pt-BR', {minimumFractionDigits: 1, maximumFractionDigits: 1});
+        }
+
+        function updateChart(mode) {
+            const isComp = chkComparativo.checked;
+            const visao = document.querySelector('input[name="visao"]:checked').value;
+            const isRelative = visao === 'percentual';
+            let datasets = [];
+            let validIndices = [];
+            if(!select1.value || (isComp && !select2.value)) {
+                const emptyConfig = {
+                    type: 'line',
+                    data: { labels: dbData.Competencia, datasets: [] },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        layout: { padding: { top: 0, left: 5, right: 20, bottom: 0 } },
+                        scales: {
+                            x: { grid: { display: false } },
+                            y: { grid: { display: true } }
+                        }
+                    }
+                };
+                if (myChart) {
+                    myChart.data = emptyConfig.data;
+                    myChart.options = emptyConfig.options;
+                    myChart.update();
+                } else {
+                    myChart = new Chart(ctx, emptyConfig);
+                }
+                return;
+            }
+
+            let startIdx = 0;
+            let endIdx = dbData.Competencia.length - 1;
+
+            if (!isComp) {
+                let dtStart = selectInicio.value;
+                let dtEnd = selectFim.value;
+                let i1 = dbData.Competencia.indexOf(dtStart);
+                let i2 = dbData.Competencia.indexOf(dtEnd);
+                if(i1 !== -1 && i2 !== -1 && i1 <= i2) {
+                    startIdx = i1; endIdx = i2;
+                }
+            }
+
+            let s1_Qtd = false, s1_Cont = false, s1_Ind = false;
+
+            if (isComp) {
+                const s1 = select1.value;
+                const s2 = select2.value;
+                const nivel = document.querySelector('input[name="nivel"]:checked').value;
+                
+                let key1 = dbData[s1 + ' (' + nivel + ')'] ? s1 + ' (' + nivel + ')' : s1;
+                let key2 = dbData[s2 + ' (' + nivel + ')'] ? s2 + ' (' + nivel + ')' : s2;
+
+                // Recupera as séries com sufíxos estranhos caso a variação (topo) falhe
+                if (!dbData[key1]) key1 = Object.keys(dbData).find(k => k.startsWith(s1) && dbData[k].some(v => typeof v === 'number')) || s1;
+                if (!dbData[key2]) key2 = Object.keys(dbData).find(k => k.startsWith(s2) && dbData[k].some(v => typeof v === 'number')) || s2;
+                
+                let raw1 = dbData[key1] || new Array(dbData.Competencia.length).fill(null);
+                let raw2 = dbData[key2] || new Array(dbData.Competencia.length).fill(null);
+                let data1 = [], data2 = [];
+                let points1 = [], points2 = [];
+                let lastVal1 = undefined, lastVal2 = undefined;
+
+                let firstValidG = -1, lastValidG = -1;
+                for (let i = 0; i < dbData.Competencia.length; i++) {
+                    // Ignora 0s frontais para não criar linha reta no passado do comparativo
+                    if ((raw1[i] !== null && raw1[i] !== 0) || (raw2[i] !== null && raw2[i] !== 0)) {
+                        if (firstValidG === -1) firstValidG = i;
+                    }
+                    if (raw1[i] !== null || raw2[i] !== null) {
+                        lastValidG = i;
+                    }
+                }
+                if (firstValidG !== -1) { startIdx = firstValidG; endIdx = lastValidG; }
+
+                for (let i = startIdx; i <= endIdx; i++) {
+                    let v1 = raw1[i], v2 = raw2[i];
+                    let cv1 = null, cv2 = null;
+                    
+                    if (isRelative) {
+                        if (v2 !== null && v2 !== 0) {
+                            cv2 = 100.0;
+                            cv1 = (v1 !== null) ? parseFloat(((v1 / v2) * 100).toFixed(1)) : null;
+                        } else {
+                            cv1 = null; cv2 = null;
+                        }
+                    } else {
+                        cv1 = v1; cv2 = v2;
+                    }
+                    
+                    data1.push(cv1); data2.push(cv2);
+                    validIndices.push(i);
+
+                    const isTsv1 = tsvCargos.some(c => key1.startsWith(c));
+                    const isTsv2 = tsvCargos.some(c => key2.startsWith(c));
+                    if (cv1 !== null) { points1.push((isTsv1 && lastVal1 === cv1) ? 0 : 3); lastVal1 = cv1; } else points1.push(0);
+                    if (cv2 !== null) { points2.push((isTsv2 && lastVal2 === cv2) ? 0 : 3); lastVal2 = cv2; } else points2.push(0);
+                }
+                
+                datasets.push({
+                    label: key1, data: data1, borderColor: '#C00000', backgroundColor: 'rgba(192, 0, 0, 0.25)',
+                    stepped:'"middle', borderWidth: 3, pointRadius: points1, pointHoverRadius: 6, spanGaps: true, fill: false
+                });
+                datasets.push({
+                    label: key2, data: data2, borderColor: '#0070C0', backgroundColor: 'rgba(0, 112, 192, 0.25)',
+                    stepped:'"middle', borderWidth: 3, pointRadius: points2, pointHoverRadius: 6, spanGaps: true, fill: false
+                });
+
+            } else {
+                const key = select1.value;
+                let raw = dbData[key] || new Array(dbData.Competencia.length).fill(null);
+                
+                s1_Qtd = isQuantityOrIndex(key) && !key.includes('Índice');
+                s1_Cont = key.includes('Contagem');
+                s1_Ind = key.includes('Índice') || key.includes('Indice');
+
+                let fValid = -1, lValid = -1;
+                for (let i = startIdx; i <= endIdx; i++) {
+                    if (raw[i] !== null) {
+                        if (fValid === -1) fValid = i;
+                        lValid = i;
+                    }
+                }
+                if (fValid !== -1) { startIdx = fValid; endIdx = lValid; }
+
+                let refKey = getRefSeries(key);
+                let rawRef = refKey ? dbData[refKey] : null;
+                
+                let data = [], dataRef = [], points = [];
+                let lastVal = undefined, firstValidVal = null;
+
+                if (isRelative) {
+                    for (let i = startIdx; i <= endIdx; i++) {
+                        if (raw[i] !== null && raw[i] !== 0) {
+                            firstValidVal = raw[i];
+                            break;
+                        }
+                    }
+                }
+
+                for (let i = startIdx; i <= endIdx; i++) {
+                    validIndices.push(i);
+                    let v = raw[i];
+                    let rV = rawRef ? rawRef[i] : null;
+                    let currentVal = null, currentRef = null;
+
+                    if (v !== null) {
+                        if (isRelative) {
+                            if (rawRef) currentVal = (rV !== null && rV !== 0) ? parseFloat(((v / rV) * 100).toFixed(1)) : null;
+                            else currentVal = firstValidVal ? parseFloat(((v / firstValidVal) * 100).toFixed(1)) : null;
+                        } else currentVal = v;
+                    }
+                    data.push(currentVal);
+
+                    if (rawRef && rV !== null) {
+                        if (isRelative) currentRef = 100;
+                        else currentRef = rV;
+                    }
+                    dataRef.push(currentRef);
+                    
+                    if (currentVal !== null) {
+                        points.push((lastVal === currentVal) ? 0 : 3);
+                        lastVal = currentVal;
+                    } else {
+                        points.push(0);
+                    }
+                }
+                
+                datasets.push({
+                    label: formatSerieOption(key), data: data, borderColor: '#00B050', backgroundColor: 'rgba(0, 176, 80, 0.25)',
+                    stepped:'"middle', borderWidth: 3, pointRadius: points, pointHoverRadius: 6, spanGaps: true, fill: false
+                });
+
+                if (key === 'CGPP | Dados da Apuração | Valor unitário por cota (=)') {
+                    ['CGPP | Dados da Apuração | Valor unitário máximo por cota (=)', 'CGPP | Dados da Apuração | Valor unitário por cota ajustado (=)'].forEach(extraKey => {
+                        if (dbData[extraKey]) {
+                            let dataExtra = [];
+                            let extraPoints = []; // Array de bolinhas exclusivo para essas séries
+                            let lastValExtra = undefined;
+                            
+                            for (let i = startIdx; i <= endIdx; i++) {
+                                let v = dbData[extraKey][i];
+                                let currentValExtra = null;
+                                
+                                if (v !== null) {
+                                    if (isRelative) {
+                                        if (rawRef && rawRef[i] !== null && rawRef[i] !== 0) currentValExtra = parseFloat(((v / rawRef[i]) * 100).toFixed(1));
+                                        else if (firstValidVal) currentValExtra = parseFloat(((v / firstValidVal) * 100).toFixed(1));
+                                    } else {
+                                        currentValExtra = v;
+                                    }
+                                } else if (i > startIdx && dbData[extraKey][i-1] !== null) {
+                                    currentValExtra = dataExtra[dataExtra.length - 1];
+                                }
+                                
+                                dataExtra.push(currentValExtra);
+                                
+                                if (v !== null && currentValExtra !== null) {
+                                    extraPoints.push(lastValExtra === currentValExtra ? 0 : 3);
+                                    lastValExtra = currentValExtra;
+                                } else {
+                                    extraPoints.push(0); // Esconde a bolinha na extensão artificial!
+                                }
+                            }
+                            
+                            const isMaximo = extraKey.includes('máximo');
+                            const lineColor = isMaximo ? '#F79646' : '#7030A0';
+                            const bgColor = isMaximo ? 'rgba(247, 150, 70, 0.25)' : 'rgba(112, 48, 160, 0.25)';
+                            
+                            datasets.push({
+                                label: extraKey.replace('CGPP | Dados da Apuração | ', ''), data: dataExtra, 
+                                borderColor: lineColor, backgroundColor: bgColor,
+                                stepped:'"middle', borderWidth: 5, borderDash: [5, 5], 
+                                pointRadius: extraPoints, pointHoverRadius: 6, spanGaps: true, fill: false
+                            });
+                        }
+                    });
+                }
+
+				if (rawRef) {
+                    // 1. Linha Amarela (Limite)
+					if (!key.includes('100%')) {
+						datasets.push({
+							label: 'Limite (Bônus Mensal Máximo)', data: dataRef, 
+							borderColor: '#FFC000', backgroundColor: 'rgba(255, 192, 0, 0.25)',
+							stepped:'"middle', borderWidth: 4, borderDash: [10, 5], 
+							pointRadius: points, pointHoverRadius: 6, spanGaps: true, fill: false
+						});
+					}
+					
+					// 2. Linha Rosa (Cota)
+                    const keyCota = 'CGPP | Dados da Apuração | Valor unitário por cota (=)';
+                    if (dbData[keyCota]) {
+                        let dataCota = [];
+                        let pointsCota = []; // <-- NOVO: Array exclusivo para as bolinhas rosas
+                        let lastValCota = undefined; // <-- NOVO: Memória da linha rosa
+                        
+                        for (let i = startIdx; i <= endIdx; i++) {
+                            let v = dbData[keyCota][i];
+                            let currentValCota = null;
+                            
+                            if (v !== null) {
+                                if (isRelative) {
+                                    if (rawRef[i] !== null && rawRef[i] !== 0) currentValCota = parseFloat(((v / rawRef[i]) * 100).toFixed(1));
+                                    else if (firstValidVal) currentValCota = parseFloat(((v / firstValidVal) * 100).toFixed(1));
+                                } else {
+                                    currentValCota = v;
+                                }
+                            }
+                            
+                            dataCota.push(currentValCota);
+                            
+                            // Lógica independente: a bolinha rosa só aparece se a COTA mudar
+                            if (currentValCota !== null) {
+                                pointsCota.push(lastValCota === currentValCota ? 0 : 3);
+                                lastValCota = currentValCota;
+                            } else {
+                                pointsCota.push(0);
+                            }
+                        }
+                        
+                        datasets.push({
+                            label: 'Cota (valor unitário)', data: dataCota, 
+                            borderColor: '#FF0066', backgroundColor: 'rgba(255, 0, 102, 0.25)',
+                            stepped:'"middle', borderWidth: 4, borderDash: [10, 5], 
+							pointRadius: pointsCota, pointHoverRadius: 6, spanGaps: true, fill: false
+                        });
+                    }
+                }
+            }
+
+            const chartLabels = validIndices.map(i => dbData.Competencia[i]);
+
+            if (chkRotulos.checked && !userFontOverridden) {
+                let activePoints = chartLabels.length * datasets.length;
+                if (activePoints < 20) currentLabelFontSize = 14;
+                else if (activePoints < 50) currentLabelFontSize = 13;
+                else if (activePoints < 100) currentLabelFontSize = 12;
+                else if (activePoints < 200) currentLabelFontSize = 11;
+                else currentLabelFontSize = 15;
+            }
+
+            let minYValue = Infinity;
+
+            datasets.forEach(ds => {
+                ds.data.forEach(val => {
+                    if (val !== null && val < minYValue) {
+                        minYValue = val;
+                    }
+                });
+            });
+
+            let suggestedMin = (minYValue !== Infinity) ? (minYValue > 0 ? minYValue * 0.95 : minYValue * 1.05) : 0;
+            if (!isRelative && minYValue === 0) suggestedMin = 0; // Se partiu de zero cravado, mantém 0.
+
+            const chartConfig = {
+                type: 'line',
+                data: { labels: chartLabels, datasets: datasets },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    layout: { padding: { top: 0, left: 5, right: 20, bottom: 0 } },
+                    interaction: { mode: 'index', intersect: false },
+                    plugins: {
+                        datalabels: {
+							clip: false,
+                            display: function(context) {
+                                return chkRotulos.checked && context.dataset.pointRadius[context.dataIndex] > 0;
+                            },
+                            align: 'top',
+						
+                            // NOVA REGRA DE INCLINAÇÃO (ROTAÇÃO)
+                            rotation: function(context) {
+                                const lbl = context.dataset.label || '';
+                                const rotacionar = [
+                                    'Base de cálculo mensal',
+                                    'Índice de Eficiência Institucional',
+                                    'Valor Global do Bônus',
+                                    'Provisão para ajustes',
+                                    'Saldo da provisão',
+                                    'Valor efetivo para distribuição',
+                                    'Contagem Geral de Cotas',
+                                    'Quantidade de beneficiários',
+                                    'Quantidade de pensionistas',
+                                    'Quantidade de não beneficiários'
+                                ];
+                                // Usa -45 para o texto subir (leitura mais natural), se preferir que desça, use apenas 45
+                                return rotacionar.some(termo => lbl.includes(termo)) ? -45 : 0;
+                            },
+						
+                            color: function(context) { return context.dataset.borderColor; },
+                            font: { size: currentLabelFontSize, family: 'Arial', weight: 'bold' },
+                            backgroundColor: 'rgba(255, 255, 255, 0.7)',
+                            borderRadius: 4,
+                            padding: 2,
+                            formatter: function(value) { return formatDatalabel(value, isRelative, s1_Qtd, s1_Cont, s1_Ind); }
+                        },
+                        tooltip: {
+                            filter: function(tooltipItem) {
+                                const lbl = tooltipItem.dataset.label;
+                                // Se for o limite máximo ou ajustado, verifica na base original
+                                if (lbl.includes('máximo') || lbl.includes('ajustado')) {
+                                    const originalKey = 'CGPP | Dados da Apuração | ' + lbl;
+                                    // Se o dado real for null, aborta a exibição no balão
+                                    if (dbData[originalKey] && dbData[originalKey][validIndices[tooltipItem.dataIndex]] === null) {
+                                        return false;
+                                    }
+                                }
+                                return true;
+                            },
+                            backgroundColor: 'rgba(30, 35, 45, 0.95)', // Um fundo escuro mais sofisticado
+                            titleFont: { size: 14, family: 'Segoe UI, Arial, sans-serif' }, // Título (Data) mantém fonte padrão
+                            bodyFont: { size: 14, family: 'Consolas, "Courier New", monospace' }, // Valores em monoespaço
+                            footerFont: { size: 14, family: 'Consolas, "Courier New", monospace', weight: 'normal' }, // Rodapé em monoespaço
+                            padding: 12,
+                            boxPadding: 8,
+                            usePointStyle: true, // Transforma os quadradinhos de cor em bolinhas (mais limpo)
+                            callbacks: {
+                                label: function(context) {
+                                    const isComp = document.getElementById('comparativo').checked;
+                                    const visao = document.querySelector('input[name="visao"]:checked').value;
+                                    const isRelative = visao === 'percentual';
+                                    
+                                    if (context.parsed.y === null) return 'Sem dados';
+                                    
+                                    let valFormatted = '';
+                                    if (context.dataset.borderDash && isRelative) valFormatted = '100%';
+                                    else valFormatted = formatYAxisNumber(context.parsed.y, isRelative, s1_Qtd, s1_Cont, s1_Ind);
+                                    
+                                    // MODO DESAFIO (Cálculo Monoespaçado)
+                                    if (isComp && context.chart.data.datasets.length >= 2 && !isRelative) {
+                                        // Garante espaçamentos idênticos para manter as colunas alinhadas
+                                        const role = context.datasetIndex === 0 ? 'Desafiante:' : 'Desafiado:';
+                                        return role.padEnd(12, ' ') + valFormatted.padStart(16, ' ');
+                                    }
+                                    
+                                    // MODO AVULSO (Padrão)
+                                    let label = context.dataset.label || '';
+                                    return label + ': ' + valFormatted;
+                                },
+                                footer: function(tooltipItems) {
+                                    const isComp = document.getElementById('comparativo').checked;
+                                    const visao = document.querySelector('input[name="visao"]:checked').value;
+                                    const isRelative = visao === 'percentual';
+                                    
+                                    // ADICIONA A LINHA DE DIFERENÇA E VARIAÇÃO
+                                    if (isComp && tooltipItems.length >= 2 && !isRelative) {
+                                        const val0 = tooltipItems[0].parsed.y;
+                                        const val1 = tooltipItems[1].parsed.y;
+                                        
+                                        if (val0 !== null && val1 !== null) {
+                                            const diff = val0 - val1;
+
+                                            const diffFormatted = formatYAxisNumber(diff, false, s1_Qtd, s1_Cont, s1_Ind);
+                                            // Substituímos o toFixed(1) pela localização em pt-BR aqui também
+                                            const pct = val1 !== 0 ? ((diff / val1) * 100).toLocaleString('pt-BR', {minimumFractionDigits: 1, maximumFractionDigits: 1}) + '%' : 'N/A';                                            
+                                            
+                                            const pDiff = ' - Diferença:';
+                                            const pVar  = ' Δ Variação:';
+                                            
+                                            return '---------------------------------\n' + 
+                                                   pDiff.padEnd(15, ' ') + diffFormatted.padStart(16, ' ') + '\n' + 
+                                                   pVar.padEnd(15, ' ') + pct.padStart(16, ' ');
+                                        }
+                                    }
+                                    return null;
+                                }
+                            }
+                        },
+						legend: { position: 'top', labels: { font: { size: 14, weight: 'bold' }, padding: 10 } },
+                        zoom: {
+                            pan: {
+                                enabled: true,
+                                mode: 'x', // Permite arrastar para os lados
+                                modifierKey: 'shift', // Segura shift para arrastar no desktop
+                            },
+                            zoom: {
+                                wheel: { enabled: true }, // Rodinha do mouse
+                                drag: { enabled: true },  // Clicar e arrastar um retângulo para zoom
+                                pinch: { enabled: true }, // Pinça no mobile
+                                mode: 'x', // Zoom apenas no tempo
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { 
+                                display: true, 
+                                color: function(context) {
+                                    if (context.tick && context.tick.label) return 'rgba(200, 200, 200, 0.4)';
+                                    return 'transparent';
+                                }, 
+                                borderDash: [4, 4],
+                                drawTicks: false,
+                                drawBorder: false
+                            },
+                            ticks: {
+                                autoSkip: false,
+                                maxRotation: 45, 
+                                minRotation: 45,
+                                callback: function(value, index) {
+                                    const hasPoint = datasets.some(ds => ds.pointRadius && ds.pointRadius[index] > 0);
+                                    return hasPoint ? this.getLabelForValue(value) : null;
+                                }
+                            }
+                        },
+                        y: {
+                            grace: '15%',
+                            suggestedMin: suggestedMin, // Aplica o novo piso calculado acima
+                            ticks: { callback: function(value) { return formatYAxisNumber(value, isRelative, s1_Qtd, s1_Cont, s1_Ind); } }
+                        }
+                    }
+                },
+                plugins: [{
+                    id: 'solidBackgroundColor',
+                    beforeDraw: (chart) => {
+                        const {ctx} = chart;
+                        ctx.save();
+                        ctx.globalCompositeOperation = 'destination-over';
+                        ctx.fillStyle = '#ffffff'; 
+                        ctx.fillRect(0, 0, chart.width, chart.height);
+                        ctx.restore();
+                    }
+                }, {
+                    // NOVO PLUGIN: Balão Flutuante de Resolução
+                    id: 'balaoResolucao',
+                    afterDraw: (chart) => {
+                        const isComp = document.getElementById('comparativo').checked;
+                        const s1 = document.getElementById('series1').value;
+                        
+                        // Exibe APENAS no modo avulso e na série específica
+                        if (!isComp && s1 === 'CGPP | Dados da Apuração | Valor unitário por cota (=)') {
+                            const { ctx, chartArea } = chart;
+                            const text = "Apuração realizada de acordo com a Resolução CGPP nº 8, de 30 de abril de 2025";
+                            
+                            ctx.save();
+                            ctx.font = "bold 13px 'Segoe UI', Tahoma, sans-serif";
+                            
+                            // Calcula largura dinâmica da pílula (texto + espaço das 2 bolinhas + margens)
+                            const textWidth = ctx.measureText(text).width;
+                            const boxWidth = textWidth + 50; 
+                            const boxHeight = 28; 
+                            
+                            // Posição: Centralizado horizontalmente e 20px abaixo do teto
+                            const cx = chartArea.left + (chartArea.right - chartArea.left) / 2;
+                            const cy = chartArea.top + 20; 
+                            
+                            // 1. Fundo do balão (Retângulo arredondado)
+                            ctx.fillStyle = "rgba(248, 249, 250, 0.9)"; // Fundo clarinho, levemente translúcido
+                            ctx.strokeStyle = "#ced4da"; // Bordinha cinza sutil
+                            ctx.lineWidth = 1;
+                            ctx.beginPath();
+                            ctx.roundRect(cx - (boxWidth/2), cy - (boxHeight/2), boxWidth, boxHeight, 14);
+                            ctx.fill();
+                            ctx.stroke();
+                            
+                            const startX = cx - (boxWidth/2) + 15;
+                            
+                            // 2. Bolinha Laranja (Máximo)
+                            ctx.fillStyle = '#F79646';
+                            ctx.beginPath();
+                            ctx.arc(startX, cy, 5, 0, 2 * Math.PI);
+                            ctx.fill();
+                            
+                            // 3. Bolinha Roxa (Ajustado)
+                            ctx.fillStyle = '#7030A0';
+                            ctx.beginPath();
+                            ctx.arc(startX + 14, cy, 5, 0, 2 * Math.PI);
+                            ctx.fill();
+                            
+                            // 4. Texto
+                            ctx.fillStyle = "#495057"; // Cinza escuro para leitura confortável
+                            ctx.textAlign = "left";
+                            ctx.textBaseline = "middle";
+                            ctx.fillText(text, startX + 24, cy);
+                            
+                            ctx.restore();
+                        }
+                    }
+                }]
+            };
+/*
+            if (myChart) myChart.destroy();
+            myChart = new Chart(ctx, chartConfig);
+*/
+            if (myChart) {
+                myChart.data.labels = chartLabels;
+                myChart.data.datasets = datasets;
+                myChart.options = chartConfig.options;
+                myChart.update(mode || 'default'); // Usa 'none' quando solicitado para não animar a curva
+            } else {
+                myChart = new Chart(ctx, chartConfig);
+            }
+        }
+
+        chkComparativo.addEventListener('change', handleUI);
+
+        chkRotulos.addEventListener('change', () => {
+            const btnMinus = document.getElementById('btn-font-minus');
+            const btnPlus = document.getElementById('btn-font-plus');
+            if (chkRotulos.checked) {
+                userFontOverridden = false; 
+                btnMinus.style.display = 'inline-block';
+                btnPlus.style.display = 'inline-block';
+                updateChart(); 
+            } else {
+                btnMinus.style.display = 'none';
+                btnPlus.style.display = 'none';
+                if(myChart) myChart.update('none'); 
+            }
+            updateChart('none'); // Atualiza instantaneamente sem recriar a curva
+        });
+
+        document.getElementById('btn-font-minus').addEventListener('click', () => {
+            if (currentLabelFontSize > 6) {
+                currentLabelFontSize--;
+                userFontOverridden = true; 
+                if (myChart) {
+                    myChart.options.plugins.datalabels.font.size = currentLabelFontSize;
+                    myChart.update('none'); 
+                }
+            }
+        });
+
+        document.getElementById('btn-font-plus').addEventListener('click', () => {
+            if (currentLabelFontSize < 24) {
+                currentLabelFontSize++;
+                userFontOverridden = true; 
+                if (myChart) {
+                    myChart.options.plugins.datalabels.font.size = currentLabelFontSize;
+                    myChart.update('none');
+                }
+            }
+        });
+
+        select2.addEventListener('change', () => { if (chkComparativo.checked) updateSelectOptions(); updateChart(); });
+
+        function ensureDatesOrder() {
+            let i1 = selectInicio.selectedIndex;
+            let i2 = selectFim.selectedIndex;
+            if (i1 > i2) {
+                let temp = selectInicio.value;
+                selectInicio.value = selectFim.value;
+                selectFim.value = temp;
+            }
+        }
+        
+        selectInicio.addEventListener('change', () => { ensureDatesOrder(); updateChart(); });
+        selectFim.addEventListener('change', () => { ensureDatesOrder(); updateChart(); });
+
+        document.querySelectorAll('input[name="nivel"]').forEach(el => el.addEventListener('change', updateChart));
+        document.querySelectorAll('input[name="visao"]').forEach(el => el.addEventListener('change', updateChart));
+
+        // Lógicas dos Botões (O "✖" agora opera inteligentemente com o display visível do modo atual)
+        document.getElementById('btn-clear1').addEventListener('click', () => { select1.value = ''; updateSelectOptions(); updateChart(); });
+        document.getElementById('btn-clear2').addEventListener('click', () => { select1.value = ''; select2.value = ''; updateSelectOptions(); updateChart(); });
+        
+        document.getElementById('btn-swap').addEventListener('click', () => {
+            let temp = select1.value; select1.value = select2.value; select2.value = temp;
+            updateSelectOptions(); updateChart();
+        });
+
+        document.getElementById('btn-prev').addEventListener('click', () => {
+            let idx = select1.selectedIndex;
+            if (idx > 1) { select1.selectedIndex = idx - 1; updateSelectOptions(); updateChart(); }
+        });
+
+        document.getElementById('btn-next').addEventListener('click', () => {
+            let idx = select1.selectedIndex;
+            if (idx > 0 && idx < select1.options.length - 1) { 
+                select1.selectedIndex = idx + 1; updateSelectOptions(); updateChart(); 
+            } else if (idx === 0 && select1.options.length > 1) { 
+                select1.selectedIndex = 1; updateSelectOptions(); updateChart(); 
+            }
+        });
+
+        // Força o foco na tela para captar o teclado logo após o carregamento
+        window.focus();
+
+        // Mapeamento Global do Teclado (Joystick)
+        document.addEventListener('keydown', (e) => {
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
+
+            const isComp = document.getElementById('comparativo').checked;
+
+            // [ LIMPAR ] - Tecla X
+            if (e.key.toLowerCase() === 'x') {
+                if (isComp) document.getElementById('btn-clear2').click();
+                else document.getElementById('btn-clear1').click();
+            }
+            // [ TAMANHO DA FONTE ]
+            else if (e.key === '+' || e.key === '=') {
+                document.getElementById('btn-font-plus').click();
+            }
+            else if (e.key === '-') {
+                document.getElementById('btn-font-minus').click();
+            }
+            // [ INVERTER ] - Barra de Espaço
+            else if (e.key === ' ' || e.code === 'Space') {
+                if (isComp) document.getElementById('btn-swap').click();
+                e.preventDefault(); 
+            }
+            
+            // ==========================================
+            // NOVOS ATALHOS DE SELEÇÃO E OPÇÕES
+            // ==========================================
+            
+            // [ NÍVEL ] - 1 (base), 2 (meio), 3 (topo)
+            else if (e.key === '1') {
+                const rb = document.querySelector('input[name="nivel"][value="base"]');
+                if (rb && !rb.disabled) rb.click();
+            }
+            else if (e.key === '2') {
+                const rb = document.querySelector('input[name="nivel"][value="meio"]');
+                if (rb && !rb.disabled) rb.click();
+            }
+            else if (e.key === '3') {
+                const rb = document.querySelector('input[name="nivel"][value="topo"]');
+                if (rb && !rb.disabled) rb.click();
+            }
+            
+            // [ ESCALA ] - $ (absoluto) e % (relativo)
+            else if (e.key === '$') {
+                const rb = document.querySelector('input[name="visao"][value="valor"]');
+                if (rb && !rb.disabled) rb.click();
+            }
+            else if (e.key === '%') {
+                const rb = document.querySelector('input[name="visao"][value="percentual"]');
+                if (rb && !rb.disabled) rb.click();
+            }
+            
+            // [ OPÇÕES ] - # (desafio) e @ (rótulos)
+            else if (e.key === '#') {
+                document.getElementById('comparativo').click();
+            }
+            else if (e.key === '@') {
+                document.getElementById('rotulos').click();
+            }
+
+            // ==========================================
+            // CÂMERA E NAVEGAÇÃO TEMPORAL
+            // ==========================================
+            
+			// ZOOM RESET (Voltar ao original) - Shift + 0
+            else if (e.key === '0') {
+                if (myChart && typeof myChart.resetZoom === 'function') {
+                    myChart.resetZoom();
+                }
+                e.preventDefault(); 
+            }
+			
+            // ZOOM (Requer Shift)
+            else if (e.key === 'ArrowUp' && e.shiftKey) {
+                if (myChart && typeof myChart.zoom === 'function') myChart.zoom(1.1);
+                e.preventDefault(); 
+            }
+            else if (e.key === 'ArrowDown' && e.shiftKey) {
+                if (myChart && typeof myChart.zoom === 'function') myChart.zoom(0.9);
+                e.preventDefault(); 
+            }
+            
+            // PAN E NAVEGAÇÃO DE SÉRIES
+            else if (e.key === 'ArrowLeft') {
+                if (e.shiftKey) {
+                    if (myChart && typeof myChart.pan === 'function') myChart.pan({x: 50}); 
+                    e.preventDefault();
+                } else if (!isComp) {
+                    document.getElementById('btn-prev').click(); 
+                    e.preventDefault();
+                }
+            }
+            else if (e.key === 'ArrowRight') {
+                if (e.shiftKey) {
+                    if (myChart && typeof myChart.pan === 'function') myChart.pan({x: -50}); 
+                    e.preventDefault();
+                } else if (!isComp) {
+                    document.getElementById('btn-next').click(); 
+                    e.preventDefault();
+                }
+            }
+        });
+
+		// ==========================================
+        // SINTETIZADOR DE EFEITOS SONOROS (WEB AUDIO API)
+        // ==========================================
+        function playSFX(type) {
+            try {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                const ctx = new AudioContext();
+                
+                if (type === 'camera') {
+                    const osc = ctx.createOscillator(); const gainOsc = ctx.createGain();
+                    osc.type = 'square'; osc.frequency.setValueAtTime(300, ctx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(20, ctx.currentTime + 0.05);
+                    gainOsc.gain.setValueAtTime(1, ctx.currentTime); gainOsc.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.05);
+                    osc.connect(gainOsc); gainOsc.connect(ctx.destination);
+                    osc.start(); osc.stop(ctx.currentTime + 0.05);
+
+                    const bufferSize = ctx.sampleRate * 0.1; const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+                    const data = buffer.getChannelData(0); for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1; 
+                    const noise = ctx.createBufferSource(); noise.buffer = buffer;
+                    const filter = ctx.createBiquadFilter(); filter.type = 'highpass'; filter.frequency.value = 4000; 
+                    const gainNoise = ctx.createGain(); gainNoise.gain.setValueAtTime(0.8, ctx.currentTime);
+                    gainNoise.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
+                    noise.connect(filter); filter.connect(gainNoise); gainNoise.connect(ctx.destination); noise.start();
+                } 
+                else if (type === 'robot') {
+                    // 5 bips rápidos com frequências aleatórias (estilo R2-D2)
+                    for (let i = 0; i < 5; i++) {
+                        const osc = ctx.createOscillator(); const gain = ctx.createGain();
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(600 + Math.random() * 1000, ctx.currentTime + i * 0.08);
+                        gain.gain.setValueAtTime(0.15, ctx.currentTime + i * 0.08);
+                        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + i * 0.08 + 0.05);
+                        osc.connect(gain); gain.connect(ctx.destination);
+                        osc.start(ctx.currentTime + i * 0.08); osc.stop(ctx.currentTime + i * 0.08 + 0.08);
+                    }
+                } 
+                else if (type === 'printer') {
+                    // 12 estalos secos e rápidos imitando a agulha de uma impressora matricial
+                    for (let i = 0; i < 12; i++) {
+                        const osc = ctx.createOscillator(); const gain = ctx.createGain();
+                        osc.type = 'sawtooth';
+                        osc.frequency.setValueAtTime(150, ctx.currentTime + i * 0.04);
+                        gain.gain.setValueAtTime(0.15, ctx.currentTime + i * 0.04);
+                        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + i * 0.04 + 0.03);
+                        osc.connect(gain); gain.connect(ctx.destination);
+                        osc.start(ctx.currentTime + i * 0.04); osc.stop(ctx.currentTime + i * 0.04 + 0.03);
+                    }
+                } 
+                else if (type === 'typing') {
+                    // 6 cliques curtos de teclas de teclado mecânico
+                    for (let i = 0; i < 6; i++) {
+                        const osc = ctx.createOscillator(); const gain = ctx.createGain();
+                        osc.type = 'square';
+                        osc.frequency.setValueAtTime(200 + Math.random() * 50, ctx.currentTime + i * 0.09);
+                        gain.gain.setValueAtTime(0.05, ctx.currentTime + i * 0.09);
+                        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + i * 0.09 + 0.03);
+                        osc.connect(gain); gain.connect(ctx.destination);
+                        osc.start(ctx.currentTime + i * 0.09); osc.stop(ctx.currentTime + i * 0.09 + 0.04);
+                    }
+                }
+                else if (type === 'scribble') {
+                    // Ruído abafado em vai-e-vem imitando um lápis/caneta no papel
+                    const bufferSize = ctx.sampleRate * 0.4; const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+                    const data = buffer.getChannelData(0); for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+                    const noise = ctx.createBufferSource(); noise.buffer = buffer;
+                    const filter = ctx.createBiquadFilter(); filter.type = 'lowpass'; filter.frequency.value = 600;
+                    const gain = ctx.createGain(); gain.gain.setValueAtTime(0.3, ctx.currentTime);
+                    gain.gain.linearRampToValueAtTime(0.05, ctx.currentTime + 0.1);
+                    gain.gain.linearRampToValueAtTime(0.4, ctx.currentTime + 0.2);
+                    gain.gain.linearRampToValueAtTime(0.05, ctx.currentTime + 0.3);
+                    gain.gain.linearRampToValueAtTime(0.01, ctx.currentTime + 0.4);
+                    noise.connect(filter); filter.connect(gain); gain.connect(ctx.destination); noise.start();
+                }
+				else if (type === 'zip') {
+                    // Som de "Ziiiip" (Carta voando / papel deslizando rápido)
+                    const osc = ctx.createOscillator();
+                    const gainOsc = ctx.createGain();
+                    osc.type = 'triangle';
+                    
+                    // A frequência sobe muito rápido (efeito elástico/movimento)
+                    osc.frequency.setValueAtTime(150, ctx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(900, ctx.currentTime + 0.15);
+                    
+                    // O volume entra e sai num piscar de olhos
+                    gainOsc.gain.setValueAtTime(0, ctx.currentTime);
+                    gainOsc.gain.linearRampToValueAtTime(0.2, ctx.currentTime + 0.03);
+                    gainOsc.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.2);
+                    
+                    osc.connect(gainOsc);
+                    gainOsc.connect(ctx.destination);
+                    osc.start();
+                    osc.stop(ctx.currentTime + 0.2);
+
+                    // Soprinho de ruído (imita o vento/papel)
+                    const bufferSize = ctx.sampleRate * 0.2;
+                    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+                    const data = buffer.getChannelData(0);
+                    for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+                    
+                    const noise = ctx.createBufferSource();
+                    noise.buffer = buffer;
+                    
+                    const filter = ctx.createBiquadFilter();
+                    filter.type = 'bandpass';
+                    filter.frequency.value = 1200; // Frequência de atrito do papel
+                    
+                    const gainNoise = ctx.createGain();
+                    gainNoise.gain.setValueAtTime(0.15, ctx.currentTime);
+                    gainNoise.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.15);
+                    
+                    noise.connect(filter);
+                    filter.connect(gainNoise);
+                    gainNoise.connect(ctx.destination);
+                    noise.start();
+                }
+				else if (type === 'floppy') {
+                    // Som de Disquete (Motor de passo gravando setores)
+                    for (let i = 0; i < 3; i++) {
+                        // 1. O motor mecânico (buzz grave e rasgado)
+                        const oscMotor = ctx.createOscillator();
+                        const gainMotor = ctx.createGain();
+                        oscMotor.type = 'square';
+                        oscMotor.frequency.setValueAtTime(50 + Math.random() * 10, ctx.currentTime + i * 0.25);
+                        gainMotor.gain.setValueAtTime(0.15, ctx.currentTime + i * 0.25);
+                        gainMotor.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + i * 0.25 + 0.2);
+                        oscMotor.connect(gainMotor); gainMotor.connect(ctx.destination);
+                        oscMotor.start(ctx.currentTime + i * 0.25); 
+                        oscMotor.stop(ctx.currentTime + i * 0.25 + 0.2);
+                        
+                        // 2. Os "grilos" da cabeça magnética lendo/escrevendo
+                        for (let j = 0; j < 4; j++) {
+                            const oscHead = ctx.createOscillator();
+                            const gainHead = ctx.createGain();
+                            oscHead.type = 'sawtooth';
+                            oscHead.frequency.setValueAtTime(250 + Math.random() * 100, ctx.currentTime + i * 0.25 + j * 0.05);
+                            gainHead.gain.setValueAtTime(0.03, ctx.currentTime + i * 0.25 + j * 0.05);
+                            gainHead.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + i * 0.25 + j * 0.05 + 0.02);
+                            oscHead.connect(gainHead); gainHead.connect(ctx.destination);
+                            oscHead.start(ctx.currentTime + i * 0.25 + j * 0.05); 
+                            oscHead.stop(ctx.currentTime + i * 0.25 + j * 0.05 + 0.03);
+                        }
+                    }
+                }
+            } catch (e) {
+                console.log('Áudio não suportado.');
+            }
+        }
+
+        // ==========================================
+        // SISTEMA DO SPLIT BUTTON E MOTORES DE AÇÃO
+        // ==========================================
+        let currentAction = 'snapshot';
+        const splitMenu = document.getElementById('split-menu');
+        const btnToggleMenu = document.getElementById('btn-toggle-menu');
+        const btnActiveAction = document.getElementById('btn-active-action');
+        
+        // Variáveis de controle de áudio falado
+        let isReading = false;
+        let readInterval;
+        let utterance = null;
+        let audioToggle = false;
+
+        // Abrir/Fechar o Menu
+        btnToggleMenu.addEventListener('click', (e) => {
+            e.stopPropagation();
+            splitMenu.style.display = splitMenu.style.display === 'flex' ? 'none' : 'flex';
+            btnToggleMenu.textContent = splitMenu.style.display === 'flex' ? '▲' : '▼';
+        });
+        
+        document.addEventListener('click', () => {
+            splitMenu.style.display = 'none';
+            btnToggleMenu.textContent = '▼';
+        });
+
+        // Trocar o Emoji e Ajustar o CSS dinamicamente
+        splitMenu.querySelectorAll('.split-dropdown-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (isReading) stopAudio(); // Para a fala se mudar de ferramenta
+                
+                currentAction = item.getAttribute('data-action');
+                btnActiveAction.textContent = item.textContent;
+                btnActiveAction.title = item.title;
+                
+                // Aplica as proporções específicas da Câmera vs Outros Emojis
+                if (currentAction === 'snapshot') {
+                    btnActiveAction.style.fontSize = '40px';
+                    btnActiveAction.style.paddingBottom = '10px';
+                } else {
+                    btnActiveAction.style.fontSize = '35px';
+                    btnActiveAction.style.paddingBottom = '1px';
+                }
+                
+                splitMenu.style.display = 'none';
+                btnToggleMenu.textContent = '▼';
+            });
+        });
+
+        // ------------------------------------------
+        // 1. Motor CSV (✉️)
+        // ------------------------------------------
+        function exportCurrentDataToCSV() {
+            if (!myChart || !myChart.data || !myChart.data.datasets.length) return;
+            
+            // O myChart.data contém exatamente as séries e linhas extras em exibição
+            let csvContent = 'Competencia;' + myChart.data.datasets.map(ds => ds.label).join(';') + '\n';
+            
+            for (let i = 0; i < myChart.data.labels.length; i++) {
+                let row = [myChart.data.labels[i]];
+                myChart.data.datasets.forEach(ds => {
+                    let val = ds.data[i];
+                    row.push(val !== null && val !== undefined ? val.toString().replace('.', ',') : '');
+                });
+                csvContent += row.join(';') + '\n';
+            }
+            
+            const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'CGG x CAF x CAJ x CPF (' + new Date().toISOString().slice(0,10).replaceAll('-','_') + ' - ' + new Date().toTimeString().slice(0,8) + ').csv';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // ------------------------------------------
+        // 2. Motor Resumo / Falsa IA (📋)
+        // ------------------------------------------
+        function generateFakeAISummary() {
+            if (!myChart || myChart.data.datasets.length === 0) return "Nenhum dado plotado; selecione ambas as séries 'desafiante' e 'desafiado' ou uma série avulsa, se desmarcada a opção 'desafio'.";
+            const isRelative = document.querySelector('input[name="visao"]:checked').value === 'percentual';
+            
+            let text = "📊 *Resumo Estatístico dos Dados Plotados:*\n\n";
+            
+            myChart.data.datasets.forEach(ds => {
+                let validData = ds.data.filter(v => v !== null && v !== undefined);
+                if(validData.length === 0) return;
+                
+                let first = validData[0];
+                let last = validData[validData.length - 1];
+                let max = Math.max(...validData);
+                
+                let varPct = first !== 0 ? (((last - first) / first) * 100).toFixed(1) : 0;
+                let direction = varPct > 0 ? "crescimento" : (varPct < 0 ? "queda" : "estabilidade");
+                
+                // Ignora linhas de 100% liso no modo relativo para não poluir o resumo
+                if (isRelative && first === 100 && last === 100) {
+                    text += `A série de referência *${ds.label}* representa a base de 100% no período.\n\n`;
+                    return;
+                }
+                
+                let valFirst = formatYAxisNumber(first, isRelative, false, false, false).trim();
+                let valLast = formatYAxisNumber(last, isRelative, false, false, false).trim();
+                let valMax = formatYAxisNumber(max, isRelative, false, false, false).trim();
+
+                text += `A série *${ds.label}* apresentou ${direction} de ${varPct.toString().replace('.', ',')}% na tela atual. Iniciou marcando ${valFirst} e finalizou em ${valLast}. Seu pico no período visível foi de ${valMax}.\n\n`;
+            });
+            return text;
+        }
+
+        // ------------------------------------------
+        // 3. Motor Prompt para IAs Externas (🤖)
+        // ------------------------------------------
+        function generateIAPrompt() {
+            if (!myChart) return "";
+            
+            let md = "Aja como um Analista de Dados sênior especialista em remuneração de carreiras de Estado e finanças públicas do Brasil. Analise a tabela de evolução abaixo, identifique tendências cruzadas, explique anomalias e redija um relatório executivo claro e objetivo.\n\n### Glossário de Siglas:\n";
+            for (let [sigla, desc] of Object.entries(glossarioSiglas)) {
+                md += `- **${sigla}**: ${desc}\n`;
+            }
+            
+            md += "\n### Fontes dos Dados:\n- Portal da Transparência (Servidores)\n- Portal de Legislação do Planalto\n- CGPP-RFB\n- CCHA-AGU\n";
+            
+            md += "\n### Dados Estruturados:\n| Competência | " + myChart.data.datasets.map(d => d.label).join(" | ") + " |\n|" + "-|".repeat(myChart.data.datasets.length + 1) + "\n";
+            for(let i = 0; i < myChart.data.labels.length; i++) {
+                md += `| ${myChart.data.labels[i]} | ` + myChart.data.datasets.map(d => {
+                    let v = d.data[i];
+                    return (v !== null && v !== undefined) ? v.toString().replace('.', ',') : "-";
+                }).join(" | ") + " |\n";
+            }
+            return md;
+        }
+
+        // ------------------------------------------
+        // 4. Motor de Leitura de Áudio (🔈)
+        // ------------------------------------------
+        function stopAudio() {
+            window.speechSynthesis.cancel();
+            isReading = false;
+            clearInterval(readInterval);
+            if(currentAction === 'audio') btnActiveAction.textContent = '🔈';
+        }
+
+        function toggleAudio() {
+            if (isReading) {
+                stopAudio(); // Se clicou enquanto lia (ou no mute), desliga
+                return;
+            }
+            
+            // Limpa formatação markdown e emojis para a voz robótica não tentar ler
+            let cleanText = generateFakeAISummary().replace(/[*📊]/g, '').replace(/R\$/g, 'reais'); 
+            
+            utterance = new SpeechSynthesisUtterance(cleanText);
+            utterance.lang = 'pt-BR';
+            utterance.rate = 1.1; // Leitura levemente mais rápida e dinâmica
+            
+            utterance.onend = stopAudio;
+            window.speechSynthesis.speak(utterance);
+            isReading = true;
+            
+            // Alterna o emoji animando a caixa de som
+            readInterval = setInterval(() => {
+                if(btnActiveAction.textContent !== '🔇' && currentAction === 'audio') {
+                    audioToggle = !audioToggle;
+                    btnActiveAction.textContent = audioToggle ? '🔊' : '🔉';
+                }
+            }, 400);
+        }
+
+        // Eventos de Hover para o Mute (Ocultar falante)
+        btnActiveAction.addEventListener('mouseenter', () => {
+            if (isReading && currentAction === 'audio') btnActiveAction.textContent = '🔇';
+        });
+        btnActiveAction.addEventListener('mouseleave', () => {
+            if (isReading && currentAction === 'audio') btnActiveAction.textContent = audioToggle ? '🔊' : '🔉';
+        });
+
+        // ------------------------------------------
+        // GATILHO PRINCIPAL (CLIQUE NO EMOJI ATIVO)
+        // ------------------------------------------
+        btnActiveAction.addEventListener('click', () => {
+            if (currentAction === 'audio') {
+                toggleAudio();
+            } else if (!myChart || !myChart.data || myChart.data.datasets.length === 0) {
+                showCustomToast("<strong style='font-size: 15px;'>Nenhum dado plotado!</strong><br>Selecione ambas as séries 'desafiante' e 'desafiado' ou uma série avulsa, se desmarcada a opção 'desafio'.", 5000);
+                return;
+            } else {
+				if (currentAction === 'snapshot') {
+					btnActiveAction.textContent = '📸';
+					playSFX('camera'); // <-- SOM DA CÂMERA
+					if (myChart) {
+						const a = document.createElement('a');
+						a.href = myChart.toBase64Image();
+						a.download = 'CGG x CAF x CAJ x CPF (' + new Date().toISOString().slice(0,10).replaceAll('-','_') + ' - ' + new Date().toTimeString().slice(0,8) + ').png';
+						a.click();
+					}
+					setTimeout(() => { btnActiveAction.textContent = '📷'; }, 333);
+				} 
+				else if (currentAction === 'csv') {
+					btnActiveAction.textContent = '📂';
+					playSFX('printer'); // <-- SOM DA IMPRESSORA MATRICIAL (Pode trocar por 'zip' ou 'floppy' se preferir)
+					exportCurrentDataToCSV();
+					setTimeout(() => { btnActiveAction.textContent = '💾️'; }, 666);
+				}
+				else if (currentAction === 'prompt') {
+					btnActiveAction.textContent = '💬';
+					playSFX('robot'); // <-- SOM DO ROBÔ
+					navigator.clipboard.writeText(generateIAPrompt()).then(() => {
+						showCustomToast("<strong style='font-size: 15px;'>Prompt copiado para a área de transferência!</strong><br>Cole num assistente de IA(ChatGPT, Claude, Gemini etc) para melhor interpretar os dados.", 6000);
+						setTimeout(() => { btnActiveAction.textContent = '🤖'; }, 999);
+					});
+				}
+				else if (currentAction === 'summary') {
+					btnActiveAction.textContent = '📝';
+					playSFX('typing'); // <-- SOM DO TECLADO (Pode trocar por 'scribble' se preferir)
+					navigator.clipboard.writeText(generateFakeAISummary()).then(() => {
+						showCustomToast("<strong style='font-size: 15px;'>Resumo copiado para a área de transferência!</strong><br>Cole como legenda da imagem do gráfico ao compartilhar via WhatsApp.", 6000);
+						setTimeout(() => { btnActiveAction.textContent = '📋'; }, 999);
+					});
+				}
+			}
+        });
+
+        handleUI(true);
+    </script>
+</body>
+</html>
