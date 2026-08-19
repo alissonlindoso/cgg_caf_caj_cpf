@@ -10,7 +10,10 @@
     <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1"></script>
     
-    <script src="cgg_caf_caj_cpf.js"></script>
+    <!-- O novo motor de marcos visuais -->
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
+    
+    <script src="CGG x CAF x CAJ x CPF.js"></script>
     
     <style>
 		/* Estilos do Botão Duplo / Split Button */
@@ -93,13 +96,74 @@
         .split-dropdown-item:hover {
             background: #f1f3f5;
         }
-        :root {
-            --bg-color: #faf8f5;
-            --card-bg: #ffffff;
-            --text-main: #333333;
-            --text-muted: #666666;
-            --border: #e0e0e0;
+		:root {
+            /* 1. Cores de Fundo (Estrutura) */
+            --bg-color: #f0f2f5;        /* Fundo da tela inteira (atrás de tudo) */
+            --controls-bg: #ffffff;     /* Fundo da caixa de controles (onde estão os selects) */
+            --chart-bg: #fdfdfd;        /* Fundo exclusivo da área de plotagem (Canvas) */
+            
+            /* 2. Cores de Fonte */
+            --text-main: #333333;       /* Textos principais da interface externa */
+            --text-muted: #666666;      /* Textos secundários da interface externa */
+            --chart-text: #666666;      /* Letras e números de dentro do gráfico (eixos) */
+            
+            /* 3. Elementos Interativos e Bordas */
+            --border: #cccccc;          /* Linhas divisórias gerais */
+            --input-bg: #ffffff;        /* Fundo dos Selects, Inputs e Botões */
+            --input-hover: #f1f3f5;     /* Cor quando passa o mouse nos botões */
         }
+
+        /* INJEÇÃO CSS: MODO ESCURO */
+        [data-theme="dark"] {
+            --bg-color: #0f1115;
+            --controls-bg: #1e232b;     /* Caixa de controles fica grafite escuro */
+            --chart-bg: #fdfdfd;        /* MANTÉM BRANCO (Se quiser o gráfico escuro, mude para #121418) */
+            --chart-text: #666666;      /* Mantém cinza para continuar legível no fundo branco */
+            
+            --text-main: #e8eaed;
+            --text-muted: #9aa0a6;
+            --border: #3c4043;
+            
+            --input-bg: #2b303b;        /* Selects e botões ganham um tom destacado no escuro */
+            --input-hover: #3a414f;
+        }
+
+        /* Garante que os formulários e botões sigam as cores calibradas acima */
+        select, input[type="text"], button, details summary {
+            background-color: var(--input-bg);
+            color: var(--text-main);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            transition: background-color 0.2s, color 0.2s;
+        }
+		
+        /* Aplica o hover nos controles, mas IGNORA os botões flutuantes do topo */
+        button:not(#btn-theme):not(#btn-link):hover, details summary:hover, .split-dropdown-item:hover {
+            background-color: var(--input-hover) !important;
+        }
+
+        /* Opcional: Apenas tira uma "casquinha" da opacidade quando passar o mouse no Sol/Lua/Link */
+        #btn-theme:hover, #btn-link:hover {
+            opacity: 0.7;
+            background-color: transparent !important;
+        }
+
+        /* Clareia os links de azul escuro para azul claro no modo escuro para dar leitura */
+        [data-theme="dark"] a { color: #58a6ff !important; }
+        
+        /* Conserta os fundos do Split Button (câmera) no modo escuro */
+        [data-theme="dark"] .split-action-container, 
+        [data-theme="dark"] #split-menu {
+            background-color: var(--input-bg);
+            border-color: var(--border);
+        }
+
+        /* Garante que o botão fique bem posicionado no canto */
+        .dashboard-container {
+            position: relative; /* Adicione esta linha na classe existente */
+            /* ... (resto do seu css do dashboard-container) ... */
+        }
+		
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: var(--bg-color);
@@ -166,12 +230,12 @@
     </style>
 </head>
 <body>
-    <div class="dashboard-container">
+	<div class="dashboard-container">
         <div id="toast-shortcuts" class="toast-shortcuts"></div>
     
         <h1 class="header-title"><span title="Carreiras de Gestão Governamental">CGG</span> x <span title="Carreiras de Auditoria Federal">CAF</span> x <span title="Carreiras da Área Jurídica">CAJ</span> x <span title="Carreira Policial Federal">CPF</span></h1>
 
-        <div class="controls-grid" style="display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-end; background: #ededed; padding: 0px 20px 10px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 10px; width: 100%; box-sizing: border-box;">
+        <div class="controls-grid" style="display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-end; background-color: var(--controls-bg); padding: 0px 20px 10px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 10px; width: 100%; box-sizing: border-box;">
             
             <!-- Grupo 1: Seleção de Séries -->
             <div id="container-series1" style="display: flex; flex-direction: column; gap: 2px; flex-shrink: 0;">
@@ -182,8 +246,8 @@
             <!-- Botões Swap/Navegação -->
             <div id="wrapper-nav-btns" style="display: flex; align-items: center; gap: 2px; height: 30px; flex-shrink: 0;">
                 <button id="btn-swap" style="cursor:pointer; padding: 0px 5px; background:#fff; border:1px solid #ccc; border-radius:4px; width:30px; height:30px; font-size:24px;" title="Inverter">⇄</button>
-                <button id="btn-prev" style="display:none; cursor:pointer; padding: 0px 8px; background:#fff; border:1px solid #ccc; border-radius:4px; width:30px; height:30px; font-size:16px;" title="Anterior">◀</button>
-                <button id="btn-next" style="display:none; cursor:pointer; padding: 0px 10px; background:#fff; border:1px solid #ccc; border-radius:4px; width:30px; height:30px; font-size:16px;" title="Próximo">▶</button>
+                <button id="btn-prev" style="display:none; cursor:pointer; padding: 0px 8px 2px; background:#fff; border:1px solid #ccc; border-radius:4px; width:30px; height:30px; font-size:16px;" title="Anterior">◀</button>
+                <button id="btn-next" style="display:none; cursor:pointer; padding: 0px 10px 2px; background:#fff; border:1px solid #ccc; border-radius:4px; width:30px; height:30px; font-size:16px;" title="Próximo">▶</button>
                 <button id="btn-clear1" style="cursor:pointer; padding: 0px 6px; background:#fff; border:1px solid #ccc; border-radius:4px; width:30px; height:30px; font-weight:bold; font-size:18px;" title="Limpar">✖</button>
             </div>
 
@@ -201,8 +265,8 @@
             <div id="container-datas" style="display: none; flex-direction: column; gap: 2px; flex-shrink: 0;">
                 <u><b><label style="font-size: 13px; font-weight: 666; color: var(--text-muted); cursor: default;">Período</label></b></u>
                 <div style="display: flex; gap: 2px; align-items: center; height: 30px;">
-                    <select id="data-inicio" style="width: 80px; padding: 4px 5px; border-radius: 4px; border: 1px solid #ccc; font-size: 14px; background: #fff; height: 30px; outline: none; box-sizing: border-box;"></select>
-                    <select id="data-fim" style="width: 80px; padding: 4px 5px; border-radius: 4px; border: 1px solid #ccc; font-size: 14px; background: #fff; height: 30px; outline: none; box-sizing: border-box;"></select>
+                    <select id="data-inicio" style="width: 80px; padding: 4px 5px; border-radius: 4px; border: 1px solid #ccc; font-size: 13px; background: #fff; height: 30px; outline: none; box-sizing: border-box;"></select>
+                    <select id="data-fim" style="width: 80px; padding: 4px 5px; border-radius: 4px; border: 1px solid #ccc; font-size: 13px; background: #fff; height: 30px; outline: none; box-sizing: border-box;"></select>
                 </div>
             </div>
 
@@ -220,20 +284,23 @@
             <div id="container-escala" style="display: flex; flex-direction: column; gap: 2px; flex-shrink: 0;">
                 <u><b><label style="font-size: 13px; font-weight: 666; color: var(--text-muted); cursor: default;">Escala</label></b></u>
                 <div style="display: flex; gap: 7px; align-items: center; height: 30px;">
-                    <label style="display: flex; align-items: center; gap: 1px; cursor: pointer; font-size: 14px; color: var(--text-main); margin: 0;"><input type="radio" name="visao" value="valor" checked> absoluto <i>(R$)</i></label>
-                    <label style="display: flex; align-items: center; gap: 1px; cursor: pointer; font-size: 14px; color: var(--text-main); margin: 0;"><input type="radio" name="visao" value="percentual"> relativo <i>(%)</i></label>
+                    <label style="display: flex; align-items: center; gap: 1px; cursor: pointer; font-size: 14px; color: var(--text-main); margin: 0;"><input type="radio" name="escala" value="valor" checked> abs. <i>(R$)</i></label>
+                    <label style="display: flex; align-items: center; gap: 1px; cursor: pointer; font-size: 14px; color: var(--text-main); margin: 0;"><input type="radio" name="escala" value="percentual"> rel. <i>(%)</i></label>
                 </div>
             </div>
 
-            <!-- Grupo: Opções (Ambos) -->
+			<!-- Grupo: Opções (Ambos) -->
+			
+			
             <div id="wrapper-opcoes" style="display: flex; flex-direction: column; gap: 2px; flex-shrink: 0;">
                 <u><b><label style="font-size: 13px; font-weight: 666; color: var(--text-muted); cursor: default;">Opções</label></b></u>
                 <div style="display: flex; gap: 3px; align-items: center; height: 30px; padding-left: 3px">
-                    <label style="display: flex; align-items: center; gap: 3px; cursor: pointer; font-size: 14px; color: var(--text-main); margin: 0;"><input type="checkbox" id="comparativo" checked> desafio</label>
+                    <label style="display: flex; align-items: center; gap: 3px; cursor: pointer; font-size: 14px; color: var(--text-main); margin: 0;"><input type="checkbox" id="desafio" checked> desafio</label>
                     <div style="display: flex; align-items: center; gap: 5px;">
                         <label style="display: flex; align-items: center; gap: 3px; cursor: pointer; font-size: 14px; color: var(--text-main); margin: 0;"><input type="checkbox" id="rotulos"> rótulos</label>
                         <button id="btn-font-minus" style="cursor:pointer; padding: 0px; background:#fff; border:1px solid #ccc; border-radius:4px; width:22px; height:22px; font-weight:bold; display:none; line-height:1; font-size:18px;" title="Diminuir fonte">–</button>
                         <button id="btn-font-plus" style="cursor:pointer; padding: 0px; background:#fff; border:1px solid #ccc; border-radius:4px; width:22px; height:22px; font-weight:bold; display:none; line-height:1; font-size:18px;" title="Aumentar fonte">+</button>
+                        <label style="display: flex; align-items: center; gap: 3px; cursor: pointer; font-size: 14px; color: var(--text-main); margin: 0;"><input type="checkbox" id="ipca" title="Deflacionar a valor presente"> IPCA</label>
                         
 						<div class="split-action-container" id="split-container" style="position: relative; display: inline-flex; align-items: center; background: #fff; border: 1px solid #ccc; border-radius: 4px; height: 45px; margin-left: 10px; margin-bottom: 12px;">
 							<button id="btn-active-action" style="background: transparent; border: none; cursor: pointer; padding: 0 0px; padding-bottom: 10px; line-height: 1; font-size: 40px; height: 100%; display: flex; align-items: center; justify-content: center;" title="Capturar em PNG">📷</button>
@@ -252,7 +319,60 @@
             </div>
         </div>
         
+		<!-- Botões de Ação Global (Topo Direito) -->
+        <div style="position: absolute; top: 10px; left: 25px; display: flex; gap: 12px; align-items: center;">
+            <button id="btn-theme" style="background: transparent; border: none; font-size: 24px; cursor: pointer; outline: none; transition: transform 0.2s;" title="Ativar modo ESCURO">🌚</button> <!-- 🌑☀️🔆🔅 -->
+        </div>
+        <div style="position: absolute; top: 10px; right: 25px; display: flex; gap: 12px; align-items: center;">
+            <button id="btn-link" style="background: transparent; border: none; font-size: 24px; cursor: pointer; outline: none;" title="Compartilhar link URL">🔗</button>
+        </div>
+		
         <div class="chart-container">
+            
+            <!-- QUADRO DE KPI DINÂMICO (Oculto por padrão, ativado no hover da legenda) -->
+            <div id="kpi-container" style="position: absolute; top: 50px; left: 50%; transform: translateX(-50%); z-index: 10; display: none; flex-direction: column; gap: 12px; backdrop-filter: blur(4px); border: 2px solid; padding: 12px 18px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); pointer-events: none; transition: opacity 0.2s;">
+                
+                <!-- LINHA 1: PERÍODO -->
+                <div style="display: flex; gap: 20px; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(128, 128, 128, 0.2); padding-bottom: 10px;">
+                    <div style="text-align: left; min-width: 110px;">
+                        <div style="font-size: 10px; color: var(--text-muted); font-weight: bold; letter-spacing: 0.5px;">INÍCIO DO PERÍODO</div>
+                        <div id="kpi-inicio-val" style="font-size: 16px; font-weight: 900; color: var(--text-main); margin-top: 2px;">-</div>
+                        <div id="kpi-inicio-data" style="font-size: 11px; color: var(--text-muted);">-</div>
+                    </div>
+                    
+                    <div style="text-align: center; padding: 0 10px;">
+                        <div style="font-size: 10px; color: var(--text-muted); font-weight: bold; letter-spacing: 0.5px;">VARIAÇÃO</div>
+                        <div id="kpi-var-periodo-val" style="font-size: 17px; font-weight: 900; margin-top: 2px;">-</div>
+                    </div>
+
+                    <div style="text-align: right; min-width: 110px;">
+                        <div style="font-size: 10px; color: var(--text-muted); font-weight: bold; letter-spacing: 0.5px;">FINAL DO PERÍODO</div>
+                        <div id="kpi-fim-val" style="font-size: 16px; font-weight: 900; color: var(--text-main); margin-top: 2px;">-</div>
+                        <div id="kpi-fim-data" style="font-size: 11px; color: var(--text-muted);">-</div>
+                    </div>
+                </div>
+
+                <!-- LINHA 2: EXTREMOS -->
+                <div style="display: flex; gap: 20px; align-items: center; justify-content: space-between;">
+                    <div style="text-align: left; min-width: 110px;">
+                        <div style="font-size: 10px; color: var(--text-muted); font-weight: bold; letter-spacing: 0.5px;">PISO NO PERÍODO</div>
+                        <div id="kpi-min-val" style="font-size: 16px; font-weight: 900; color: var(--text-main); margin-top: 2px;">-</div>
+                        <div id="kpi-min-data" style="font-size: 11px; color: var(--text-muted);">-</div>
+                    </div>
+                    
+                    <div style="text-align: center; padding: 0 10px;">
+                        <div style="font-size: 10px; color: var(--text-muted); font-weight: bold; letter-spacing: 0.5px;">VARIAÇÃO</div>
+                        <div id="kpi-var-extremos-val" style="font-size: 17px; font-weight: 900; margin-top: 2px;">-</div>
+                    </div>
+
+                    <div style="text-align: right; min-width: 110px;">
+                        <div style="font-size: 10px; color: var(--text-muted); font-weight: bold; letter-spacing: 0.5px;">TETO NO PERÍODO</div>
+                        <div id="kpi-max-val" style="font-size: 16px; font-weight: 900; color: var(--text-main); margin-top: 2px;">-</div>
+                        <div id="kpi-max-data" style="font-size: 11px; color: var(--text-muted);">-</div>
+                    </div>
+                </div>
+            </div>
+
             <canvas id="mainChart"></canvas>
         </div>
         
@@ -260,12 +380,14 @@
             <h3 style="margin-top: 0; color: var(--text-muted); font-size: 15px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Fontes Gerais</h3>
             
             <ul style="list-style-type: none; padding-left: 0; margin-bottom: 15px; line-height: 1.8;">
-                <li>🔗 <a href="https://portaldatransparencia.gov.br/download-de-dados/servidores" target="_blank" style="color: #3498DB; text-decoration: none; font-weight: 500;">Dados Abertos do Portal da Transparência (Servidores)</a></li>
-                <li>🔗 <a href="https://www4.planalto.gov.br/legislacao" target="_blank" style="color: #3498DB; text-decoration: none; font-weight: 500;">Portal de Legislação do Palácio do Planalto (Leis, Medidas Provisórias e Decretos)</a></li>
-                <li>🔗 <a href="https://www.gov.br/receitafederal/pt-br/acesso-a-informacao/participacao-social/conselhos-e-orgaos-colegiados/comite-gestor-do-programa-de-produtividade-da-receita-federal" target="_blank" style="color: #3498DB; text-decoration: none; font-weight: 500;">Comitê Gestor do Programa de Produtividade da Receita Federal do Brasil (CGPP-RFB)</a></li>
-                <li>🔗 <a href="https://www.gov.br/agu/pt-br/comunicacao/noticias/painel-amplia-transparencia-de-informacoes-sobre-honorarios-sucumbenciais" target="_blank" style="color: #3498DB; text-decoration: none; font-weight: 500;">Painel do Conselho Curador dos Honorários Advocatícios de Sucumbência e da eficiência institucional da Advocacia-Geral da União (CCHA-AGU)</a></li>
+                <li>💡 <a href="https://portaldatransparencia.gov.br/download-de-dados/servidores" target="_blank" style="color: #3498DB; text-decoration: none; font-weight: 500;">Dados Abertos do Portal da Transparência (Servidores e Honorários)</a></li>
+                <li>📜 <a href="https://www4.planalto.gov.br/legislacao" target="_blank" style="color: #3498DB; text-decoration: none; font-weight: 500;">Portal de Legislação do Palácio do Planalto (Leis, Medidas Provisórias e Decretos)</a></li>
+                <li>🦁 <a href="https://www.gov.br/receitafederal/pt-br/acesso-a-informacao/participacao-social/conselhos-e-orgaos-colegiados/comite-gestor-do-programa-de-produtividade-da-receita-federal" target="_blank" style="color: #3498DB; text-decoration: none; font-weight: 500;">Comitê Gestor do Programa de Produtividade da Receita Federal do Brasil (CGPP-RFB)</a></li>
+                <li>⚖️ <a href="https://www.gov.br/agu/pt-br/comunicacao/noticias/painel-amplia-transparencia-de-informacoes-sobre-honorarios-sucumbenciais" target="_blank" style="color: #3498DB; text-decoration: none; font-weight: 500;">Painel do Conselho Curador dos Honorários Advocatícios de Sucumbência e da eficiência institucional da Advocacia-Geral da União (CCHA-AGU)</a></li>
+                <li>🏫 <a href="https://repositorio.enap.gov.br/handle/1/5504" target="_blank" style="color: #3498DB; text-decoration: none; font-weight: 500;">Memória Institucional e Editais de Concurso (Repositório ENAP-ESAF)</a></li>
+                <li id="fonte-ipca" style="display: none;">🏦 <a href="https://www3.bcb.gov.br/sgspub/consultarvalores/consultarValoresSeries.do?method=consultarSeries&series=433" target="_blank" style="color: #3498DB; text-decoration: none; font-weight: 500;">Índice Nacional de Preços ao Consumidor Amplo - IPCA (SGS/BCB)</a></li>
             </ul>
-
+<!--
             <details style="cursor: pointer; outline: none;">
                 <summary style="font-weight: 600; color: var(--text-muted); user-select: none; display: inline-block; padding: 5px 10px; background: #fdfbf7; border: 1px solid var(--border); border-radius: 4px;">
                     Fontes Específicas ▾
@@ -304,41 +426,45 @@
                     </div>
                 </div>
             </details>
+-->
+			<details style="cursor: pointer; outline: none;">
+                <summary style="font-weight: 600; color: var(--text-muted); user-select: none; display: inline-block; padding: 5px 10px; background: #fdfbf7; border: 1px solid var(--border); border-radius: 4px;">
+                    Fontes Específicas ▾
+                </summary>
+                
+                <!-- Contêiner de Coluna Única (Flexbox em coluna) que será alimentado pelo JS -->
+                <div id="container-fontes-dinamicas" style="margin-top: 10px; padding: 20px; background-color: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; color: var(--text-muted); display: flex; flex-direction: column; gap: 18px;">
+                    <em style="color: #999;">Nenhum dado plotado; selecione ambas as séries 'desafiante' e 'desafiado' ou uma série avulsa, se desmarcada a opção 'desafio'.</em>
+                </div>
+            </details>
         </div>
     </div>
 
     <script>
-/*
-// 1. Dicionário Único de URLs (Índice = ID)
-const fontesUrls = [
-	"https://www.planalto.gov.br/ccivil_03/_ato2007-2010/2008/mpv/anexos/anmpv440.htm#AnexoIV", // 0
-	"https://www.planalto.gov.br/ccivil_03/_ato2007-2010/2008/mpv/anexos/anmpv440.htm#AnexoII", // 1
-	"https://www.planalto.gov.br/ccivil_03/_ato2007-2010/2008/mpv/anexos/anmpv440.htm#AnexoIII", // 2
-	"https://www.planalto.gov.br/ccivil_03/_ato2007-2010/2008/lei/anexos/anl11890-01-10a.htm#AnexoIV", // 3
-	"https://www.planalto.gov.br/ccivil_03/_ato2007-2010/2008/lei/anexos/anl11890-01-10a.htm#AnexoII", // 4
-	"https://www.planalto.gov.br/ccivil_03/_ato2007-2010/2008/lei/anexos/anl11890-01-10a.htm#AnexoIII", // 5
-	"https://www.planalto.gov.br/ccivil_03/_ato2011-2014/2012/lei/l12775.htm#AnexoIV", // 6
-	"https://www.planalto.gov.br/ccivil_03/_ato2011-2014/2013/lei/l12808.htm#anexoi", // 7
-	"https://www.planalto.gov.br/ccivil_03/_ato2011-2014/2012/lei/l12775.htm#AnexoXII", // 8
-	"https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2016/lei/l13327.htm#anexoi", // 9
-	"https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2016/lei/l13327.htm#anexoxxxv", // 10
-	"https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2016/mpv/mpv765.htm#Art20", // 11
-	"https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2016/mpv/mpv765.htm#AnexoVII", // 12
-	"https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2017/lei/l13464.htm#anexo7", // 13
-	"https://www.planalto.gov.br/ccivil_03/_ato2023-2026/2023/mpv/mpv1170anexo2.htm#anexo134", // 14
-	"https://www.planalto.gov.br/ccivil_03/_ato2023-2026/2023/mpv/mpv1170anexo2.htm#anexo127", // 15
-	"https://www.planalto.gov.br/ccivil_03/_ato2023-2026/2023/lei/l14673anexo4.htm#anexo150", // 16
-	"https://www.planalto.gov.br/ccivil_03/_ato2023-2026/2023/decreto/d11545.htm#Art8%C2%A72", // 17
-	"https://www.planalto.gov.br/ccivil_03/_ato2023-2026/2024/mpv/anexos/mpv1286anexo254a321.htm#anexo320", // 18
-	"https://www.planalto.gov.br/ccivil_03/_ato2023-2026/2024/mpv/anexos/mpv1286anexo254a321.htm#anexo321", // 19
-	"https://www.planalto.gov.br/ccivil_03/_ato2023-2026/2025/lei/anexo/anexo254a323-lei15141.htm#anexo320", // 20
-	"https://www.planalto.gov.br/ccivil_03/_ato2023-2026/2026/lei/l15367.htm#anexo12", // 21
-	"https://www.planalto.gov.br/ccivil_03/_ato2023-2026/2025/lei/anexo/anexo254a323-lei15141.htm#anexo321", // 22
-	"https://www.gov.br/receitafederal/pt-br/acesso-a-informacao/participacao-social/conselhos-e-orgaos-colegiados/comite-gestor-do-programa-de-produtividade-da-receita-federal/resolucoes/resolucao-cgpp-no-11-de-02-de-julho-de-2026-bs.pdf/@@download/file", // 23
-	"https://www.gov.br/receitafederal/pt-br/acesso-a-informacao/participacao-social/conselhos-e-orgaos-colegiados/comite-gestor-do-programa-de-produtividade-da-receita-federal/resolucoes/resolucao-cgpp-no-11-de-02-de-julho-de-2026-bs.pdf/view" // 24
-];
+		// ==========================================
+        // ASSETS VETORIAIS INSTITUCIONAIS (SVG)
+        // ==========================================
+        
+        // Lê a URL sorrateiramente antes de tudo para descobrir a identidade visual
+        const urlParamsIniciais = new URLSearchParams(window.location.search);
+        const parametroLogo = urlParamsIniciais.get('logo');
+        // Só aceita ASTN ou ASCGU. Qualquer outra coisa (ou vazio) fica null.
+        const LOGO = (parametroLogo === 'ASTN' || parametroLogo === 'ASCGU') ? parametroLogo : null;
 
-// 2. Mapeamento CSV Célula:ID_URL
+        // 1. Logo ASTN
+        const svgASTN = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 200" width="500" height="200"><path d="M0.08 0.08C166.69 0.08 333.31 0.08 499.92 0.08C499.92 66.69 499.92 133.31 499.92 199.92C333.31 199.92 166.69 199.92 0.08 199.92C0.08 133.31 0.08 66.69 0.08 0.08ZM64.62 126C51 131.74 38.19 139.78 25.32 147.16C21.41 149.4 17.68 151.96 13.89 154.38C12.35 155.36 11.12 156.92 9.41 157.5C11.55 158.24 19.47 153.57 21.79 152.29C24.26 150.94 26.9 150.11 29.42 148.91C36.08 145.76 42.73 142.67 49.63 140.13C52.24 139.17 57.29 136.04 59.9 137C59.27 141.14 54.34 149.44 52.39 153.56C48.21 162.36 43.99 171.07 39.53 179.71C36.98 184.65 32.75 190.42 30.92 195.5C32.12 197.07 34.7 196.59 36.5 196.6C41.05 196.62 45.61 196.62 50.17 196.58C51.98 196.56 54.26 196.97 55.41 195.24C58.66 190.39 60.85 184.82 63.48 179.64C68.74 169.3 73.33 158.58 77.69 147.84C79.45 143.52 81.32 139.05 82.82 134.65C83.53 132.53 83.79 130.58 85.06 128.67C88.04 127.19 92.16 126.5 95.5 125.97C99.97 125.27 104.32 124.06 108.69 123.18C111.66 122.57 114.83 122.83 117.83 122.37C120.25 122 130.78 120.97 132.59 121.64C137.56 140.33 144.85 158.28 151.83 176.33C153.16 179.77 158.12 193.29 160.09 195.42C161.14 196.55 163.31 195.9 164.68 196.16C168.86 196.95 173.25 196.63 177.5 196.6C179.1 196.59 181.12 197.02 182.5 196.09C182.62 194.23 180.92 192.34 180.22 190.61C178.39 186.17 176.38 181.8 174.32 177.5C168.25 164.82 163.61 151.33 158.65 138.18C157.59 135.39 153.17 125.19 153.4 122.97C163.73 123.75 174.79 128.05 183.79 133.36C187.54 135.57 191.1 138.28 194.46 141.02C195.63 141.97 196.47 143.61 198.05 143.5C198.55 141.94 198.35 140.13 198.32 138.5C198.3 136.94 198.6 135.11 198.2 133.59C197.62 131.44 193.18 127.31 191.49 125.68C183.41 117.83 173.46 111.82 162.49 108.99C158.87 108.06 155.12 107.34 151.45 106.78C150.13 106.58 148.91 106.95 147.67 106.35C146.2 104.68 145.94 101.63 145.34 99.51C144.03 94.86 142.58 90.11 141.07 85.49C134.89 66.53 130.4 46.9 126.04 27.48C124.72 21.64 123.68 15.65 122.38 9.82C121.94 7.85 122.22 4.63 120.75 3.17C118.62 2.71 113.7 2.23 111.83 3.47C110.91 5.71 112.04 7.63 112.18 9.88C112.52 15.18 112.94 20.26 113.76 25.5C114.27 28.77 114.05 32.2 114.42 35.49C114.92 39.86 116.15 44.17 116.71 48.5C118.15 59.75 119.67 71.09 122.4 82.15C123.45 86.4 124.09 90.91 125.27 95.17C125.76 96.95 126.59 98.68 126.88 100.51C127.18 102.44 128.75 104.94 127.67 106.7C124.79 107.94 121.36 107.6 118.29 108.15C111.48 109.38 104.91 111.39 98.18 113.08C96.3 113.55 90.67 116.32 89.24 115.33C89.5 112.25 91.33 108.97 92.11 105.9C94.28 97.47 96.67 89.07 98.83 80.67C100.02 76.06 100.51 71.25 101.49 66.6C104.06 54.39 105.75 42.54 107.3 30.17C107.67 27.17 108.43 24.13 108.7 21.17C108.84 19.51 108.57 17.83 108.75 16.17C109.01 13.75 109.59 11.66 109.56 9.17C109.53 7.24 110.45 5.34 109.78 3.5C108.11 2.58 103.78 2.18 102.47 3.95C100.94 6 101.24 9.11 100.63 11.49C99.09 17.56 97.57 23.69 96.28 29.82C91.57 52.16 84.02 74.08 76.41 95.56C74.12 102.01 71.76 108.4 69.26 114.78C67.8 118.51 66.61 122.49 64.62 126ZM277.81 68.5C274.39 64.49 265.37 63.44 260.5 62.71C240.81 59.75 218.34 64.68 210.86 85.4C209.9 88.06 208.98 90.68 208.82 93.56C207.72 114.07 223.24 125.08 240.49 131.71C252.57 136.36 266.68 142.15 266.59 157.5C266.47 179.06 241.3 181.17 225.56 177.24C222.54 176.48 219.05 175.31 216.3 173.85C214.5 172.9 212.45 171.14 210.4 171.5C209.48 174.9 206.3 181.23 206.83 184.57C208.62 186.46 212.05 187.55 214.44 188.41C221 190.75 227.22 192.01 234.17 192.32C240.06 192.6 246.32 193.02 252.15 191.66C266.8 188.26 280.41 178.05 282.25 162.17C282.63 158.92 283.2 155.88 282.95 152.5C281.74 136.54 269.03 126.13 255.1 120.41C245.75 116.57 233.92 113.42 228.19 104.31C222.32 94.97 226.45 83.03 235.91 78.09C239.26 76.34 242.76 76.02 246.43 75.84C247.81 75.78 248.98 75.23 250.38 75.49C254.82 76.29 259.23 75.98 263.66 77.18C266.96 78.07 270.18 80.55 273.5 80.97C274.94 76.81 276.38 72.66 277.81 68.5ZM385.13 64.5C383.26 63.43 379.98 64.04 377.83 64.04C371.94 64.04 366.06 64.04 360.17 64.04C344.83 64.04 329.5 64.04 314.17 64.04C307.05 64.04 298.43 63.08 291.49 64.17C290.49 65.95 290.69 75.81 291.5 77.81C304.31 77.81 317.12 77.81 329.94 77.81C329.94 115.54 329.94 153.26 329.94 190.99C335.43 190.99 340.92 190.99 346.41 190.99C346.41 153.26 346.41 115.53 346.41 77.81C359.22 77.81 372.03 77.81 384.83 77.81C385.88 75.3 385.72 67.27 385.13 64.5ZM417.5 64.06C411.5 64.06 405.5 64.06 399.5 64.06C398.42 66.51 399.07 70.17 399.07 72.83C399.07 79.28 399.07 85.72 399.07 92.17C399.07 114.72 399.07 137.28 399.07 159.83C399.07 167.06 399.07 174.28 399.07 181.5C399.07 184.2 398.29 188.42 399.45 190.83C402.01 191.38 412.76 191.68 414.78 190.5C415.6 182.21 414.86 173.5 414.86 165.17C414.86 147.03 414.61 128.95 414.21 110.83C414.07 104.64 414.99 97.95 414.08 91.83C413.79 89.85 412.56 86.23 414.5 85.04C418.53 92.51 421.77 100.39 426.15 107.69C442.9 135.53 460.17 163.25 477.83 190.64C479.86 191.56 492.35 191.5 494.29 190.5C494.29 148.5 494.29 106.5 494.29 64.5C492.29 63.63 481.04 63.5 479.17 64.43C478.62 67.09 478.99 70.12 478.99 72.83C478.99 78.72 478.99 84.61 478.99 90.5C478.99 107.03 478.46 123.65 478.99 140.17C479.06 142.29 479.74 144.31 479.83 146.44C479.97 149.99 479.51 153.64 479.91 157.17C480.25 160.23 481.5 164.81 480.17 167.67C477.59 165.86 476.35 160.76 474.85 157.97C470.92 150.61 466.75 143.42 462.75 136.09C459.06 129.34 454.57 122.89 450.34 116.47C442.95 105.23 436.16 93.6 428.91 82.25C425.11 76.32 420.55 70.4 417.5 64.06Z" fill="%23ffffff" fill-rule="evenodd" stroke="%23ffffff" stroke-width="0.25" stroke-linejoin="round"/><path d="M277.81 68.5C276.38 72.66 274.94 76.81 273.5 80.97C270.18 80.55 266.96 78.07 263.66 77.18C259.23 75.98 254.82 76.29 250.38 75.49C248.98 75.23 247.81 75.78 246.43 75.84C242.76 76.02 239.26 76.34 235.91 78.09C226.45 83.03 222.32 94.97 228.19 104.31C233.92 113.42 245.75 116.57 255.1 120.41C269.03 126.13 281.74 136.54 282.95 152.5C283.2 155.88 282.63 158.92 282.25 162.17C280.41 178.05 266.8 188.26 252.15 191.66C246.32 193.02 240.06 192.6 234.17 192.32C227.22 192.01 221 190.75 214.44 188.41C212.05 187.55 208.62 186.46 206.83 184.57C206.3 181.23 209.48 174.9 210.4 171.5C212.45 171.14 214.5 172.9 216.3 173.85C219.05 175.31 222.54 176.48 225.56 177.24C241.3 181.17 266.47 179.06 266.59 157.5C266.68 142.15 252.57 136.36 240.49 131.71C223.24 125.08 207.72 114.07 208.82 93.56C208.98 90.68 209.9 88.06 210.86 85.4C218.34 64.68 240.81 59.75 260.5 62.71C265.37 63.44 274.39 64.49 277.81 68.5ZM385.13 64.5C385.72 67.27 385.88 75.3 384.83 77.81C372.03 77.81 359.22 77.81 346.41 77.81C346.41 115.53 346.41 153.26 346.41 190.99C340.92 190.99 335.43 190.99 329.94 190.99C329.94 153.26 329.94 115.54 329.94 77.81C317.12 77.81 304.31 77.81 291.5 77.81C290.69 75.81 290.49 65.95 291.49 64.17C298.43 63.08 307.05 64.04 314.17 64.04C329.5 64.04 344.83 64.04 360.17 64.04C366.06 64.04 371.94 64.04 377.83 64.04C379.98 64.04 383.26 63.43 385.13 64.5ZM417.5 64.06C420.55 70.4 425.11 76.32 428.91 82.25C436.16 93.6 442.95 105.23 450.34 116.47C454.57 122.89 459.06 129.34 462.75 136.09C466.75 143.42 470.92 150.61 474.85 157.97C476.35 160.76 477.59 165.86 480.17 167.67C481.5 164.81 480.25 160.23 479.91 157.17C479.51 153.64 479.97 149.99 479.83 146.44C479.74 144.31 479.06 142.29 478.99 140.17C478.46 123.65 478.99 107.03 478.99 90.5C478.99 84.61 478.99 78.72 478.99 72.83C478.99 70.12 478.62 67.09 479.17 64.43C481.04 63.5 492.29 63.63 494.29 64.5C494.29 106.5 494.29 148.5 494.29 190.5C492.35 191.5 479.86 191.56 477.83 190.64C460.17 163.25 442.9 135.53 426.15 107.69C421.77 100.39 418.53 92.51 414.5 85.04C412.56 86.23 413.79 89.85 414.08 91.83C414.99 97.95 414.07 104.64 414.21 110.83C414.61 128.95 414.86 147.03 414.86 165.17C414.86 173.5 415.6 182.21 414.78 190.5C412.76 191.68 402.01 191.38 399.45 190.83C398.29 188.42 399.07 184.2 399.07 181.5C399.07 174.28 399.07 167.06 399.07 159.83C399.07 137.28 399.07 114.72 399.07 92.17C399.07 85.72 399.07 79.28 399.07 72.83C399.07 70.17 398.42 66.51 399.5 64.06C405.5 64.06 411.5 64.06 417.5 64.06Z" fill="%23747474" fill-rule="evenodd" stroke="%23747474" stroke-width="0.25" stroke-linejoin="round"/><path d="M89.24 115.33C88.75 115.76 87.9 119.37 86.67 120.83C87.4 123.13 85.51 126.27 85.06 128.67C83.79 130.58 83.53 132.53 82.82 134.65C81.32 139.05 79.45 143.52 77.69 147.84C73.33 158.58 68.74 169.3 63.48 179.64C60.85 184.82 58.66 190.39 55.41 195.24C54.26 196.97 51.98 196.56 50.17 196.58C45.61 196.62 41.05 196.62 36.5 196.6C34.7 196.59 32.12 197.07 30.92 195.5C32.75 190.42 36.98 184.65 39.53 179.71C43.99 171.07 48.21 162.36 52.39 153.56C54.34 149.44 59.27 141.14 59.9 137C61.32 135.37 61.21 132.79 63 131.5C63.54 129.67 64.08 127.83 64.62 126C66.61 122.49 67.8 118.51 69.26 114.78C71.76 108.4 74.12 102.01 76.41 95.56C84.02 74.08 91.57 52.16 96.28 29.82C97.57 23.69 99.09 17.56 100.63 11.49C101.24 9.11 100.94 6 102.47 3.95C103.78 2.18 108.11 2.58 109.78 3.5C110.45 5.34 109.53 7.24 109.56 9.17C109.59 11.66 109.01 13.75 108.75 16.17C108.57 17.83 108.84 19.51 108.7 21.17C108.43 24.13 107.67 27.17 107.3 30.17C105.75 42.54 104.06 54.39 101.49 66.6C100.51 71.25 100.02 76.06 98.83 80.67C96.67 89.07 94.28 97.47 92.11 105.9C91.33 108.97 89.5 112.25 89.24 115.33Z" fill="%23fdd401" fill-rule="evenodd" stroke="%23fdd401" stroke-width="0.25" stroke-linejoin="round"/><path d="M147.67 106.35C147.28 106.23 146.89 106.12 146.5 106C145.01 106.86 143.48 106.05 141.83 105.91C139.04 105.66 130.86 107.92 129.17 106C128.67 106.23 128.17 106.46 127.67 106.7C128.75 104.94 127.18 102.44 126.88 100.51C126.59 98.68 125.76 96.95 125.27 95.17C124.09 90.91 123.45 86.4 122.4 82.15C119.67 71.09 118.15 59.75 116.71 48.5C116.15 44.17 114.92 39.86 114.42 35.49C114.05 32.2 114.27 28.77 113.76 25.5C112.94 20.26 112.52 15.18 112.18 9.88C112.04 7.63 110.91 5.71 111.83 3.47C113.7 2.23 118.62 2.71 120.75 3.17C122.22 4.63 121.94 7.85 122.38 9.82C123.68 15.65 124.72 21.64 126.04 27.48C130.4 46.9 134.89 66.53 141.07 85.49C142.58 90.11 144.03 94.86 145.34 99.51C145.94 101.63 146.2 104.68 147.67 106.35ZM153.4 122.97C153.17 125.19 157.59 135.39 158.65 138.18C163.61 151.33 168.25 164.82 174.32 177.5C176.38 181.8 178.39 186.17 180.22 190.61C180.92 192.34 182.62 194.23 182.5 196.09C181.12 197.02 179.1 196.59 177.5 196.6C173.25 196.63 168.86 196.95 164.68 196.16C163.31 195.9 161.14 196.55 160.09 195.42C158.12 193.29 153.16 179.77 151.83 176.33C144.85 158.28 137.56 140.33 132.59 121.64C133.06 121.7 133.53 121.77 134 121.83C135.36 120.39 137.47 121.27 139.22 121.55C142.56 122.08 151.31 121.62 153.4 122.97Z" fill="%23329a32" fill-rule="evenodd" stroke="%23329a32" stroke-width="0.25" stroke-linejoin="round"/><path d="M147.67 106.35C148.91 106.95 150.13 106.58 151.45 106.78C155.12 107.34 158.87 108.06 162.49 108.99C173.46 111.82 183.41 117.83 191.49 125.68C193.18 127.31 197.62 131.44 198.2 133.59C198.6 135.11 198.3 136.94 198.32 138.5C198.35 140.13 198.55 141.94 198.05 143.5C196.47 143.61 195.63 141.97 194.46 141.02C191.1 138.28 187.54 135.57 183.79 133.36C174.79 128.05 163.73 123.75 153.4 122.97C151.31 121.62 142.56 122.08 139.22 121.55C137.47 121.27 135.36 120.39 134 121.83C133.53 121.77 133.06 121.7 132.59 121.64C130.78 120.97 120.25 122 117.83 122.37C114.83 122.83 111.66 122.57 108.69 123.18C104.32 124.06 99.97 125.27 95.5 125.97C92.16 126.5 88.04 127.19 85.06 128.67C85.51 126.27 87.4 123.13 86.67 120.83C87.9 119.37 88.75 115.76 89.24 115.33C90.67 116.32 96.3 113.55 98.18 113.08C104.91 111.39 111.48 109.38 118.29 108.15C121.36 107.6 124.79 107.94 127.67 106.7C128.17 106.46 128.67 106.23 129.17 106C130.86 107.92 139.04 105.66 141.83 105.91C143.48 106.05 145.01 106.86 146.5 106C146.89 106.12 147.28 106.23 147.67 106.35ZM64.62 126C64.08 127.83 63.54 129.67 63 131.5C61.21 132.79 61.32 135.37 59.9 137C57.29 136.04 52.24 139.17 49.63 140.13C42.73 142.67 36.08 145.76 29.42 148.91C26.9 150.11 24.26 150.94 21.79 152.29C19.47 153.57 11.55 158.24 9.41 157.5C11.12 156.92 12.35 155.36 13.89 154.38C17.68 151.96 21.41 149.4 25.32 147.16C38.19 139.78 51 131.74 64.62 126Z" fill="%2301488f" fill-rule="evenodd" stroke="%2301488f" stroke-width="0.25" stroke-linejoin="round"/></svg>`;
+
+        // 2. Logo ASCGU
+        const svgASCGU = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 200" width="500" height="200"><path d="M0.13 0.13C166.71 0.13 333.29 0.13 499.88 0.13C499.88 66.71 499.88 133.29 499.88 199.88C333.29 199.88 166.71 199.88 0.13 199.88C0.13 133.29 0.13 66.71 0.13 0.13ZM85.75 51.44C88.37 52.65 90.33 56.81 92.1 59.14C96.57 65.02 101.02 70.95 105.29 76.96C116.47 92.68 128.23 108.03 139.75 123.5C143.44 128.46 147.01 133.54 150.8 138.44C152.45 140.58 153.32 142.99 155.49 144.76C169.08 155.77 196.94 159.18 211.64 148.89C215.58 146.14 218.45 142.52 220.44 138.19C222.09 134.61 222.76 130.68 222.91 126.75C223.04 123.24 222.77 119.71 221.88 116.3C216.86 97.05 188.79 93.2 173.99 84.74C168.04 81.34 163.02 76.28 162.21 69.17C160.02 50.2 179.31 45.24 194.25 47.57C200.37 48.52 205.97 50.7 211.14 54.12C212.68 55.14 215.83 58.71 217.27 59.08C219.04 59.53 220.46 58.14 220.28 56.38C219.8 51.78 209.81 47.23 206.04 45.71C191.96 40.02 165.82 39.02 158.37 55.63C156.97 58.77 156.15 62.32 156.01 65.75C154.95 91.34 184.16 94.35 201.52 103.25C213.33 109.31 219.75 120.78 215.77 134.05C209.86 153.69 179.11 152.51 164.66 144.59C154.92 139.25 149.18 129.16 142.78 120.46C130.65 103.95 118.31 87.59 106.19 71.08C101.53 64.74 96.93 58.36 92.17 52.1C90.78 50.28 88.79 45.97 86.49 45.29C84.18 44.6 81.97 49.16 80.83 50.61C76.04 56.67 71.54 62.97 66.87 69.13C52.42 88.19 37.98 107.28 23.74 126.5C19.71 131.95 15.51 137.28 11.52 142.76C9.74 145.19 6.79 147.85 6.04 150.75C10.59 152.03 12.16 149.11 14.55 145.81C18.95 139.74 23.51 133.77 28.05 127.81C41.02 110.76 53.76 93.52 66.7 76.44C70.72 71.14 74.79 65.84 78.72 60.47C80.92 57.48 83.04 53.94 85.75 51.44ZM274.86 42.23C243.93 44.97 229.85 71.68 230.45 100.25C230.97 124.61 242.17 147.3 267.4 153.3C272.95 154.62 278.73 155.28 284.44 154.74C292.67 153.96 301.24 151.16 307.91 146.18C309.79 144.77 315.36 140.46 311.67 138.05C309.38 136.56 306.6 140.43 304.94 141.69C299.49 145.81 292.97 148.37 286.22 149.35C281.45 150.04 276.62 150.02 271.84 149.31C248.82 145.85 237.55 123.8 236.76 102.41C235.91 79.33 244.26 52.45 270.23 47.89C274.91 47.06 279.65 46.77 284.39 47.28C291.35 48.01 298.14 50.32 303.9 54.35C305.83 55.7 309.14 60.13 311.62 58.87C316.48 56.41 307.14 50.06 305.33 48.91C296.39 43.22 285.29 41.3 274.86 42.23ZM403.77 104.25C404.74 108.63 403.57 113.84 403.03 118.25C402.33 124.07 400.38 129.74 397.66 134.89C389.17 150.92 366.43 153.6 351.4 145.81C341.8 140.83 334.86 132.23 331.19 122.11C322.94 99.31 326.95 62.8 351.4 51.18C362.68 45.82 376.59 45.7 388.23 50.05C391.2 51.16 394.11 52.66 396.65 54.58C398.19 55.74 400.08 58.31 401.82 58.97C403.73 59.7 405.38 58.21 405.19 56.25C404.95 53.91 401.86 51.86 400.13 50.62C394.65 46.72 387.96 43.9 381.32 42.8C359.8 39.26 336.45 48.19 327.25 68.98C312.95 101.28 322.91 148.48 362.77 154.36C368.5 155.21 374.43 155.07 380.08 153.78C399.23 149.42 408.63 132.94 409.89 114.25C410.08 111.46 411.17 101.66 409.63 99.61C408.81 98.5 402.32 98.98 400.75 98.98C392.92 98.98 385.08 98.96 377.25 98.98C374.87 98.98 370 98.37 369.71 101.84C369.44 105.17 375.66 103.94 377.75 103.94C384.86 103.94 397.31 102.91 403.77 104.25ZM425.86 43.16C422.32 44.21 423.07 49.52 423.07 52.25C423.08 61.42 423.06 70.58 423.07 79.75C423.08 84.58 423.06 89.42 423.07 94.25C423.09 104.31 422.27 114.74 424.18 124.67C426.63 137.48 435.07 149.66 448.09 153.22C451.76 154.22 455.44 154.91 459.25 154.9C464.37 154.89 469.87 153.92 474.54 151.77C497.99 140.96 495.37 113.18 495.37 91.75C495.37 85.58 495.35 79.42 495.36 73.25C495.38 65.58 495.38 57.92 495.37 50.25C495.37 48.39 496.36 43.43 493.74 43.03C490.1 42.48 489.29 46.57 489.24 49.28C489.11 57.27 489.23 65.26 489.24 73.25C489.25 78.25 489.23 83.25 489.24 88.25C489.28 108.82 493.12 139.92 468.75 148.52C465.64 149.61 462.02 149.9 458.75 149.85C454.23 149.78 449.89 148.88 445.82 146.92C425.97 137.33 429.13 107.79 429.16 89.75C429.17 84.42 429.17 79.08 429.16 73.75C429.16 65.75 429.16 57.75 429.16 49.75C429.16 47.17 430.13 41.88 425.86 43.16ZM133.46 150.75C134.52 143.17 128.75 131.95 124.28 125.97C104.48 99.4 65.35 100.34 45.85 126.62C41.67 132.24 36.04 143.65 37.18 150.75C38.27 151 39.93 151.56 40.88 150.62C41.98 149.54 41.79 145.83 42.16 144.32C43.18 140.14 44.94 136.06 47.12 132.35C54.39 119.96 67.51 112.05 81.72 110.8C85.62 110.46 92.06 109.91 95.41 112.25C93.63 115.53 88.61 119.24 85.92 122.17C80.64 127.91 76.24 134.25 72.02 140.78C70.22 143.58 67.38 147.44 67.07 150.75C72.14 152.23 72.9 147.3 75.1 143.85C80.53 135.36 86.4 127.45 93.57 120.33C95.02 118.88 99.38 113.96 101.25 113.83C102.26 113.76 103.11 114.36 103.98 114.75C105.28 115.33 105.93 115.59 106.75 116.75C104.77 118.84 102.41 120.58 100.31 122.56C94.55 127.99 89.27 134.05 84.81 140.59C82.83 143.5 79.5 147.25 79.05 150.75C84.38 152.27 85.72 146.72 88.26 143.01C92.94 136.18 98.56 129.99 104.63 124.38C106.02 123.09 109.26 119.21 111.25 119.3C113.01 119.39 115.49 122.42 116.66 123.59C121.69 128.61 125.78 135.04 127.81 141.88C129.02 145.96 127.75 152.36 133.46 150.75ZM111.37 129.59C110.22 130.34 111.33 132.16 112.53 131.28C113.58 130.51 112.49 128.86 111.37 129.59ZM70.31 130.62C68.12 130.75 68.44 134.27 70.73 133.93C72.74 133.63 72.26 130.5 70.31 130.62ZM113.75 137.46C113.36 137.61 111.78 138.03 112.92 138.77C114.03 139.49 113.78 137.87 113.75 137.46ZM119.28 137.43C117.94 137.73 118.85 139.89 119.97 139.21C121.03 138.58 120.51 137.16 119.28 137.43ZM117.78 145.61C116.25 145.93 117.26 148.3 118.61 147.36C119.49 146.75 118.79 145.4 117.78 145.61ZM93.27 150.75C93.92 150.9 97.04 151.63 96.33 149.86C95.52 147.82 93.6 149.73 93.27 150.75Z" fill="%23eaeaea" fill-rule="evenodd" stroke="%23eaeaea" stroke-width="0.25" stroke-linejoin="round"/><path d="M85.75 51.44C83.04 53.94 80.92 57.48 78.72 60.47C74.79 65.84 70.72 71.14 66.7 76.44C53.76 93.52 41.02 110.76 28.05 127.81C23.51 133.77 18.95 139.74 14.55 145.81C12.16 149.11 10.59 152.03 6.04 150.75C6.79 147.85 9.74 145.19 11.52 142.76C15.51 137.28 19.71 131.95 23.74 126.5C37.98 107.28 52.42 88.19 66.87 69.13C71.54 62.97 76.04 56.67 80.83 50.61C81.97 49.16 84.18 44.6 86.49 45.29C88.79 45.97 90.78 50.28 92.17 52.1C96.93 58.36 101.53 64.74 106.19 71.08C118.31 87.59 130.65 103.95 142.78 120.46C149.18 129.16 154.92 139.25 164.66 144.59C179.11 152.51 209.86 153.69 215.77 134.05C219.75 120.78 213.33 109.31 201.52 103.25C184.16 94.35 154.95 91.34 156.01 65.75C156.15 62.32 156.97 58.77 158.37 55.63C165.82 39.02 191.96 40.02 206.04 45.71C209.81 47.23 219.8 51.78 220.28 56.38C220.46 58.14 219.04 59.53 217.27 59.08C215.83 58.71 212.68 55.14 211.14 54.12C205.97 50.7 200.37 48.52 194.25 47.57C179.31 45.24 160.02 50.2 162.21 69.17C163.02 76.28 168.04 81.34 173.99 84.74C188.79 93.2 216.86 97.05 221.88 116.3C222.77 119.71 223.04 123.24 222.91 126.75C222.76 130.68 222.09 134.61 220.44 138.19C218.45 142.52 215.58 146.14 211.64 148.89C196.94 159.18 169.08 155.77 155.49 144.76C153.32 142.99 152.45 140.58 150.8 138.44C147.01 133.54 143.44 128.46 139.75 123.5C128.23 108.03 116.47 92.68 105.29 76.96C101.02 70.95 96.57 65.02 92.1 59.14C90.33 56.81 88.37 52.65 85.75 51.44ZM274.86 42.23C285.29 41.3 296.39 43.22 305.33 48.91C307.14 50.06 316.48 56.41 311.62 58.87C309.14 60.13 305.83 55.7 303.9 54.35C298.14 50.32 291.35 48.01 284.39 47.28C279.65 46.77 274.91 47.06 270.23 47.89C244.26 52.45 235.91 79.33 236.76 102.41C237.55 123.8 248.82 145.85 271.84 149.31C276.62 150.02 281.45 150.04 286.22 149.35C292.97 148.37 299.49 145.81 304.94 141.69C306.6 140.43 309.38 136.56 311.67 138.05C315.36 140.46 309.79 144.77 307.91 146.18C301.24 151.16 292.67 153.96 284.44 154.74C278.73 155.28 272.95 154.62 267.4 153.3C242.17 147.3 230.97 124.61 230.45 100.25C229.85 71.68 243.93 44.97 274.86 42.23ZM403.77 104.25C397.31 102.91 384.86 103.94 377.75 103.94C375.66 103.94 369.44 105.17 369.71 101.84C370 98.37 374.87 98.98 377.25 98.98C385.08 98.96 392.92 98.98 400.75 98.98C402.32 98.98 408.81 98.5 409.63 99.61C411.17 101.66 410.08 111.46 409.89 114.25C408.63 132.94 399.23 149.42 380.08 153.78C374.43 155.07 368.5 155.21 362.77 154.36C322.91 148.48 312.95 101.28 327.25 68.98C336.45 48.19 359.8 39.26 381.32 42.8C387.96 43.9 394.65 46.72 400.13 50.62C401.86 51.86 404.95 53.91 405.19 56.25C405.38 58.21 403.73 59.7 401.82 58.97C400.08 58.31 398.19 55.74 396.65 54.58C394.11 52.66 391.2 51.16 388.23 50.05C376.59 45.7 362.68 45.82 351.4 51.18C326.95 62.8 322.94 99.31 331.19 122.11C334.86 132.23 341.8 140.83 351.4 145.81C366.43 153.6 389.17 150.92 397.66 134.89C400.38 129.74 402.33 124.07 403.03 118.25C403.57 113.84 404.74 108.63 403.77 104.25ZM425.86 43.16C430.13 41.88 429.16 47.17 429.16 49.75C429.16 57.75 429.16 65.75 429.16 73.75C429.17 79.08 429.17 84.42 429.16 89.75C429.13 107.79 425.97 137.33 445.82 146.92C449.89 148.88 454.23 149.78 458.75 149.85C462.02 149.9 465.64 149.61 468.75 148.52C493.12 139.92 489.28 108.82 489.24 88.25C489.23 83.25 489.25 78.25 489.24 73.25C489.23 65.26 489.11 57.27 489.24 49.28C489.29 46.57 490.1 42.48 493.74 43.03C496.36 43.43 495.37 48.39 495.37 50.25C495.38 57.92 495.38 65.58 495.36 73.25C495.35 79.42 495.37 85.58 495.37 91.75C495.37 113.18 497.99 140.96 474.54 151.77C469.87 153.92 464.37 154.89 459.25 154.9C455.44 154.91 451.76 154.22 448.09 153.22C435.07 149.66 426.63 137.48 424.18 124.67C422.27 114.74 423.09 104.31 423.07 94.25C423.06 89.42 423.08 84.58 423.07 79.75C423.06 70.58 423.08 61.42 423.07 52.25C423.07 49.52 422.32 44.21 425.86 43.16ZM133.46 150.75C127.75 152.36 129.02 145.96 127.81 141.88C125.78 135.04 121.69 128.61 116.66 123.59C115.49 122.42 113.01 119.39 111.25 119.3C109.26 119.21 106.02 123.09 104.63 124.38C98.56 129.99 92.94 136.18 88.26 143.01C85.72 146.72 84.38 152.27 79.05 150.75C79.5 147.25 82.83 143.5 84.81 140.59C89.27 134.05 94.55 127.99 100.31 122.56C102.41 120.58 104.77 118.84 106.75 116.75C105.93 115.59 105.28 115.33 103.98 114.75C103.11 114.36 102.26 113.76 101.25 113.83C99.38 113.96 95.02 118.88 93.57 120.33C86.4 127.45 80.53 135.36 75.1 143.85C72.9 147.3 72.14 152.23 67.07 150.75C67.38 147.44 70.22 143.58 72.02 140.78C76.24 134.25 80.64 127.91 85.92 122.17C88.61 119.24 93.63 115.53 95.41 112.25C92.06 109.91 85.62 110.46 81.72 110.8C67.51 112.05 54.39 119.96 47.12 132.35C44.94 136.06 43.18 140.14 42.16 144.32C41.79 145.83 41.98 149.54 40.88 150.62C39.93 151.56 38.27 151 37.18 150.75C36.04 143.65 41.67 132.24 45.85 126.62C65.35 100.34 104.48 99.4 124.28 125.97C128.75 131.95 134.52 143.17 133.46 150.75ZM111.37 129.59C112.49 128.86 113.58 130.51 112.53 131.28C111.33 132.16 110.22 130.34 111.37 129.59ZM70.31 130.62C72.26 130.5 72.74 133.63 70.73 133.93C68.44 134.27 68.12 130.75 70.31 130.62ZM113.75 137.46C113.78 137.87 114.03 139.49 112.92 138.77C111.78 138.03 113.36 137.61 113.75 137.46ZM119.28 137.43C120.51 137.16 121.03 138.58 119.97 139.21C118.85 139.89 117.94 137.73 119.28 137.43ZM117.78 145.61C118.79 145.4 119.49 146.75 118.61 147.36C117.26 148.3 116.25 145.93 117.78 145.61ZM93.27 150.75C93.6 149.73 95.52 147.82 96.33 149.86C97.04 151.63 93.92 150.9 93.27 150.75Z" fill="%23020202" fill-rule="evenodd" stroke="%23020202" stroke-width="0.25" stroke-linejoin="round"/></svg>`;
+		//const svgASCGU = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 200" width="500" height="200"><path d="M0.13 0.13C166.71 0.13 333.29 0.13 499.88 0.13C499.88 66.71 499.88 133.29 499.88 199.88C333.29 199.88 166.71 199.88 0.13 199.88C0.13 133.29 0.13 66.71 0.13 0.13ZM85.75 51.44C88.37 52.65 90.33 56.81 92.1 59.14C96.57 65.02 101.02 70.95 105.29 76.96C116.47 92.68 128.23 108.03 139.75 123.5C143.44 128.46 147.01 133.54 150.8 138.44C152.45 140.58 153.32 142.99 155.49 144.76C169.08 155.77 196.94 159.18 211.64 148.89C215.58 146.14 218.45 142.52 220.44 138.19C222.09 134.61 222.76 130.68 222.91 126.75C223.04 123.24 222.77 119.71 221.88 116.3C216.86 97.05 188.79 93.2 173.99 84.74C168.04 81.34 163.02 76.28 162.21 69.17C160.02 50.2 179.31 45.24 194.25 47.57C200.37 48.52 205.97 50.7 211.14 54.12C212.68 55.14 215.83 58.71 217.27 59.08C219.04 59.53 220.46 58.14 220.28 56.38C219.8 51.78 209.81 47.23 206.04 45.71C191.96 40.02 165.82 39.02 158.37 55.63C156.97 58.77 156.15 62.32 156.01 65.75C154.95 91.34 184.16 94.35 201.52 103.25C213.33 109.31 219.75 120.78 215.77 134.05C209.86 153.69 179.11 152.51 164.66 144.59C154.92 139.25 149.18 129.16 142.78 120.46C130.65 103.95 118.31 87.59 106.19 71.08C101.53 64.74 96.93 58.36 92.17 52.1C90.78 50.28 88.79 45.97 86.49 45.29C84.18 44.6 81.97 49.16 80.83 50.61C76.04 56.67 71.54 62.97 66.87 69.13C52.42 88.19 37.98 107.28 23.74 126.5C19.71 131.95 15.51 137.28 11.52 142.76C9.74 145.19 6.79 147.85 6.04 150.75C10.59 152.03 12.16 149.11 14.55 145.81C18.95 139.74 23.51 133.77 28.05 127.81C41.02 110.76 53.76 93.52 66.7 76.44C70.72 71.14 74.79 65.84 78.72 60.47C80.92 57.48 83.04 53.94 85.75 51.44ZM274.86 42.23C243.93 44.97 229.85 71.68 230.45 100.25C230.97 124.61 242.17 147.3 267.4 153.3C272.95 154.62 278.73 155.28 284.44 154.74C292.67 153.96 301.24 151.16 307.91 146.18C309.79 144.77 315.36 140.46 311.67 138.05C309.38 136.56 306.6 140.43 304.94 141.69C299.49 145.81 292.97 148.37 286.22 149.35C281.45 150.04 276.62 150.02 271.84 149.31C248.82 145.85 237.55 123.8 236.76 102.41C235.91 79.33 244.26 52.45 270.23 47.89C274.91 47.06 279.65 46.77 284.39 47.28C291.35 48.01 298.14 50.32 303.9 54.35C305.83 55.7 309.14 60.13 311.62 58.87C316.48 56.41 307.14 50.06 305.33 48.91C296.39 43.22 285.29 41.3 274.86 42.23ZM403.77 104.25C404.74 108.63 403.57 113.84 403.03 118.25C402.33 124.07 400.38 129.74 397.66 134.89C389.17 150.92 366.43 153.6 351.4 145.81C341.8 140.83 334.86 132.23 331.19 122.11C322.94 99.31 326.95 62.8 351.4 51.18C362.68 45.82 376.59 45.7 388.23 50.05C391.2 51.16 394.11 52.66 396.65 54.58C398.19 55.74 400.08 58.31 401.82 58.97C403.73 59.7 405.38 58.21 405.19 56.25C404.95 53.91 401.86 51.86 400.13 50.62C394.65 46.72 387.96 43.9 381.32 42.8C359.8 39.26 336.45 48.19 327.25 68.98C312.95 101.28 322.91 148.48 362.77 154.36C368.5 155.21 374.43 155.07 380.08 153.78C399.23 149.42 408.63 132.94 409.89 114.25C410.08 111.46 411.17 101.66 409.63 99.61C408.81 98.5 402.32 98.98 400.75 98.98C392.92 98.98 385.08 98.96 377.25 98.98C374.87 98.98 370 98.37 369.71 101.84C369.44 105.17 375.66 103.94 377.75 103.94C384.86 103.94 397.31 102.91 403.77 104.25ZM425.86 43.16C422.32 44.21 423.07 49.52 423.07 52.25C423.08 61.42 423.06 70.58 423.07 79.75C423.08 84.58 423.06 89.42 423.07 94.25C423.09 104.31 422.27 114.74 424.18 124.67C426.63 137.48 435.07 149.66 448.09 153.22C451.76 154.22 455.44 154.91 459.25 154.9C464.37 154.89 469.87 153.92 474.54 151.77C497.99 140.96 495.37 113.18 495.37 91.75C495.37 85.58 495.35 79.42 495.36 73.25C495.38 65.58 495.38 57.92 495.37 50.25C495.37 48.39 496.36 43.43 493.74 43.03C490.1 42.48 489.29 46.57 489.24 49.28C489.11 57.27 489.23 65.26 489.24 73.25C489.25 78.25 489.23 83.25 489.24 88.25C489.28 108.82 493.12 139.92 468.75 148.52C465.64 149.61 462.02 149.9 458.75 149.85C454.23 149.78 449.89 148.88 445.82 146.92C425.97 137.33 429.13 107.79 429.16 89.75C429.17 84.42 429.17 79.08 429.16 73.75C429.16 65.75 429.16 57.75 429.16 49.75C429.16 47.17 430.13 41.88 425.86 43.16ZM133.46 150.75C134.52 143.17 128.75 131.95 124.28 125.97C104.48 99.4 65.35 100.34 45.85 126.62C41.67 132.24 36.04 143.65 37.18 150.75C38.27 151 39.93 151.56 40.88 150.62C41.98 149.54 41.79 145.83 42.16 144.32C43.18 140.14 44.94 136.06 47.12 132.35C54.39 119.96 67.51 112.05 81.72 110.8C85.62 110.46 92.06 109.91 95.41 112.25C93.63 115.53 88.61 119.24 85.92 122.17C80.64 127.91 76.24 134.25 72.02 140.78C70.22 143.58 67.38 147.44 67.07 150.75C72.14 152.23 72.9 147.3 75.1 143.85C80.53 135.36 86.4 127.45 93.57 120.33C95.02 118.88 99.38 113.96 101.25 113.83C102.26 113.76 103.11 114.36 103.98 114.75C105.28 115.33 105.93 115.59 106.75 116.75C104.77 118.84 102.41 120.58 100.31 122.56C94.55 127.99 89.27 134.05 84.81 140.59C82.83 143.5 79.5 147.25 79.05 150.75C84.38 152.27 85.72 146.72 88.26 143.01C92.94 136.18 98.56 129.99 104.63 124.38C106.02 123.09 109.26 119.21 111.25 119.3C113.01 119.39 115.49 122.42 116.66 123.59C121.69 128.61 125.78 135.04 127.81 141.88C129.02 145.96 127.75 152.36 133.46 150.75ZM111.37 129.59C110.22 130.34 111.33 132.16 112.53 131.28C113.58 130.51 112.49 128.86 111.37 129.59ZM70.31 130.62C68.12 130.75 68.44 134.27 70.73 133.93C72.74 133.63 72.26 130.5 70.31 130.62ZM113.75 137.46C113.36 137.61 111.78 138.03 112.92 138.77C114.03 139.49 113.78 137.87 113.75 137.46ZM119.28 137.43C117.94 137.73 118.85 139.89 119.97 139.21C121.03 138.58 120.51 137.16 119.28 137.43ZM117.78 145.61C116.25 145.93 117.26 148.3 118.61 147.36C119.49 146.75 118.79 145.4 117.78 145.61ZM93.27 150.75C93.92 150.9 97.04 151.63 96.33 149.86C95.52 147.82 93.6 149.73 93.27 150.75Z" fill="%23020202" fill-rule="evenodd" stroke="%23020202" stroke-width="0.25" stroke-linejoin="round"/><path d="M85.75 51.44C83.04 53.94 80.92 57.48 78.72 60.47C74.79 65.84 70.72 71.14 66.7 76.44C53.76 93.52 41.02 110.76 28.05 127.81C23.51 133.77 18.95 139.74 14.55 145.81C12.16 149.11 10.59 152.03 6.04 150.75C6.79 147.85 9.74 145.19 11.52 142.76C15.51 137.28 19.71 131.95 23.74 126.5C37.98 107.28 52.42 88.19 66.87 69.13C71.54 62.97 76.04 56.67 80.83 50.61C81.97 49.16 84.18 44.6 86.49 45.29C88.79 45.97 90.78 50.28 92.17 52.1C96.93 58.36 101.53 64.74 106.19 71.08C118.31 87.59 130.65 103.95 142.78 120.46C149.18 129.16 154.92 139.25 164.66 144.59C179.11 152.51 209.86 153.69 215.77 134.05C219.75 120.78 213.33 109.31 201.52 103.25C184.16 94.35 154.95 91.34 156.01 65.75C156.15 62.32 156.97 58.77 158.37 55.63C165.82 39.02 191.96 40.02 206.04 45.71C209.81 47.23 219.8 51.78 220.28 56.38C220.46 58.14 219.04 59.53 217.27 59.08C215.83 58.71 212.68 55.14 211.14 54.12C205.97 50.7 200.37 48.52 194.25 47.57C179.31 45.24 160.02 50.2 162.21 69.17C163.02 76.28 168.04 81.34 173.99 84.74C188.79 93.2 216.86 97.05 221.88 116.3C222.77 119.71 223.04 123.24 222.91 126.75C222.76 130.68 222.09 134.61 220.44 138.19C218.45 142.52 215.58 146.14 211.64 148.89C196.94 159.18 169.08 155.77 155.49 144.76C153.32 142.99 152.45 140.58 150.8 138.44C147.01 133.54 143.44 128.46 139.75 123.5C128.23 108.03 116.47 92.68 105.29 76.96C101.02 70.95 96.57 65.02 92.1 59.14C90.33 56.81 88.37 52.65 85.75 51.44ZM274.86 42.23C285.29 41.3 296.39 43.22 305.33 48.91C307.14 50.06 316.48 56.41 311.62 58.87C309.14 60.13 305.83 55.7 303.9 54.35C298.14 50.32 291.35 48.01 284.39 47.28C279.65 46.77 274.91 47.06 270.23 47.89C244.26 52.45 235.91 79.33 236.76 102.41C237.55 123.8 248.82 145.85 271.84 149.31C276.62 150.02 281.45 150.04 286.22 149.35C292.97 148.37 299.49 145.81 304.94 141.69C306.6 140.43 309.38 136.56 311.67 138.05C315.36 140.46 309.79 144.77 307.91 146.18C301.24 151.16 292.67 153.96 284.44 154.74C278.73 155.28 272.95 154.62 267.4 153.3C242.17 147.3 230.97 124.61 230.45 100.25C229.85 71.68 243.93 44.97 274.86 42.23ZM403.77 104.25C397.31 102.91 384.86 103.94 377.75 103.94C375.66 103.94 369.44 105.17 369.71 101.84C370 98.37 374.87 98.98 377.25 98.98C385.08 98.96 392.92 98.98 400.75 98.98C402.32 98.98 408.81 98.5 409.63 99.61C411.17 101.66 410.08 111.46 409.89 114.25C408.63 132.94 399.23 149.42 380.08 153.78C374.43 155.07 368.5 155.21 362.77 154.36C322.91 148.48 312.95 101.28 327.25 68.98C336.45 48.19 359.8 39.26 381.32 42.8C387.96 43.9 394.65 46.72 400.13 50.62C401.86 51.86 404.95 53.91 405.19 56.25C405.38 58.21 403.73 59.7 401.82 58.97C400.08 58.31 398.19 55.74 396.65 54.58C394.11 52.66 391.2 51.16 388.23 50.05C376.59 45.7 362.68 45.82 351.4 51.18C326.95 62.8 322.94 99.31 331.19 122.11C334.86 132.23 341.8 140.83 351.4 145.81C366.43 153.6 389.17 150.92 397.66 134.89C400.38 129.74 402.33 124.07 403.03 118.25C403.57 113.84 404.74 108.63 403.77 104.25ZM425.86 43.16C430.13 41.88 429.16 47.17 429.16 49.75C429.16 57.75 429.16 65.75 429.16 73.75C429.17 79.08 429.17 84.42 429.16 89.75C429.13 107.79 425.97 137.33 445.82 146.92C449.89 148.88 454.23 149.78 458.75 149.85C462.02 149.9 465.64 149.61 468.75 148.52C493.12 139.92 489.28 108.82 489.24 88.25C489.23 83.25 489.25 78.25 489.24 73.25C489.23 65.26 489.11 57.27 489.24 49.28C489.29 46.57 490.1 42.48 493.74 43.03C496.36 43.43 495.37 48.39 495.37 50.25C495.38 57.92 495.38 65.58 495.36 73.25C495.35 79.42 495.37 85.58 495.37 91.75C495.37 113.18 497.99 140.96 474.54 151.77C469.87 153.92 464.37 154.89 459.25 154.9C455.44 154.91 451.76 154.22 448.09 153.22C435.07 149.66 426.63 137.48 424.18 124.67C422.27 114.74 423.09 104.31 423.07 94.25C423.06 89.42 423.08 84.58 423.07 79.75C423.06 70.58 423.08 61.42 423.07 52.25C423.07 49.52 422.32 44.21 425.86 43.16ZM133.46 150.75C127.75 152.36 129.02 145.96 127.81 141.88C125.78 135.04 121.69 128.61 116.66 123.59C115.49 122.42 113.01 119.39 111.25 119.3C109.26 119.21 106.02 123.09 104.63 124.38C98.56 129.99 92.94 136.18 88.26 143.01C85.72 146.72 84.38 152.27 79.05 150.75C79.5 147.25 82.83 143.5 84.81 140.59C89.27 134.05 94.55 127.99 100.31 122.56C102.41 120.58 104.77 118.84 106.75 116.75C105.93 115.59 105.28 115.33 103.98 114.75C103.11 114.36 102.26 113.76 101.25 113.83C99.38 113.96 95.02 118.88 93.57 120.33C86.4 127.45 80.53 135.36 75.1 143.85C72.9 147.3 72.14 152.23 67.07 150.75C67.38 147.44 70.22 143.58 72.02 140.78C76.24 134.25 80.64 127.91 85.92 122.17C88.61 119.24 93.63 115.53 95.41 112.25C92.06 109.91 85.62 110.46 81.72 110.8C67.51 112.05 54.39 119.96 47.12 132.35C44.94 136.06 43.18 140.14 42.16 144.32C41.79 145.83 41.98 149.54 40.88 150.62C39.93 151.56 38.27 151 37.18 150.75C36.04 143.65 41.67 132.24 45.85 126.62C65.35 100.34 104.48 99.4 124.28 125.97C128.75 131.95 134.52 143.17 133.46 150.75ZM111.37 129.59C112.49 128.86 113.58 130.51 112.53 131.28C111.33 132.16 110.22 130.34 111.37 129.59ZM70.31 130.62C72.26 130.5 72.74 133.63 70.73 133.93C68.44 134.27 68.12 130.75 70.31 130.62ZM113.75 137.46C113.78 137.87 114.03 139.49 112.92 138.77C111.78 138.03 113.36 137.61 113.75 137.46ZM119.28 137.43C120.51 137.16 121.03 138.58 119.97 139.21C118.85 139.89 117.94 137.73 119.28 137.43ZM117.78 145.61C118.79 145.4 119.49 146.75 118.61 147.36C117.26 148.3 116.25 145.93 117.78 145.61ZM93.27 150.75C93.6 149.73 95.52 147.82 96.33 149.86C97.04 151.63 93.92 150.9 93.27 150.75Z" fill="%23eaeaea" fill-rule="evenodd" stroke="%23eaeaea" stroke-width="0.25" stroke-linejoin="round"/></svg>`;
+
+        // Só injeta o src se a variável LOGO tiver encontrado um parâmetro válido
+        const logoInstitucional = new Image();
+        if (LOGO === 'ASTN') logoInstitucional.src = svgASTN;
+        if (LOGO === 'ASCGU') logoInstitucional.src = svgASCGU;
+
+/*
+// 2. Mapeamento CSV Célula:ID_URL (Preservado exatamente como original)
 const mapaCelulasCSV = "B2:0,C2:0,D2:0,E2:0,F2:1,G2:1,H2:1,I2:1,J2:2,K2:2,B3:3,C3:3,D3:3,E3:3,B4:3,C4:3,D4:3,E4:3,B7:3,C7:3,D7:3,E7:3,F3:4,G3:4,H3:4,I3:4,F4:4,G4:4,H4:4,I4:4,J3:5,K3:5,J4:5,K4:5,B5:6,C5:6,D5:6,E5:6,B6:6,C6:6,D6:6,E6:6,F5:7,G5:7,H5:7,I5:7,F6:7,G6:7,H6:7,I6:7,F7:7,G7:7,H7:7,I7:7,J5:8,K5:8,J6:8,K6:8,J7:8,K7:8,B8:9,C8:9,D8:9,E8:9,B11:9,C11:9,D11:9,E11:9,B12:9,C12:9,D12:9,E12:9,B13:9,C13:9,D13:9,E13:9,J8:10,K8:10,J11:10,K11:10,J12:10,K12:10,J13:10,K13:10,G9:11,I9:11,F10:12,G10:12,H10:12,I10:12,F11:12,G11:12,H11:12,I11:12,F12:13,G12:13,H12:13,I12:13,F13:13,G13:13,H13:13,I13:13,B19:14,C19:14,D19:14,E19:14,F19:15,G19:15,H19:15,I19:15,J19:16,K19:16,G20:17,I20:17,G21:17,I21:17,G23:17,I23:17,G25:17,I25:17,B22:18,C22:18,D22:18,E22:18,J22:19,K24:19,B26:20,C26:20,D26:20,E26:20,G26:21,I26:21,J26:22,K26:22,G27:23,I27:24";
 
 // 3. Tradutor de Colunas (Batalha Naval)
@@ -357,123 +483,148 @@ const dicionarioColunas = {
 
 // 4. Tradutor de Linhas para Data (MM/AAAA)
 const dicionarioLinhas = {
-	'2': '07/2008', '3': '07/2009', '4': '07/2010', '5': '01/2013', '6': '01/2014',
-	'7': '01/2015', '8': '08/2016', '9': '09/2016', '10': '12/2016', '11': '01/2017',
-	'12': '01/2018', '13': '01/2019', '14': '01/2020', '15': '01/2021', '16': '01/2022',
-	'17': '02/2023', '18': '04/2023', '19': '05/2023', '20': '02/2024', '21': '08/2024',
-	'22': '01/2025', '23': '02/2025', '24': '06/2025', '25': '02/2026', '26': '04/2026',
-	'27': '02/2027'
+	'2': '07/2008', '3': '07/2009', '4': '07/2010', '5': '01/2013', '6': '01/2014', '7': '01/2015', '8': '08/2016', '9': '09/2016', 
+	'10': '12/2016', '11': '01/2017', '12': '01/2018', '13': '01/2019', '14': '01/2020', '15': '01/2021', '16': '01/2022',
+	'17': '02/2023', '18': '04/2023', '19': '05/2023', '20': '02/2024', '21': '08/2024', '22': '01/2025', 
+	'23': '02/2025', '24': '06/2025', '25': '02/2026', '26': '04/2026', '27': '02/2027'
 };
-
-// ==========================================
-// BASES DE DOMÍNIOS (Para otimização de strings)
-// ==========================================
-const dominioPlanalto = "https://www.planalto.gov.br/ccivil_03/_ato";
-const dominioReceitaFederal = "https://www.gov.br/receitafederal/pt-br/acesso-a-informacao/participacao-social/conselhos-e-orgaos-colegiados/comite-gestor-do-programa-de-produtividade-da-receita-federal";
-const baseCCHA = "https://app.powerbi.com/view?r=eyJrIjoiNjNkYWJkNmYtZGQ1OS00ZTQ1LTg3ZWUtNmI3ODU2YzhmNzJiIiwidCI6IjRkNzlkMzdhLTFlNGUtNGEzOS05ZmRlLWYxNjMxY2I2MDdkNCJ9";
-
-// ==========================================
-// MAPEAMENTO DO PORTAL DO PLANALTO
-// ==========================================
-const urlsPlanalto = [
-	`${dominioPlanalto}2007-2010/2008/mpv/anexos/anmpv440.htm#AnexoIV`,
-	`${dominioPlanalto}2007-2010/2008/mpv/anexos/anmpv440.htm#AnexoII`,
-	`${dominioPlanalto}2007-2010/2008/mpv/anexos/anmpv440.htm#AnexoIII`,
-	`${dominioPlanalto}2007-2010/2008/lei/anexos/anl11890-01-10a.htm#AnexoIV`,
-	`${dominioPlanalto}2007-2010/2008/lei/anexos/anl11890-01-10a.htm#AnexoII`,
-	`${dominioPlanalto}2007-2010/2008/lei/anexos/anl11890-01-10a.htm#AnexoIII`,
-	`${dominioPlanalto}2011-2014/2012/lei/l12775.htm#AnexoIV`,
-	`${dominioPlanalto}2011-2014/2013/lei/l12808.htm#anexoi`,
-	`${dominioPlanalto}2011-2014/2012/lei/l12775.htm#AnexoXII`,
-	`${dominioPlanalto}2015-2018/2016/lei/l13327.htm#anexoi`,
-	`${dominioPlanalto}2015-2018/2016/lei/l13327.htm#anexoxxxv`,
-	`${dominioPlanalto}2015-2018/2016/mpv/mpv765.htm#Art20`,
-	`${dominioPlanalto}2015-2018/2016/mpv/mpv765.htm#AnexoVII`,
-	`${dominioPlanalto}2015-2018/2017/lei/l13464.htm#anexo7`,
-	`${dominioPlanalto}2023-2026/2023/mpv/mpv1170anexo2.htm#anexo134`,
-	`${dominioPlanalto}2023-2026/2023/mpv/mpv1170anexo2.htm#anexo127`,
-	`${dominioPlanalto}2023-2026/2023/lei/l14673anexo4.htm#anexo150`,
-	`${dominioPlanalto}2023-2026/2023/decreto/d11545.htm#Art8%C2%A72`,
-	`${dominioPlanalto}2023-2026/2024/mpv/anexos/mpv1286anexo254a321.htm#anexo320`,
-	`${dominioPlanalto}2023-2026/2024/mpv/anexos/mpv1286anexo254a321.htm#anexo321`,
-	`${dominioPlanalto}2023-2026/2025/lei/anexo/anexo254a323-lei15141.htm#anexo320`,
-	`${dominioPlanalto}2023-2026/2026/lei/l15367.htm#anexo12`,
-	`${dominioPlanalto}2023-2026/2025/lei/anexo/anexo254a323-lei15141.htm#anexo321`
-];
-
-// ==========================================
-// MAPEAMENTO DO CGPP - RECEITA FEDERAL
-// ==========================================
-// Função auxiliar para gerar a URL dinâmica do PDF do Bônus de Eficiência (Ano a Ano)
-const getUrlBonusRFB = (ano, mes) => {
-	if (ano === 2023) return `${dominioReceitaFederal}/bonus-de-eficiencia-e-produtividade/2023/valores-do-bonus-de-eficiencia-ate-dezembro-2023.pdf`;
-	
-	// Converte mês '08' para nome completo 'agosto', por exemplo. (Você precisará de uma função mapMonth se não tiver uma).
-	const mapMonth = {'01':'janeiro', '02':'fevereiro', '03':'marco', '04':'abril', '05':'maio', '06':'junho', '07':'julho', '08':'agosto', '09':'setembro', '10':'outubro', '11':'novembro', '12':'dezembro'};
-	return `${dominioReceitaFederal}/bonus-de-eficiencia-e-produtividade/${ano}/valores-do-bonus-de-eficiencia-${mapMonth[mes]}-${ano}.pdf`;
-};
-
-// Outras URLs institucionais da Receita
-const urlsReceitaFederal = {
-	indiceEficiencia: `${dominioReceitaFederal}/indice-de-eficiencia-institucional`,
-	bonusEficiencia: `${dominioReceitaFederal}/bonus-de-eficiencia-e-produtividade`,
-	arrecadacaoFundaf: `${dominioReceitaFederal}/arrecadacao-fundaf`,
-	legislacao: `${dominioReceitaFederal}/legislacao`,
-	resolucoes: `${dominioReceitaFederal}/resolucoes`,
-	relatorios: `${dominioReceitaFederal}/relatorios`,
-	notas: `${dominioReceitaFederal}/notas`,
-	notasTecnicas: `${dominioReceitaFederal}/notas/NotasTecnicas`,
-	baseCalculo: `${dominioReceitaFederal}/notas/base-de-calculo-do-bonus-de-eficiencia-e-produtividade`,
-	atasReunioes: `https://www.gov.br/receitafederal/pt-br/centrais-de-conteudo/atas-e-pautas/comite-gestor-do-programa-de-produtividade-da-receita-federal/atas-de-reunioes-do-cgpp/`,
-	membros: `${dominioReceitaFederal}/membros`,
-	resolucao11: `${dominioReceitaFederal}/resolucoes/resolucao-cgpp-no-11-de-02-de-julho-de-2026-bs.pdf/@@download/file`,
-	resolucao11_view: `${dominioReceitaFederal}/resolucoes/resolucao-cgpp-no-11-de-02-de-julho-de-2026-bs.pdf/view`
-};
-
-// ==========================================
-// MAPEAMENTO DO CCHA - AGU (POWER BI)
-// ==========================================
-const urlsCCHA = {
-	painelPrincipal: `${baseCCHA}&pageName=951fb5b48411cd406c02`,
-	infoRelevantes: `${baseCCHA}&pageName=ReportSection`, 
-	honorariosResultados: `${baseCCHA}&pageName=ReportSection1`, 
-	detalhamentoDistribuicao: `${baseCCHA}&pageName=ReportSection2`  
-};
-
-// ==========================================
-// MATRIZ DE BATALHA NAVAL (Planilha -> URL)
-// ==========================================
-const mapaCelulasCSV = "B2:0,C2:0,D2:0,E2:0,F2:1,G2:1,H2:1,I2:1,J2:2,K2:2,B3:3,C3:3,D3:3,E3:3,B4:3,C4:3,D4:3,E4:3,B7:3,C7:3,D7:3,E7:3,F3:4,G3:4,H3:4,I3:4,F4:4,G4:4,H4:4,I4:4,J3:5,K3:5,J4:5,K4:5,B5:6,C5:6,D5:6,E5:6,B6:6,C6:6,D6:6,E6:6,F5:7,G5:7,H5:7,I5:7,F6:7,G6:7,H6:7,I6:7,F7:7,G7:7,H7:7,I7:7,J5:8,K5:8,J6:8,K6:8,J7:8,K7:8,B8:9,C8:9,D8:9,E8:9,B11:9,C11:9,D11:9,E11:9,B12:9,C12:9,D12:9,E12:9,B13:9,C13:9,D13:9,E13:9,J8:10,K8:10,J11:10,K11:10,J12:10,K12:10,J13:10,K13:10,G9:11,I9:11,F10:12,G10:12,H10:12,I10:12,F11:12,G11:12,H11:12,I11:12,F12:13,G12:13,H12:13,I12:13,F13:13,G13:13,H13:13,I13:13,B19:14,C19:14,D19:14,E19:14,F19:15,G19:15,H19:15,I19:15,J19:16,K19:16,G20:17,I20:17,G21:17,I21:17,G23:17,I23:17,G25:17,I25:17,B22:18,C22:18,D22:18,E22:18,J22:19,K24:19,B26:20,C26:20,D26:20,E26:20,G26:21,I26:21,J26:22,K26:22";
-
-// ==========================================
-// BASES DE DOMÍNIOS (Para otimização de strings)
-// ==========================================
-const dominioPlanalto = "https://www.planalto.gov.br/ccivil_03/_ato";
-const dominioReceitaFederal = "https://www.gov.br/receitafederal/pt-br/acesso-a-informacao/participacao-social/conselhos-e-orgaos-colegiados/comite-gestor-do-programa-de-produtividade-da-receita-federal";
-const dominioEnap = "https://repositorio.enap.gov.br";
-const baseCCHA = "https://app.powerbi.com/view?r=eyJrIjoiNjNkYWJkNmYtZGQ1OS00ZTQ1LTg3ZWUtNmI3ODU2YzhmNzJiIiwidCI6IjRkNzlkMzdhLTFlNGUtNGEzOS05ZmRlLWYxNjMxY2I2MDdkNCJ9";
-
-// ... (aqui ficam as urlsPlanalto, urlsReceitaFederal e urlsCCHA que já mapeamos) ...
-
-// ==========================================
-// MAPEAMENTO ESAF / ENAP / CGU (Histórico de Concursos)
-// ==========================================
-const urlsESAF = {
-	noticiaCGU2008: "https://www.gov.br/cgu/pt-br/assuntos/noticias/2008/05/sai-resultado-de-concurso-para-analista-e-tecnico-da-cgu",
-	repositorioEnap: `${dominioEnap}/handle/1/5504`,
-	editalRegulador: `${dominioEnap}/bitstream/1/5504/4/edital-2%20regulador.pdf`,
-	anexo1: `${dominioEnap}/bitstream/1/5504/3/anexo-i1.pdf`
-};		
 */
+        // ==============================================
+        // BASES DE DOMÍNIOS (Para otimização de strings)
+        // ==============================================
+        const dominioPlanalto = "https://www.planalto.gov.br/ccivil_03/_ato";
+        const dominioCGPP = "https://www.gov.br/receitafederal/pt-br/acesso-a-informacao/participacao-social/conselhos-e-orgaos-colegiados/comite-gestor-do-programa-de-produtividade-da-receita-federal";
+        const dominioCCHA = "https://app.powerbi.com/view?r=eyJrIjoiNjNkYWJkNmYtZGQ1OS00ZTQ1LTg3ZWUtNmI3ODU2YzhmNzJiIiwidCI6IjRkNzlkMzdhLTFlNGUtNGEzOS05ZmRlLWYxNjMxY2I2MDdkNCJ9";
+        const dominioENAP = "https://repositorio.enap.gov.br";
+
+        const urlsPlanalto = {
+            0: { nome: "Medida Provisória nº 440/2008 - Anexo IV", url: `${dominioPlanalto}2007-2010/2008/mpv/anexos/anmpv440.htm#AnexoIV` },
+            1: { nome: "Medida Provisória nº 440/2008 - Anexo II", url: `${dominioPlanalto}2007-2010/2008/mpv/anexos/anmpv440.htm#AnexoII` },
+            2: { nome: "Medida Provisória nº 440/2008 - Anexo III", url: `${dominioPlanalto}2007-2010/2008/mpv/anexos/anmpv440.htm#AnexoIII` },
+            3: { nome: "Lei nº 11.890/2008 - Anexo IV", url: `${dominioPlanalto}2007-2010/2008/lei/anexos/anl11890-01-10a.htm#AnexoIV` },
+            4: { nome: "Lei nº 11.890/2008 - Anexo II", url: `${dominioPlanalto}2007-2010/2008/lei/anexos/anl11890-01-10a.htm#AnexoII` },
+            5: { nome: "Lei nº 11.890/2008 - Anexo III", url: `${dominioPlanalto}2007-2010/2008/lei/anexos/anl11890-01-10a.htm#AnexoIII` },
+            6: { nome: "Lei nº 12.775/2012 - Anexo IV", url: `${dominioPlanalto}2011-2014/2012/lei/l12775.htm#AnexoIV` },
+            7: { nome: "Lei nº 12.808/2013 - Anexo I", url: `${dominioPlanalto}2011-2014/2013/lei/l12808.htm#anexoi` },
+            8: { nome: "Lei nº 12.775/2012 - Anexo XII", url: `${dominioPlanalto}2011-2014/2012/lei/l12775.htm#AnexoXII` },
+            9: { nome: "Lei nº 13.327/2016 - Anexo I", url: `${dominioPlanalto}2015-2018/2016/lei/l13327.htm#anexoi` },
+            10: { nome: "Lei nº 13.327/2016 - Anexo XXXV", url: `${dominioPlanalto}2015-2018/2016/lei/l13327.htm#anexoxxxv` },
+            11: { nome: "Medida Provisória nº 765/2016 - Art. 20", url: `${dominioPlanalto}2015-2018/2016/mpv/mpv765.htm#Art20` },
+            12: { nome: "Medida Provisória nº 765/2016 - Anexo VII", url: `${dominioPlanalto}2015-2018/2016/mpv/mpv765.htm#AnexoVII` },
+            13: { nome: "Lei nº 13.464/2017 - Anexo VII", url: `${dominioPlanalto}2015-2018/2017/lei/l13464.htm#anexo7` },
+            14: { nome: "Medida Provisória nº 1.170/2023 - Anexo 134", url: `${dominioPlanalto}2023-2026/2023/mpv/mpv1170anexo2.htm#anexo134` },
+            15: { nome: "Medida Provisória nº 1.170/2023 - Anexo 127", url: `${dominioPlanalto}2023-2026/2023/mpv/mpv1170anexo2.htm#anexo127` },
+            16: { nome: "Lei nº 14.673/2023 - Anexo 150", url: `${dominioPlanalto}2023-2026/2023/lei/l14673anexo4.htm#anexo150` },
+            17: { nome: "Decreto nº 11.545/2023 - Art. 8º", url: `${dominioPlanalto}2023-2026/2023/decreto/d11545.htm#Art8%C2%A72` },
+            18: { nome: "Medida Provisória nº 1.286/2024 - Anexo 320", url: `${dominioPlanalto}2023-2026/2024/mpv/anexos/mpv1286anexo254a321.htm#anexo320` },
+            19: { nome: "Medida Provisória nº 1.286/2024 - Anexo 321", url: `${dominioPlanalto}2023-2026/2024/mpv/anexos/mpv1286anexo254a321.htm#anexo321` },
+            20: { nome: "Lei nº 15.141/2025 - Anexo 320", url: `${dominioPlanalto}2023-2026/2025/lei/anexo/anexo254a323-lei15141.htm#anexo320` },
+            21: { nome: "Lei nº 15.367/2026 - Anexo 12", url: `${dominioPlanalto}2023-2026/2026/lei/l15367.htm#anexo12` },
+            22: { nome: "Lei nº 15.141/2025 - Anexo 321", url: `${dominioPlanalto}2023-2026/2025/lei/anexo/anexo254a323-lei15141.htm#anexo321` }
+        };
+
+		const urlsCGPP = {
+			indiceEficiencia: `${dominioCGPP}/indice-de-eficiencia-institucional`,
+			bonusEficiencia: `${dominioCGPP}/bonus-de-eficiencia-e-produtividade`,
+			arrecadacaoFundaf: `${dominioCGPP}/arrecadacao-fundaf`,
+			legislacao: `${dominioCGPP}/legislacao`,
+			resolucoes: `${dominioCGPP}/resolucoes`,
+			relatorios: `${dominioCGPP}/relatorios`,
+			notas: `${dominioCGPP}/notas`,
+			notasTecnicas: `${dominioCGPP}/notas/NotasTecnicas`,
+			baseCalculo: `${dominioCGPP}/notas/base-de-calculo-do-bonus-de-eficiencia-e-produtividade`,
+			membros: `${dominioCGPP}/membros`,
+			resolucao11: `${dominioCGPP}/resolucoes/resolucao-cgpp-no-11-de-02-de-julho-de-2026-bs.pdf/@@download/file`,
+			resolucao11_view: `${dominioCGPP}/resolucoes/resolucao-cgpp-no-11-de-02-de-julho-de-2026-bs.pdf/view`,
+			atasReunioes: `https://www.gov.br/receitafederal/pt-br/centrais-de-conteudo/atas-e-pautas/comite-gestor-do-programa-de-produtividade-da-receita-federal/atas-de-reunioes-do-cgpp/`
+		};
+		
+		const getUrlBonusRFB = (ano, mes) => {
+			if (ano === '2023') return `${dominioCGPP}/bonus-de-eficiencia-e-produtividade/2023/valores-do-bonus-de-eficiencia-ate-dezembro-2023.pdf`;
+			
+			const mesesNome = {'01':'janeiro', '02':'fevereiro', '03':'marco', '04':'abril', '05':'maio', '06':'junho', '07':'julho', '08':'agosto', '09':'setembro', '10':'outubro', '11':'novembro', '12':'dezembro'};
+			return `${dominioCGPP}/bonus-de-eficiencia-e-produtividade/${ano}/valores-do-bonus-de-eficiencia-${mesesNome[mes]}-${ano}.pdf`;
+		};
+
+		const urlsCCHA = {
+			painelPrincipal: `${dominioCCHA}&pageName=951fb5b48411cd406c02`,
+			infoRelevantes: `${dominioCCHA}&pageName=ReportSection`, 
+			honorariosResultados: `${dominioCCHA}&pageName=ReportSection1`, 
+			detalhamentoDistribuicao: `${dominioCCHA}&pageName=ReportSection2`  
+		};
+
+		const urlsESAF = {
+			noticiaCGU2008: "https://www.gov.br/cgu/pt-br/assuntos/noticias/2008/05/sai-resultado-de-concurso-para-analista-e-tecnico-da-cgu",
+			repositorioEnap: `${dominioENAP}/handle/1/5504`,
+			editalRegulador: `${dominioENAP}/bitstream/1/5504/4/edital-2%20regulador.pdf`,
+			anexo1: `${dominioENAP}/bitstream/1/5504/3/anexo-i1.pdf`
+		};
+
+        const atosNormativos = {
+            1: { path: "2007-2010/2008/mpv/anexos/anmpv440.htm", nome_base: "MPV nº 440/2008" },
+            2: { path: "2007-2010/2008/lei/anexos/anl11890-01-10a.htm", nome_base: "Lei nº 11.890/2008" },
+            3: { path: "2011-2014/2012/lei/l12775.htm", nome_base: "Lei nº 12.775/2012" },
+            4: { path: "2015-2018/2016/lei/l13327.htm", nome_base: "Lei nº 13.327/2016" }
+            // ... (Você vai preenchendo os IDs únicos conforme a sua lista)
+        };
+
+        const legislacaoHistorica = {
+            "AFFC": [
+                { data: "2008/07", atoId: 1, txt_anexo: "#AnexoIV", num_anexo: "IV" },
+                { data: "2009/07", atoId: 2, txt_anexo: "#AnexoIV", num_anexo: "IV" },
+                { data: "2016/08", atoId: 4, txt_anexo: "#anexoi", num_anexo: "I" }
+            ],
+            "AFRFB": [
+                { data: "2008/07", atoId: 1, txt_anexo: "#AnexoII", num_anexo: "II" },
+                { data: "2016/08", atoId: 4, txt_anexo: "#anexoxxxv", num_anexo: "XXXV" }
+            ]
+			// ... (E assim por diante para TFFC, ATRFB, PFN, etc.)
+        };
+		
+        const gruposCarreiras = {
+            'CGG': ['TFFC', 'AFFC'],
+            'CFC': ['TFFC', 'AFFC'],
+            'CAF': ['ATRFB', 'AFRFB'],
+            'CTARFB': ['ATRFB', 'AFRFB'],
+            'CAJ': ['PFN'],
+            'CPFN': ['PFN'],
+            'CPF': ['APF-EPF-PPF', 'DPF-PCF'],
+            'PF':  ['APF-EPF-PPF', 'DPF-PCF']
+        };
+
+        const marcosHistoricos = [
+            // Aplica a absolutamente tudo na tela
+            { data: "2003/12", serie: "ALL", evento: "EC 41/2003 (Teto e Fim da Paridade Integral)" },
+            { data: "2019/11", serie: "ALL", evento: "EC 103/2019 (Nova Reforma da Previdência)" },
+            
+            // Aplica a todos os níveis de Auditores e Analistas da Receita (Base, Meio, Topo, Aposentado)
+            { data: "2008/07", serie: "CAF", evento: "Fim do VB e Início do Subsídio" },
+            
+            // Aplica a todos os níveis apenas dos Auditores
+            { data: "2016/12", serie: "AFRFB", evento: "Retorno ao VB + Bônus de Eficiência (BEP)" },
+            
+            // Aplica a todos os níveis da PGFN
+            { data: "2016/08", serie: "CAJ", evento: "Início do rateio de Honorários (HAS)" },
+            
+            // Aplica APENAS à linha específica dos inativos da PGFN
+            { data: "2023/01", serie: "PFN (aposentado)", evento: "Início da aplicação do piso de 52,04%" },
+            
+            // Aplica a todos os 5 cargos da Polícia Federal
+            { data: "2006/03", serie: "CPF", evento: "Implementação do Subsídio Policial" },
+
+            // Aplica ao STF
+            { data: "2025/02", serie: "STF", evento: "Último reajuste do teto constitucional" }
+        ];
 	
         // 1. Cria a regra global de fundo branco para o Canvas
         const customCanvasBackgroundColor = {
             id: 'customCanvasBackgroundColor',
-            beforeDraw: (chart, args, options) => {
+            beforeDraw: (chart) => {
                 const {ctx} = chart;
                 ctx.save();
                 ctx.globalCompositeOperation = 'destination-over';
-                ctx.fillStyle = '#fcfcfc';
+                // Agora ele puxa a variável dedicada da área de plotagem
+                ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--chart-bg').trim() || '#ffffff';
                 ctx.fillRect(0, 0, chart.width, chart.height);
                 ctx.restore();
             }
@@ -510,7 +661,7 @@ const urlsESAF = {
         const balaoResolucao = {
             id: 'balaoResolucao',
             afterDraw: (chart) => {
-                const comparativoEl = document.getElementById('comparativo');
+                const comparativoEl = document.getElementById('desafio');
                 const series1El = document.getElementById('series1');
                 
                 if (!comparativoEl || !series1El) return;
@@ -571,9 +722,61 @@ const urlsESAF = {
                 }
             }
         };
+		
+		// ==========================================
+        // PLUGIN DE AUDITORIA (Marca d'água oficial)
+        // ==========================================
+        const pluginAuditoria = {
+            id: 'pluginAuditoria',
+            afterDraw: (chart) => {
+                const { ctx, chartArea } = chart;
+                if (!chartArea) return;
+                const { top, bottom, left, right, width, height } = chartArea;
+                ctx.save();
+
+                // 1. Logo Institucional (Centralizada e Gigante)
+                // Agora o Chart.js só tenta desenhar se houver uma logo parametrizada
+                if (LOGO && logoInstitucional.complete && logoInstitucional.naturalWidth > 0) {
+                    const logoW = 800; 
+                    const logoH = 320; 
+                    const cx = left + (width / 2) - (logoW / 2);
+                    const cy = top + (height / 2) - (logoH / 2);
+                    
+                    ctx.globalAlpha = 0.25; 
+                    ctx.drawImage(logoInstitucional, cx, cy, logoW, logoH);
+                }
+
+                ctx.globalAlpha = 1.0;
+
+                // 2. Carimbos de Tempo (No TETO do Canvas, cantos esquerdo/direito)
+                const dataHoje = new Date();
+                const strData = dataHoje.toLocaleDateString('pt-BR');
+                const strHora = dataHoje.toLocaleTimeString('pt-BR', { hour12: false });
+
+                ctx.fillStyle = '#b0b0b0'; 
+                ctx.font = '10px Consolas, monospace';
+                
+                ctx.textAlign = 'left';
+                ctx.textBaseline = 'top';
+                ctx.fillText("" + strData, left, 5);
+
+                ctx.textAlign = 'right';
+                ctx.fillText("" + strHora, right, 5);
+
+                // 3. URL Centralizada (No RODAPÉ do Canvas, centralizada abaixo do eixo X)
+                const currentUrl = window.location.hostname + window.location.pathname;
+                ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--chart-text').trim() || '#999999';
+                ctx.font = '10px Segoe UI, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'bottom';
+                ctx.fillText(currentUrl, left + (width / 2), chart.height - 2);
+
+                ctx.restore();
+            }
+        };
 
         // 3. Registra TODOS os plugins nativamente na raiz do Chart.js
-        Chart.register(ChartDataLabels, customCanvasBackgroundColor, balaoResolucao);
+        Chart.register(ChartDataLabels, customCanvasBackgroundColor, balaoResolucao, pluginAuditoria);
 
         const ctx = document.getElementById('mainChart').getContext('2d');
         let myChart;
@@ -584,6 +787,38 @@ const urlsESAF = {
         let toastShownAvulso = false;
         let toastShownDesafio = false;
         let toastTimeout;
+
+		function encontrarLeiVigente(cargo, competenciaAtual) {
+            const leis = legislacaoHistorica[cargo];
+            if (!leis) return null;
+
+            let vigenciaEncontrada = null;
+            
+            // Busca a vigência mais recente que seja menor ou igual ao mês na tela
+            for (let i = 0; i < leis.length; i++) {
+                if (leis[i].data <= competenciaAtual) {
+                    vigenciaEncontrada = leis[i];
+                } else {
+                    break; // Passou da data, encerra a busca
+                }
+            }
+
+            if (vigenciaEncontrada) {
+                // Faz o "JOIN" com o dicionário de atos
+                const ato = atosNormativos[vigenciaEncontrada.atoId];
+                
+                if (ato) {
+                    return {
+                        // Concatena: "Lei nº 11.890/2008 - Anexo IV"
+                        nome: `${ato.nome_base} - Anexo ${vigenciaEncontrada.num_anexo}`,
+                        
+                        // Concatena: "https://.../_ato2007-2010/.../anl11890.htm#AnexoIV"
+                        url: `${dominioPlanalto}${ato.path}${vigenciaEncontrada.txt_anexo}`
+                    };
+                }
+            }
+            return null;
+        }
 
         // Função que exibe a colinha de atalhos
         function showShortcutsToast(isComp) {
@@ -605,7 +840,7 @@ const urlsESAF = {
                                 + ' Zoom:  <span class="toast-mono">⇧+▲|▼<i>(shift)</i></span><br>'   //⬆|⬇ 
                                 + ' Rolar: <span class="toast-mono">⇧+◀︎|▶︎<i>(shift)</i></span><br>'   //⬅|⮕
                                 + ' Escalas: <span class="toast-mono"><u>absoluto</u>:$(⇧+4) <u>relativo</u>:%(⇧+5)</span><br>'
-                                + ' Opções: <span class="toast-mono"><u>desafio</u>:#(⇧+3) <u>rótulos</u>:@(⇧+2)</span><br>';
+                                + ' Opções: <span class="toast-mono"><u>desafio</u>:#(⇧+3) <u>rótulos</u>:@(⇧+2) <u>IPCA</u>:&(⇧+6|7)</span><br>';
                 if (isComp) {
                     htmlContent += ' Inverter: <span class="toast-mono">␣<i>(space)</i></span><br>'
                                  + ' Níveis: <span class="toast-mono"><u>base</u>:1 <u>meio</u>:2 <u>topo</u>:3</span><br>';
@@ -622,7 +857,7 @@ const urlsESAF = {
                 clearTimeout(toastTimeout);
                 toastTimeout = setTimeout(() => {
                     toast.classList.remove('show');
-                }, 10000); // O modalzinho some sozinho após 10 segundos
+                }, 9999); // O modalzinho some sozinho após 10 segundos
             }, 500);
         }
 		
@@ -647,6 +882,11 @@ const urlsESAF = {
 
         const tsvCargos = [...new Set(chavesTSV.map(k => k.replace(/ \((base|meio|topo)\)$/i, '')))];
         
+        // ==========================================
+        // FILTRAGEM E CATEGORIZAÇÃO DAS SÉRIES
+        // ==========================================
+
+        // 1. Todas as séries plotáveis (Para o Modo Avulso)
         const allSeriesKeys = Object.keys(dbData).filter(k => 
             k !== 'Competencia' && 
             !k.toLowerCase().includes('período analisado') && 
@@ -655,16 +895,23 @@ const urlsESAF = {
             k !== 'CGPP | Dados da Apuração | Valor unitário por cota ajustado (=)' &&
             dbData[k].some(v => typeof v === 'number')
         );
+		
+        // 2. O Filtro do Desafio (Comparativo)
+        // Ignora CGPP, CCHA e a nossa matriz interna Fator_IPCA
+        const chavesDesafio = allSeriesKeys.filter(k => !k.startsWith('CGPP') && !k.startsWith('CCHA') && k !== 'Fator_IPCA');
+
+        // Agrupa os cargos removendo os sufixos de nível para o Select
+        const cargosDesafio = [...new Set(chavesDesafio.map(k => k.replace(/ \((base|meio|topo)\)$/i, '')))];
 
         const select1 = document.getElementById('series1');
         const select2 = document.getElementById('series2');
         const selectInicio = document.getElementById('data-inicio');
         const selectFim = document.getElementById('data-fim');
         
-        const chkComparativo = document.getElementById('comparativo');
+        const chkComparativo = document.getElementById('desafio');
         const chkRotulos = document.getElementById('rotulos');
         
-        const rdVisao = document.querySelectorAll('input[name="visao"]');
+        const rdVisao = document.querySelectorAll('input[name="escala"]');
 
         dbData.Competencia.forEach(d => {
             selectInicio.add(new Option(d, d));
@@ -684,6 +931,8 @@ const urlsESAF = {
         };
 
         function formatSerieOption(serie) {
+            if (serie === 'Fator_IPCA') return "Índice Nacional de Preços ao Consumidor-Amplo | IPCA-IBGE (Série 433 via SGS-BCB)";
+            
             let parts = serie.split(' | ');
             if (parts.length > 2 && parts[parts.length-1].includes('%')) {
                 let pct = parts[parts.length-1].trim();
@@ -714,7 +963,86 @@ const urlsESAF = {
                 document.querySelectorAll('input[name="nivel"]').forEach(el => el.disabled = !hasLevel);
             }
         }
+		
+		// ==========================================
+        // DEEP LINKING (Leitura e Escrita de Estado)
+        // ==========================================
+        
+        // 1. LER a URL ao abrir a página
+        function lerEstadoDaURL() {
+            const params = new URLSearchParams(window.location.search);
+            
+            if (params.has('desafio')) {
+                document.getElementById('desafio').checked = params.get('desafio') === '1';
+            }
+            if (params.has('ipca')) {
+                const ipcaEl = document.getElementById('ipca');
+                if(ipcaEl) ipcaEl.checked = params.get('ipca') === '1';
+            }
+            if (params.has('rotulos')) {
+                const rotEl = document.getElementById('rotulos');
+                if(rotEl) rotEl.checked = params.get('rotulos') === '1';
+            }
+            if (params.has('escala')) {
+                const v = params.get('escala');
+                const radio = document.querySelector(`input[name="escala"][value="${v}"]`);
+                if(radio) radio.checked = true;
+            }
+            if (params.has('nivel')) {
+                const n = params.get('nivel');
+                const radioNivel = document.querySelector(`input[name="nivel"][value="${n}"]`);
+                if(radioNivel) radioNivel.checked = true;
+            }
+            
+            return {
+                s1: params.get('s1') || null,
+                s2: params.get('s2') || null
+            };
+        }
 
+        // 2. GERAR e COPIAR o link no clique
+        const btnLink = document.getElementById('btn-link');
+        btnLink.addEventListener('click', () => {
+            const baseUrl = window.location.origin + window.location.pathname;
+            const params = new URLSearchParams();
+            
+            // Grava a identidade visual (Marca d'água)
+            if (LOGO) params.set('logo', LOGO);
+            
+            // Grava o estado atual da tela
+            if (select1.value) params.set('s1', select1.value);
+            if (select2.value) params.set('s2', select2.value);
+            
+            params.set('desafio', document.getElementById('desafio').checked ? '1' : '0');
+            params.set('rotulos', document.getElementById('rotulos').checked ? '1' : '0');
+            
+            const ipcaEl = document.getElementById('ipca');
+            params.set('ipca', (ipcaEl && ipcaEl.checked) ? '1' : '0');
+            
+            const visaoVal = document.querySelector('input[name="escala"]:checked').value;
+            params.set('escala', visaoVal);
+            
+            const nivelVal = document.querySelector('input[name="nivel"]:checked').value;
+            params.set('nivel', nivelVal);
+
+            const urlFinal = `${baseUrl}?${params.toString()}`;
+
+            playSFX('floppy');
+            btnLink.textContent = '⛓️‍💥';
+            btnLink.style.transform = 'scale(1.333)';
+            setTimeout(() => { 
+                btnLink.style.transform = 'none';
+                btnLink.textContent = '🔗';
+            }, 222);            
+
+            navigator.clipboard.writeText(urlFinal).then(() => {
+                showCustomToast("<strong style='font-size: 15px;'>Link copiado para a área de transferência!</strong><br>Cole para compartilhar a parametrização selecionada.", 4444);
+            }).catch(err => {
+                console.error('❌ Erro ao copiar o link.', err);
+				showToast('❌ Erro ao copiar o link.');
+            });
+        });
+ 
         function updateSelectOptions(isInitialization = false) {
             const isComp = chkComparativo.checked;
             const val1 = select1.value;
@@ -726,8 +1054,8 @@ const urlsESAF = {
             select1.add(new Option('', ''));
             select2.add(new Option('', ''));
 
-            if (isComp) {
-                tsvCargos.forEach(cargo => {
+			if (isComp) {
+                cargosDesafio.forEach(cargo => {
                     select1.add(new Option(cargo, cargo));
                     select2.add(new Option(cargo, cargo));
                 });
@@ -736,9 +1064,9 @@ const urlsESAF = {
                     select1.value = '';
                     select2.value = '';
                 } else {
-                    select1.value = tsvCargos.includes(val1) ? val1 : (val1 ? val1 : '');
-                    select2.value = tsvCargos.includes(val2) && val2 !== select1.value ? val2 : (val2 ? val2 : '');
-                    
+                    select1.value = cargosDesafio.includes(val1) ? val1 : (val1 ? val1 : '');
+                    select2.value = cargosDesafio.includes(val2) && val2 !== select1.value ? val2 : (val2 ? val2 : '');			
+			                    
                     Array.from(select2.options).forEach(opt => {
                         if (opt.value && opt.value === select1.value) opt.disabled = true;
                     });
@@ -765,115 +1093,341 @@ const urlsESAF = {
             }
         }
 
+        function atualizarTravasUI() {
+            if (!chkComparativo.checked) {
+                let s1 = select1.value;
+                let isNonMonetary = s1 && isQuantityOrIndex(s1);
+                let isFator = s1 === 'Fator_IPCA'; // Verifica se é a própria linha da inflação
+
+                if (isNonMonetary) {
+                    rdVisao[0].checked = true; 
+                    rdVisao[0].disabled = true;
+                    rdVisao[1].disabled = true;
+                    if (chkIpca) { chkIpca.checked = false; chkIpca.disabled = true; }
+                } else if (isFator) {
+                    // Se for o IPCA: Libera as escalas (pode ver abs ou rel), mas PROÍBE inflacionar a própria inflação
+                    rdVisao[0].disabled = false;
+                    rdVisao[1].disabled = false;
+                    if (chkIpca) { chkIpca.checked = false; chkIpca.disabled = true; }
+                } else {
+                    // Qualquer outra série financeira normal: Tudo liberado
+                    rdVisao[0].disabled = false;
+                    rdVisao[1].disabled = false;
+                    if (chkIpca) chkIpca.disabled = false; 
+                }
+            }
+        }
+
+        // Quando a Interface "desenha" o Avulso ou Desafio, chama as travas
         function handleUI(isInitialization = false) {
             const isComp = chkComparativo.checked;
             const containerS1 = document.getElementById('container-series1');
             const selectS1 = document.getElementById('series1');
-            
             const btnSwap = document.getElementById('btn-swap');
             const btnPrev = document.getElementById('btn-prev');
             const btnNext = document.getElementById('btn-next');
             const btnClear1 = document.getElementById('btn-clear1');
-            
             const containerS2 = document.getElementById('container-series2');
             const wClear2 = document.getElementById('wrapper-clear2');
-            
             const labelSeries1 = document.getElementById('label-series1');
             const containerNivel = document.getElementById('container-nivel');
             const containerDatas = document.getElementById('container-datas');
 
             if (isComp) {
                 labelSeries1.textContent = 'Desafiante';
-                
                 containerS1.style.flexGrow = '0';
                 selectS1.style.width = '180px';
-                
                 btnSwap.style.display = 'block';
                 btnPrev.style.display = 'none';
                 btnNext.style.display = 'none';
                 btnClear1.style.display = 'none';
-                
                 containerS2.style.display = 'flex';
                 wClear2.style.display = 'flex';
-                
                 containerNivel.style.display = 'flex';
                 containerDatas.style.display = 'none';
-
                 rdVisao[0].disabled = false;
                 rdVisao[1].disabled = false;
             } else {
                 labelSeries1.textContent = 'Série';
-                
                 containerS1.style.flexGrow = '0';
                 selectS1.style.width = '347px';
-                
                 btnSwap.style.display = 'none';
                 btnPrev.style.display = 'block';
                 btnNext.style.display = 'block';
                 btnClear1.style.display = 'block';
-                
                 containerS2.style.display = 'none';
                 wClear2.style.display = 'none';
-                
                 containerNivel.style.display = 'none';
                 containerDatas.style.display = 'flex';
-
-                let s1 = selectS1.value;
-                if (s1 && isQuantityOrIndex(s1)) {
-                    rdVisao[0].checked = true; 
-                    rdVisao[0].disabled = true;
-                    rdVisao[1].disabled = true;
-                } else {
-                    rdVisao[0].disabled = false;
-                    rdVisao[1].disabled = false;
-                }
+                
+                atualizarTravasUI(); // Chama o validador
             }
             updateSelectOptions(isInitialization);
-            showShortcutsToast(isComp); // <--- INJETAR AQUI! Dispara a colinha de atalhos inteligente
+            showShortcutsToast(isComp); 
             updateChart();
         }
 
+        // Quando usa o mouse na caixa:
         select1.addEventListener('change', () => {
-            if (!chkComparativo.checked) {
-                let s1 = select1.value;
-                if (s1 && isQuantityOrIndex(s1)) {
-                    rdVisao[0].checked = true;
-                    rdVisao[0].disabled = true;
-                    rdVisao[1].disabled = true;
-                } else {
-                    rdVisao[0].disabled = false;
-                    rdVisao[1].disabled = false;
-                }
-            }
+            atualizarTravasUI();
             updateSelectOptions();
             updateChart();
         });
 
-        function formatYAxisNumber(value, isPercent, isQtd, isCont, isIndice) {
+        function formatYAxisNumber(value, isPercent, isQtd, isCont, isIndice, isFator) {
+            // A ordem importa! Se for percentual (relativo), ignora as outras regras e crava 1 casa decimal.
+            if (isPercent) return value.toLocaleString('pt-BR', {minimumFractionDigits: 1, maximumFractionDigits: 1}) + '%';
+            
+            if (isFator) return value.toLocaleString('pt-BR', {minimumFractionDigits: 6, maximumFractionDigits: 6});
             if (isIndice) return (value * 100).toLocaleString('pt-BR', {minimumFractionDigits: 4, maximumFractionDigits: 4}) + '%';
             if (isCont) return new Intl.NumberFormat('pt-BR', {minimumFractionDigits: 4, maximumFractionDigits: 4}).format(value);
             if (isQtd) return new Intl.NumberFormat('pt-BR').format(value);
-            if (isPercent) return value.toLocaleString('pt-BR', {minimumFractionDigits: 1, maximumFractionDigits: 1}) + '%';
             if (value < 0) return 'R$ -' + new Intl.NumberFormat('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2}).format(Math.abs(value));
             return 'R$ ' + new Intl.NumberFormat('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2}).format(value);
         }
 
-        function formatDatalabel(value, isPercent, isQtd, isCont, isIndice) {
+        function formatDatalabel(value, isPercent, isQtd, isCont, isIndice, isFator) {
             if (value === null || value === undefined) return '';
+            
+            // Mesma coisa nos rótulos das bolinhas
+            if (isPercent) return value % 1 === 0 ? value.toFixed(0) : value.toLocaleString('pt-BR', {minimumFractionDigits: 1, maximumFractionDigits: 1});
+            
+            if (isFator) return value.toLocaleString('pt-BR', {minimumFractionDigits: 6, maximumFractionDigits: 6});
             if (isIndice) return (value * 100).toLocaleString('pt-BR', {minimumFractionDigits: 4, maximumFractionDigits: 4});
             if (isCont) return value.toLocaleString('pt-BR', {minimumFractionDigits: 4, maximumFractionDigits: 4});
             if (isQtd) return value.toString();
-            if (isPercent) return value % 1 === 0 ? value.toFixed(0) : value.toLocaleString('pt-BR', {minimumFractionDigits: 1, maximumFractionDigits: 1});
             let num = value / 1000;
             return num.toLocaleString('pt-BR', {minimumFractionDigits: 1, maximumFractionDigits: 1});
         }
 
-        function updateChart(mode) {
+		// ==========================================
+        // MOTOR DINÂMICO DE FONTES (Regras de Negócio)
+        // ==========================================
+        function atualizarFontesEspecificas(startIdx, endIdx, s1, s2) {
+            const container = document.getElementById('container-fontes-dinamicas');
+            if (!container) return;
+
+            if (!s1) {
+                container.innerHTML = '<em style="color: #999;">Selecione as séries no painel para carregar as fontes relacionadas.</em>';
+                return;
+            }
+
+            // 1. Variáveis Temporais e de Contexto
+            const dataFim = dbData.Competencia[endIdx]; // Ex: "2026/07"
+            const [anoFim, mesFim] = dataFim.split('/');
+            
+            const nomeS1 = s1.toUpperCase();
+            const nomeS2 = s2 ? s2.toUpperCase() : "";
+            const contexto = nomeS1 + " " + nomeS2;
+
+            // Flags gerais de carreiras
+            const isSerieCCHA = contexto.includes('CCHA');
+            const isSerieCGPP = contexto.includes('CGPP');
+			const isSerieSTF  = contexto.includes('STF'); // <-- NOVA FLAG DO STF
+
+            // 2. Filtros de Exclusão (Verifica se a série na tela é PURA de Subsídio ou VB, sem HAS ou BEP)
+            // Se as séries tiverem apenas a sigla "AFRFB", isso dará false (o que é ótimo, pois queremos mostrar os links na série agregada)
+            const isS1OnlyOld = (nomeS1.includes('SUBSÍDIO') || nomeS1.includes('SUBSIDIO') || /\bVB\b/.test(nomeS1) || nomeS1.includes('VENCIMENTO BÁSICO')) && !nomeS1.includes('HAS') && !nomeS1.includes('BEP');
+            const isS2OnlyOld = s2 ? ((nomeS2.includes('SUBSÍDIO') || nomeS2.includes('SUBSIDIO') || /\bVB\b/.test(nomeS2) || nomeS2.includes('VENCIMENTO BÁSICO')) && !nomeS2.includes('HAS') && !nomeS2.includes('BEP')) : true;
+            
+            const ocultarPaineis = isS1OnlyOld && isS2OnlyOld;
+
+            // 3. Condicionais de Aparição baseadas no Tempo e na Carreira
+            // HAS passou a existir em 01/08/2016
+            const showHAS = (isSerieCCHA || contexto.includes('PFN')) && (dataFim >= '2016/08') && !ocultarPaineis;
+            
+            // BEP passou a existir em 30/12/2016 (Mês 12)
+            const showBEP = (isSerieCGPP || contexto.includes('AFRFB') || contexto.includes('ATRFB')) && (dataFim >= '2016/12') && !ocultarPaineis;
+
+            let html = "";
+
+            // ---------------------------------------------------------
+            // BLOCO 1: LEGISLAÇÃO DO PLANALTO
+            // ---------------------------------------------------------
+            html += `<div>
+                        <strong style="color: var(--text-muted);">Portal do Planalto (Legislação Correlata)</strong>
+                        <ul style="padding-left: 20px; margin-top: 5px; margin-bottom: 0;">`;
+            
+            if (isSerieCCHA) {
+                html += `<li><a href="${dominioPlanalto}2015-2018/2016/lei/l13327.htm" target="_blank" style="color: #666; text-decoration: underline;">Lei nº 13.327/2016 (Honorários)</a></li>`;
+            } else if (isSerieCGPP) {
+                html += `<li><a href="${dominioPlanalto}2015-2018/2017/lei/l13464.htm" target="_blank" style="color: #666; text-decoration: underline;">Lei nº 13.464/2017 (Bônus de Eficiência)</a></li>`;
+                html += `<li><a href="${dominioPlanalto}2023-2026/2026/lei/l15367.htm" target="_blank" style="color: #666; text-decoration: underline;">Lei nº 15.367/2026 (Ajuste CGPP)</a></li>`;
+            } else {
+                // A LÓGICA PADRÃO VAI FUNCIONAR PERFEITAMENTE PARA O STF AQUI!
+                // Basta você colocar o "STF" no seu JSON legislacaoHistorica com as respectivas datas e leis.
+                const cargoS1 = s1.split(' ')[0]; 
+                const leiS1 = encontrarLeiVigente(cargoS1, dataFim);
+                if (leiS1) html += `<li><a href="${leiS1.url}" target="_blank" style="color: #666; text-decoration: underline;">${leiS1.nome}</a></li>`;
+
+                if (s2) {
+                    const cargoS2 = s2.split(' ')[0];
+                    const leiS2 = encontrarLeiVigente(cargoS2, dataFim);
+                    if (leiS2 && (!leiS1 || leiS2.url !== leiS1.url)) {
+                        html += `<li><a href="${leiS2.url}" target="_blank" style="color: #666; text-decoration: underline;">${leiS2.nome}</a></li>`;
+                    }
+                }
+            }
+            html += `   </ul>
+                     </div>`;
+
+            // ---------------------------------------------------------
+            // BLOCO 2: ÓRGÃOS ESPECÍFICOS (CCHA / CGPP)
+            // ---------------------------------------------------------
+            if (showBEP || showHAS) {
+                html += `<div>
+                            <strong style="color: var(--text-muted);">Informações Colegiadas (Atas e Painéis)</strong>
+                            <ul style="padding-left: 20px; margin-top: 5px; margin-bottom: 0;">`;
+                if (showBEP) {
+                    html += `<li><a href="${getUrlBonusRFB(anoFim, mesFim)}" target="_blank" style="color: #666; text-decoration: underline;">Relatório do Bônus de Eficiência (${dataFim})</a></li>`;
+                    html += `<li><a href="${urlsCGPP.indiceEficiencia}" target="_blank" style="color: #666; text-decoration: underline;">Base de Cálculo e Índice de Eficiência Institucional</a></li>`;
+                }
+                if (showHAS) {
+                    html += `<li><a href="${urlsCCHA.painelPrincipal}" target="_blank" style="color: #666; text-decoration: underline;">Painel do CCHA (Verbas Indenizatórias e Remuneratórias de ${dataFim})</a></li>`;
+                }
+                html += `   </ul>
+                         </div>`;
+            }
+			
+			// ---------------------------------------------------------
+            // NOVO BLOCO: REFERÊNCIAS EXCLUSIVAS DO STF
+            // ---------------------------------------------------------
+            if (isSerieSTF) {
+                html += `<div>
+                            <strong style="color: var(--text-muted);">Teto Constitucional (Referências Diversas)</strong>
+                            <ul style="padding-left: 20px; margin-top: 5px; margin-bottom: 0;">
+                                <!-- Exemplo 1: Portal do STF (Portarias Antigas em PDF) -->
+                                <li><a href="URL_DA_PORTARIA_AQUI" target="_blank" style="color: #666; text-decoration: underline;">Portaria STF nº XX/XXXX (Repositório Oficial)</a></li>
+                                
+                                <!-- Exemplo 2: Site Extraoficial -->
+                                <li><a href="URL_DO_SITE_AQUI" target="_blank" style="color: #666; text-decoration: underline;">Histórico de Subsídios (Base Extraoficial)</a></li>
+                                
+                                <!-- Exemplo 3: Notícias -->
+                                <li><a href="URL_DA_NOTICIA_AQUI" target="_blank" style="color: #666; text-decoration: underline;">Notícia: Reajuste do Teto Remuneratório</a></li>
+                            </ul>
+                         </div>`;
+            }
+
+            container.innerHTML = html;
+        }
+		
+		// Converte as cores HEX das linhas em RGBA com transparência extrema (5%) para o fundo do KPI
+        function hexToRgba(hex, alpha) {
+            let r = 0, g = 0, b = 0;
+            if (hex && hex.startsWith('#')) {
+                if (hex.length === 4) {
+                    r = parseInt(hex[1] + hex[1], 16);
+                    g = parseInt(hex[2] + hex[2], 16);
+                    b = parseInt(hex[3] + hex[3], 16);
+                } else if (hex.length === 7) {
+                    r = parseInt(hex[1] + hex[2], 16);
+                    g = parseInt(hex[3] + hex[4], 16);
+                    b = parseInt(hex[5] + hex[6], 16);
+                }
+                return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+            }
+            return 'rgba(255, 255, 255, 0.95)'; 
+        }
+
+        // Calcula os dados da série específica sob o mouse
+        function atualizarKPILegenda(datasetIndex, chart) {
+            const ds = chart.data.datasets[datasetIndex];
+            const labels = chart.data.labels;
+            if (!ds || !ds.data || ds.data.length === 0) return;
+
+            let valInicial = null, dataInicial = null;
+            let valFinal = null, dataFinal = null;
+            let minVal = Infinity, maxVal = -Infinity;
+            let minIdx = -1, maxIdx = -1;
+
+            // Varre apenas os dados visíveis no gráfico atual para encontrar as pontas e os extremos
+            for (let i = 0; i < ds.data.length; i++) {
+                const val = ds.data[i];
+                if (val !== null && val !== undefined) {
+                    if (valInicial === null) {
+                        valInicial = val;
+                        dataInicial = labels[i];
+                    }
+                    valFinal = val;
+                    dataFinal = labels[i];
+
+                    if (val < minVal) { minVal = val; minIdx = i; }
+                    if (val > maxVal) { maxVal = val; maxIdx = i; }
+                }
+            }
+
+            if (valInicial === null) return; // Série abortada (sem dados)
+
+            const escala = document.querySelector('input[name="escala"]:checked').value;
+            const isRelative = escala === 'percentual';
+            
+            // Descobre o tipo de dado lendo o nome da linha que o mouse tocou
+            const lbl = ds.label || '';
+            const isQtd = lbl.toLowerCase().includes('quantidade') && !lbl.includes('Índice');
+            const isCont = lbl.includes('Contagem');
+            const isIndice = lbl.includes('Índice') || lbl.includes('Indice');
+            const isFator = lbl.includes('IPCA');
+
+            // Usa a sua função oficial de formatação para garantir consistência total!
+            const formatKPI = (v) => {
+                if (isRelative) return v.toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + '%';
+                return formatYAxisNumber(v, isRelative, isQtd, isCont, isIndice, isFator);
+            };
+
+            // INJEÇÃO DA LINHA 1: PERÍODO
+            document.getElementById('kpi-inicio-val').textContent = formatKPI(valInicial);
+            document.getElementById('kpi-inicio-data').textContent = dataInicial;
+            document.getElementById('kpi-fim-val').textContent = formatKPI(valFinal);
+            document.getElementById('kpi-fim-data').textContent = dataFinal;
+
+            const varPeriodo = ((valFinal / valInicial) - 1) * 100;
+            const sinalPeriodo = varPeriodo > 0 ? '▲ +' : (varPeriodo < 0 ? '▼ ' : '');
+            document.getElementById('kpi-var-periodo-val').textContent = sinalPeriodo + varPeriodo.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '%';
+            document.getElementById('kpi-var-periodo-val').style.color = varPeriodo > 0 ? '#27ae60' : (varPeriodo < 0 ? '#e74c3c' : 'var(--text-muted)');
+
+            // INJEÇÃO DA LINHA 2: EXTREMOS
+            document.getElementById('kpi-min-val').textContent = formatKPI(minVal);
+            document.getElementById('kpi-min-data').textContent = labels[minIdx];
+            document.getElementById('kpi-max-val').textContent = formatKPI(maxVal);
+            document.getElementById('kpi-max-data').textContent = labels[maxIdx];
+
+            if (minVal !== 0) {
+                const varExtremos = ((maxVal / minVal) - 1) * 100;
+                const sinalExtremos = varExtremos > 0 ? '▲ +' : (varExtremos < 0 ? '▼ ' : '');
+                document.getElementById('kpi-var-extremos-val').textContent = sinalExtremos + varExtremos.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '%';
+                document.getElementById('kpi-var-extremos-val').style.color = varExtremos > 0 ? '#27ae60' : (varExtremos < 0 ? '#e74c3c' : 'var(--text-muted)');
+            }
+
+            // A MÁGICA VISUAL: Match de Cores (Borda Sólida + Fundo Translúcido 5%)
+            const container = document.getElementById('kpi-container');
+            const borderColor = ds.borderColor;
+            
+            container.style.borderColor = borderColor;
+            // Se estiver no tema escuro o fundo branco puro translúcido não funciona bem, então lemos do cartão
+            const isDark = document.body.getAttribute('data-theme') === 'dark';
+            const baseBg = isDark ? 'rgba(30, 35, 43, 0.95)' : 'rgba(255, 255, 255, 0.95)';
+            
+            // Fundo principal + Película da cor da linha a 6% de opacidade
+            container.style.background = `linear-gradient(${baseBg}, ${baseBg}), linear-gradient(${hexToRgba(borderColor, 0.06)}, ${hexToRgba(borderColor, 0.06)})`;
+
+            container.style.display = 'flex';
+        }
+
+		function updateChart(mode) {
             const isComp = chkComparativo.checked;
-            const visao = document.querySelector('input[name="visao"]:checked').value;
-            const isRelative = visao === 'percentual';
+            const escala = document.querySelector('input[name="escala"]:checked').value;
+            const isRelative = escala === 'percentual';
+            
+            // INJEÇÃO 1: PREPARAÇÃO IPCA
+            const chkIpca = document.getElementById('ipca');
+            const isIpcaActive = chkIpca ? chkIpca.checked : false;
+			
+            // Se o Python ainda não tiver gerado a coluna, cria um array neutro de 1.0 (não altera o valor)
+            const fatorIpca = dbData['Fator_IPCA'] || new Array(dbData.Competencia.length).fill(1.0);
+            
             let datasets = [];
             let validIndices = [];
+
             if(!select1.value || (isComp && !select2.value)) {
                 const emptyConfig = {
                     type: 'line',
@@ -911,7 +1465,7 @@ const urlsESAF = {
                 }
             }
 
-            let s1_Qtd = false, s1_Cont = false, s1_Ind = false;
+            let s1_Qtd = false, s1_Cont = false, s1_Ind = false, s1_Fator = false;
 
             if (isComp) {
                 const s1 = select1.value;
@@ -933,7 +1487,7 @@ const urlsESAF = {
 
                 let firstValidG = -1, lastValidG = -1;
                 for (let i = 0; i < dbData.Competencia.length; i++) {
-                    // Ignora 0s frontais para não criar linha reta no passado do comparativo
+                    // Ignora 0s frontais para não criar linha reta no passado do desafio
                     if ((raw1[i] !== null && raw1[i] !== 0) || (raw2[i] !== null && raw2[i] !== 0)) {
                         if (firstValidG === -1) firstValidG = i;
                     }
@@ -943,8 +1497,19 @@ const urlsESAF = {
                 }
                 if (firstValidG !== -1) { startIdx = firstValidG; endIdx = lastValidG; }
 
+				let lastRaw1 = undefined, lastRaw2 = undefined;
+                
                 for (let i = startIdx; i <= endIdx; i++) {
                     let v1 = raw1[i], v2 = raw2[i];
+                    
+                    // Salva o valor original/bruto ANTES da matemática do IPCA
+                    let originalV1 = v1, originalV2 = v2;
+                    
+                    if (isIpcaActive && !isRelative) {
+                        if (v1 !== null) v1 *= fatorIpca[i];
+                        if (v2 !== null) v2 *= fatorIpca[i];
+                    }
+                    
                     let cv1 = null, cv2 = null;
                     
                     if (isRelative) {
@@ -961,19 +1526,30 @@ const urlsESAF = {
                     data1.push(cv1); data2.push(cv2);
                     validIndices.push(i);
 
-                    const isTsv1 = tsvCargos.some(c => key1.startsWith(c));
-                    const isTsv2 = tsvCargos.some(c => key2.startsWith(c));
-                    if (cv1 !== null) { points1.push((isTsv1 && lastVal1 === cv1) ? 0 : 3); lastVal1 = cv1; } else points1.push(0);
-                    if (cv2 !== null) { points2.push((isTsv2 && lastVal2 === cv2) ? 0 : 3); lastVal2 = cv2; } else points2.push(0);
+                    const isTsv1 = cargosDesafio.some(c => key1.startsWith(c));
+                    const isTsv2 = cargosDesafio.some(c => key2.startsWith(c));
+                    
+                    // A MÁGICA: Só desenha a bolinha (e o rótulo) se o valor BRUTO mudou!
+                    if (cv1 !== null) { 
+                        points1.push((isTsv1 && lastRaw1 === originalV1) ? 0 : 3); 
+                        lastRaw1 = originalV1; 
+                    } else points1.push(0);
+                    
+                    if (cv2 !== null) { 
+                        points2.push((isTsv2 && lastRaw2 === originalV2) ? 0 : 3); 
+                        lastRaw2 = originalV2; 
+                    } else points2.push(0);
                 }
                 
                 datasets.push({
                     label: key1, data: data1, borderColor: '#C00000', backgroundColor: 'rgba(192, 0, 0, 0.25)',
-                    stepped:'"middle', borderWidth: 3, pointRadius: points1, pointHoverRadius: 6, spanGaps: true, fill: false
+                    stepped: isIpcaActive && !isRelative ? false : true, //'middle', // Deixa a curva de corrosão lisa e perfeita!
+                    borderWidth: 3, pointRadius: points1, pointHoverRadius: 6, spanGaps: true, fill: false
                 });
                 datasets.push({
                     label: key2, data: data2, borderColor: '#0070C0', backgroundColor: 'rgba(0, 112, 192, 0.25)',
-                    stepped:'"middle', borderWidth: 3, pointRadius: points2, pointHoverRadius: 6, spanGaps: true, fill: false
+                    stepped: isIpcaActive && !isRelative ? false : true, //'middle', 
+                    borderWidth: 3, pointRadius: points2, pointHoverRadius: 6, spanGaps: true, fill: false
                 });
 
             } else {
@@ -983,6 +1559,7 @@ const urlsESAF = {
                 s1_Qtd = isQuantityOrIndex(key) && !key.includes('Índice');
                 s1_Cont = key.includes('Contagem');
                 s1_Ind = key.includes('Índice') || key.includes('Indice');
+                s1_Fator = key === 'Fator_IPCA';
 
                 let fValid = -1, lValid = -1;
                 for (let i = startIdx; i <= endIdx; i++) {
@@ -997,28 +1574,42 @@ const urlsESAF = {
                 let rawRef = refKey ? dbData[refKey] : null;
                 
                 let data = [], dataRef = [], points = [];
-                let lastVal = undefined, firstValidVal = null;
+                let lastRaw = undefined, firstValidVal = null; 
 
                 if (isRelative) {
                     for (let i = startIdx; i <= endIdx; i++) {
                         if (raw[i] !== null && raw[i] !== 0) {
-                            firstValidVal = raw[i];
+                            let valorBase = raw[i];
+                            if (isIpcaActive && !s1_Qtd && !s1_Cont && !s1_Ind && !s1_Fator) {
+                                valorBase *= fatorIpca[i];
+                            }
+                            firstValidVal = valorBase;
                             break;
                         }
                     }
                 }
-
+                
                 for (let i = startIdx; i <= endIdx; i++) {
                     validIndices.push(i);
                     let v = raw[i];
                     let rV = rawRef ? rawRef[i] : null;
-                    let currentVal = null, currentRef = null;
+                    
+                    let originalV = v; 
 
+                    if (isIpcaActive && !s1_Qtd && !s1_Cont && !s1_Ind && !s1_Fator) { 
+                        if (v !== null) v *= fatorIpca[i];
+                        if (rV !== null) rV *= fatorIpca[i];
+                    }
+
+                    let currentVal = null, currentRef = null;
+                    
                     if (v !== null) {
                         if (isRelative) {
                             if (rawRef) currentVal = (rV !== null && rV !== 0) ? parseFloat(((v / rV) * 100).toFixed(1)) : null;
                             else currentVal = firstValidVal ? parseFloat(((v / firstValidVal) * 100).toFixed(1)) : null;
-                        } else currentVal = v;
+                        } else {
+                            currentVal = v;
+                        }
                     }
                     data.push(currentVal);
 
@@ -1029,8 +1620,21 @@ const urlsESAF = {
                     dataRef.push(currentRef);
                     
                     if (currentVal !== null) {
-                        points.push((lastVal === currentVal) ? 0 : 3);
-                        lastVal = currentVal;
+                        if (s1_Fator) {
+                            // SE FOR IPCA: Filtro Semestral
+                            // Extrai o mês da competência (ex: de "2015/07" extrai "07")
+                            let mesAtual = dbData.Competencia[i].split('/')[1];
+                            // Desenha bolinha apenas se for Jan, Jul, ou se for as pontas exatas do Zoom
+                            if (mesAtual === '01' || mesAtual === '07' || i === startIdx || i === endIdx) {
+                                points.push(3);
+                            } else {
+                                points.push(0);
+                            }
+                        } else {
+                            // SE FOR QUALQUER OUTRA LINHA: Regra padrão (desenha se mudou)
+                            points.push(lastRaw === originalV ? 0 : 3);
+                        }
+                        lastRaw = originalV;
                     } else {
                         points.push(0);
                     }
@@ -1038,7 +1642,8 @@ const urlsESAF = {
                 
                 datasets.push({
                     label: formatSerieOption(key), data: data, borderColor: '#00B050', backgroundColor: 'rgba(0, 176, 80, 0.25)',
-                    stepped:'"middle', borderWidth: 3, pointRadius: points, pointHoverRadius: 6, spanGaps: true, fill: false
+                    stepped: isIpcaActive && !s1_Qtd && !s1_Cont && !s1_Ind && !s1_Fator ? false : true, //'middle', 
+                    borderWidth: 3, pointRadius: points, pointHoverRadius: 6, spanGaps: true, fill: false
                 });
 
                 if (key === 'CGPP | Dados da Apuração | Valor unitário por cota (=)') {
@@ -1048,8 +1653,12 @@ const urlsESAF = {
                             let extraPoints = []; // Array de bolinhas exclusivo para essas séries
                             let lastValExtra = undefined;
                             
-                            for (let i = startIdx; i <= endIdx; i++) {
+							for (let i = startIdx; i <= endIdx; i++) {
                                 let v = dbData[extraKey][i];
+                                
+                                // INJEÇÃO 4A: IPCA NAS LINHAS PONTILHADAS
+                                if (v !== null && isIpcaActive) v *= fatorIpca[i];
+                                
                                 let currentValExtra = null;
                                 
                                 if (v !== null) {
@@ -1080,7 +1689,7 @@ const urlsESAF = {
                             datasets.push({
                                 label: extraKey.replace('CGPP | Dados da Apuração | ', ''), data: dataExtra, 
                                 borderColor: lineColor, backgroundColor: bgColor,
-                                stepped:'"middle', borderWidth: 5, borderDash: [5, 5], 
+                                stepped: true, borderWidth: 5, borderDash: [5, 5], 
                                 pointRadius: extraPoints, pointHoverRadius: 6, spanGaps: true, fill: false
                             });
                         }
@@ -1093,7 +1702,7 @@ const urlsESAF = {
 						datasets.push({
 							label: 'Limite (Bônus Mensal Máximo)', data: dataRef, 
 							borderColor: '#FFC000', backgroundColor: 'rgba(255, 192, 0, 0.25)',
-							stepped:'"middle', borderWidth: 4, borderDash: [10, 5], 
+							stepped: true, borderWidth: 4, borderDash: [10, 5], 
 							pointRadius: points, pointHoverRadius: 6, spanGaps: true, fill: false
 						});
 					}
@@ -1107,6 +1716,10 @@ const urlsESAF = {
                         
                         for (let i = startIdx; i <= endIdx; i++) {
                             let v = dbData[keyCota][i];
+                            
+                            // INJEÇÃO 4B: IPCA NA COTA ROSA
+                            if (v !== null && isIpcaActive) v *= fatorIpca[i];
+                            
                             let currentValCota = null;
                             
                             if (v !== null) {
@@ -1132,7 +1745,7 @@ const urlsESAF = {
                         datasets.push({
                             label: 'Cota (valor unitário)', data: dataCota, 
                             borderColor: '#FF0066', backgroundColor: 'rgba(255, 0, 102, 0.25)',
-                            stepped:'"middle', borderWidth: 4, borderDash: [10, 5], 
+                            stepped: true, borderWidth: 4, borderDash: [10, 5], 
 							pointRadius: pointsCota, pointHoverRadius: 6, spanGaps: true, fill: false
                         });
                     }
@@ -1162,14 +1775,70 @@ const urlsESAF = {
 
             let suggestedMin = (minYValue !== Infinity) ? (minYValue > 0 ? minYValue * 0.95 : minYValue * 1.05) : 0;
             if (!isRelative && minYValue === 0) suggestedMin = 0; // Se partiu de zero cravado, mantém 0.
+			
+			// 1. Descobrimos o que está na tela (Contexto em letras maiúsculas)
+            const s1 = select1.value || "";
+            const s2 = select2.value || "";
+            const contextoPlotado = (s1 + " " + s2).toUpperCase();
 
+            // 2. Construímos as anotações dinamicamente
+            const anotacoesVisuais = {};
+            let annIdx = 0;
+
+            marcosHistoricos.forEach(marco => {
+                let aplicaAoGrafico = false;
+                const alvo = marco.serie.toUpperCase();
+
+                // Regra A: É global?
+                if (alvo === 'ALL') {
+                    aplicaAoGrafico = true;
+                } 
+                // Regra B: É um Grupo/Carreira (ex: CFC, CAF, CPF)?
+                else if (gruposCarreiras[alvo]) {
+                    // Verifica se alguma das siglas que pertencem a esse grupo está na tela
+                    aplicaAoGrafico = gruposCarreiras[alvo].some(sigla => contextoPlotado.includes(sigla));
+                } 
+                // Regra C: É um Cargo Específico (ex: "AFRFB") ou Linha Exata (ex: "PFN (APOSENTADO)")?
+                else {
+                    aplicaAoGrafico = contextoPlotado.includes(alvo);
+                }
+
+                // Se passou no filtro do Cargo, verificamos se a data está na janela de Zoom
+                if (aplicaAoGrafico) {
+                    const idxData = dbData.Competencia.indexOf(marco.data);
+                    
+                    if (idxData >= startIdx && idxData <= endIdx) {
+                        anotacoesVisuais['linha_' + annIdx] = {
+                            type: 'line',
+                            xMin: marco.data, 
+                            xMax: marco.data,
+                            borderColor: 'rgba(50, 50, 50, 0.4)', 
+                            borderWidth: 2,
+                            borderDash: [6, 4], 
+                            label: {
+                                display: true,
+                                content: marco.evento, // <--- Aqui entra o seu texto exato!
+                                position: 'start', 
+                                backgroundColor: 'rgba(30, 35, 45, 0.85)',
+                                color: 'white',
+                                font: { size: 11, family: 'Segoe UI' },
+                                padding: { top: 4, bottom: 4, left: 6, right: 6 },
+                                rotation: -90, 
+                                yAdjust: 15 
+                            }
+                        };
+                        annIdx++;
+                    }
+                }
+            });
+			
             const chartConfig = {
                 type: 'line',
                 data: { labels: chartLabels, datasets: datasets },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    layout: { padding: { top: 0, left: 5, right: 20, bottom: 0 } },
+                    layout: { padding: { top: 10, left: 5, right: 20, bottom: 15 } },
                     interaction: { mode: 'index', intersect: false },
                     plugins: {
                         datalabels: {
@@ -1192,9 +1861,11 @@ const urlsESAF = {
                                     'Contagem Geral de Cotas',
                                     'Quantidade de beneficiários',
                                     'Quantidade de pensionistas',
-                                    'Quantidade de não beneficiários'
+                                    'Quantidade de não beneficiários',
+                                    'IPCA-IBGE',              // <--- Inclinando o IPCA
+                                    'Índice Nac. de Preços'   // <--- E o nome extenso dele
                                 ];
-                                // Usa -45 para o texto subir (leitura mais natural), se preferir que desça, use apenas 45
+                                // Usa -45 para o texto subir (leitura mais natural)
                                 return rotacionar.some(termo => lbl.includes(termo)) ? -45 : 0;
                             },
 						
@@ -1203,7 +1874,7 @@ const urlsESAF = {
                             backgroundColor: 'rgba(255, 255, 255, 0.7)',
                             borderRadius: 4,
                             padding: 2,
-                            formatter: function(value) { return formatDatalabel(value, isRelative, s1_Qtd, s1_Cont, s1_Ind); }
+                            formatter: function(value) { return formatDatalabel(value, isRelative, s1_Qtd, s1_Cont, s1_Ind, s1_Fator); }
                         },
                         tooltip: {
                             filter: function(tooltipItem) {
@@ -1227,15 +1898,15 @@ const urlsESAF = {
                             usePointStyle: true, // Transforma os quadradinhos de cor em bolinhas (mais limpo)
                             callbacks: {
                                 label: function(context) {
-                                    const isComp = document.getElementById('comparativo').checked;
-                                    const visao = document.querySelector('input[name="visao"]:checked').value;
-                                    const isRelative = visao === 'percentual';
+                                    const isComp = document.getElementById('desafio').checked;
+                                    const escala = document.querySelector('input[name="escala"]:checked').value;
+                                    const isRelative = escala === 'percentual';
                                     
                                     if (context.parsed.y === null) return 'Sem dados';
                                     
                                     let valFormatted = '';
                                     if (context.dataset.borderDash && isRelative) valFormatted = '100%';
-                                    else valFormatted = formatYAxisNumber(context.parsed.y, isRelative, s1_Qtd, s1_Cont, s1_Ind);
+                                    else valFormatted = formatYAxisNumber(context.parsed.y, isRelative, s1_Qtd, s1_Cont, s1_Ind, s1_Fator);
                                     
                                     // MODO DESAFIO (Cálculo Monoespaçado)
                                     if (isComp && context.chart.data.datasets.length >= 2 && !isRelative) {
@@ -1249,9 +1920,9 @@ const urlsESAF = {
                                     return label + ': ' + valFormatted;
                                 },
                                 footer: function(tooltipItems) {
-                                    const isComp = document.getElementById('comparativo').checked;
-                                    const visao = document.querySelector('input[name="visao"]:checked').value;
-                                    const isRelative = visao === 'percentual';
+                                    const isComp = document.getElementById('desafio').checked;
+                                    const escala = document.querySelector('input[name="escala"]:checked').value;
+                                    const isRelative = escala === 'percentual';
                                     
                                     // ADICIONA A LINHA DE DIFERENÇA E VARIAÇÃO
                                     if (isComp && tooltipItems.length >= 2 && !isRelative) {
@@ -1261,7 +1932,7 @@ const urlsESAF = {
                                         if (val0 !== null && val1 !== null) {
                                             const diff = val0 - val1;
 
-                                            const diffFormatted = formatYAxisNumber(diff, false, s1_Qtd, s1_Cont, s1_Ind);
+                                            const diffFormatted = formatYAxisNumber(diff, false, s1_Qtd, s1_Cont, s1_Ind, s1_Fator);
                                             // Substituímos o toFixed(1) pela localização em pt-BR aqui também
                                             const pct = val1 !== 0 ? ((diff / val1) * 100).toLocaleString('pt-BR', {minimumFractionDigits: 1, maximumFractionDigits: 1}) + '%' : 'N/A';                                            
                                             
@@ -1277,7 +1948,22 @@ const urlsESAF = {
                                 }
                             }
                         },
-						legend: { position: 'top', labels: { font: { size: 14, weight: 'bold' }, padding: 10 } },
+						legend: { 
+                            position: 'top', 
+                            labels: { 
+                                font: { size: 14, weight: 'bold' }, 
+                                padding: 10,
+                                color: '#555555' 
+                            },
+                            // Quando o mouse toca o nome de uma linha
+                            onHover: function(e, legendItem, legend) {
+                                atualizarKPILegenda(legendItem.datasetIndex, legend.chart);
+                            },
+                            // Quando o mouse sai da legenda
+                            onLeave: function(e, legendItem, legend) {
+                                document.getElementById('kpi-container').style.display = 'none';
+                            }
+                        },
                         zoom: {
                             pan: {
                                 enabled: true,
@@ -1290,6 +1976,9 @@ const urlsESAF = {
                                 pinch: { enabled: true }, // Pinça no mobile
                                 mode: 'x', // Zoom apenas no tempo
                             }
+                        },
+						annotation: {
+                            annotations: anotacoesVisuais // A MÁGICA ENTRA AQUI!
                         }
                     },
                     scales: {
@@ -1308,6 +1997,7 @@ const urlsESAF = {
                                 autoSkip: false,
                                 maxRotation: 45, 
                                 minRotation: 45,
+								color: '#666666',
                                 callback: function(value, index) {
                                     const hasPoint = datasets.some(ds => ds.pointRadius && ds.pointRadius[index] > 0);
                                     return hasPoint ? this.getLabelForValue(value) : null;
@@ -1317,77 +2007,10 @@ const urlsESAF = {
                         y: {
                             grace: '15%',
                             suggestedMin: suggestedMin, // Aplica o novo piso calculado acima
-                            ticks: { callback: function(value) { return formatYAxisNumber(value, isRelative, s1_Qtd, s1_Cont, s1_Ind); } }
+                            ticks: { color: '#666666', callback: function(value) { return formatYAxisNumber(value, isRelative, s1_Qtd, s1_Cont, s1_Ind, s1_Fator); } }
                         }
                     }
-                },
-                plugins: [{
-                    id: 'solidBackgroundColor',
-                    beforeDraw: (chart) => {
-                        const {ctx} = chart;
-                        ctx.save();
-                        ctx.globalCompositeOperation = 'destination-over';
-                        ctx.fillStyle = '#ffffff'; 
-                        ctx.fillRect(0, 0, chart.width, chart.height);
-                        ctx.restore();
-                    }
-                }, {
-                    // NOVO PLUGIN: Balão Flutuante de Resolução
-                    id: 'balaoResolucao',
-                    afterDraw: (chart) => {
-                        const isComp = document.getElementById('comparativo').checked;
-                        const s1 = document.getElementById('series1').value;
-                        
-                        // Exibe APENAS no modo avulso e na série específica
-                        if (!isComp && s1 === 'CGPP | Dados da Apuração | Valor unitário por cota (=)') {
-                            const { ctx, chartArea } = chart;
-                            const text = "Apuração realizada de acordo com a Resolução CGPP nº 8, de 30 de abril de 2025";
-                            
-                            ctx.save();
-                            ctx.font = "bold 13px 'Segoe UI', Tahoma, sans-serif";
-                            
-                            // Calcula largura dinâmica da pílula (texto + espaço das 2 bolinhas + margens)
-                            const textWidth = ctx.measureText(text).width;
-                            const boxWidth = textWidth + 50; 
-                            const boxHeight = 28; 
-                            
-                            // Posição: Centralizado horizontalmente e 20px abaixo do teto
-                            const cx = chartArea.left + (chartArea.right - chartArea.left) / 2;
-                            const cy = chartArea.top + 20; 
-                            
-                            // 1. Fundo do balão (Retângulo arredondado)
-                            ctx.fillStyle = "rgba(248, 249, 250, 0.9)"; // Fundo clarinho, levemente translúcido
-                            ctx.strokeStyle = "#ced4da"; // Bordinha cinza sutil
-                            ctx.lineWidth = 1;
-                            ctx.beginPath();
-                            ctx.roundRect(cx - (boxWidth/2), cy - (boxHeight/2), boxWidth, boxHeight, 14);
-                            ctx.fill();
-                            ctx.stroke();
-                            
-                            const startX = cx - (boxWidth/2) + 15;
-                            
-                            // 2. Bolinha Laranja (Máximo)
-                            ctx.fillStyle = '#F79646';
-                            ctx.beginPath();
-                            ctx.arc(startX, cy, 5, 0, 2 * Math.PI);
-                            ctx.fill();
-                            
-                            // 3. Bolinha Roxa (Ajustado)
-                            ctx.fillStyle = '#7030A0';
-                            ctx.beginPath();
-                            ctx.arc(startX + 14, cy, 5, 0, 2 * Math.PI);
-                            ctx.fill();
-                            
-                            // 4. Texto
-                            ctx.fillStyle = "#495057"; // Cinza escuro para leitura confortável
-                            ctx.textAlign = "left";
-                            ctx.textBaseline = "middle";
-                            ctx.fillText(text, startX + 24, cy);
-                            
-                            ctx.restore();
-                        }
-                    }
-                }]
+                }
             };
 /*
             if (myChart) myChart.destroy();
@@ -1401,7 +2024,38 @@ const urlsESAF = {
             } else {
                 myChart = new Chart(ctx, chartConfig);
             }
+
+            // Chama a atualização das fontes passando as chaves selecionadas e os índices do período
+            atualizarFontesEspecificas(startIdx, endIdx, select1.value, select2.value);
         }
+		
+		const btnTheme = document.getElementById('btn-theme');
+        btnTheme.addEventListener('click', () => {
+            const isDark = document.body.getAttribute('data-theme') === 'dark';
+            
+            // Alterna o atributo no Body
+            if (isDark) {
+				playSFX('zip');
+                document.body.removeAttribute('data-theme');
+                btnTheme.textContent = '🌚';
+                btnTheme.title = "Ativar modo ESCURO";
+				rotacao = '-';
+            } else {
+				playSFX('scribble');
+                document.body.setAttribute('data-theme', 'dark');
+                btnTheme.textContent = '🌞';
+                btnTheme.title = "Ativar modo CLARO";
+				rotacao = '+';
+            }
+            
+            // Efeito visual rápido de giro
+            btnTheme.style.transform = 'rotate('+ rotacao +'90deg)';
+            setTimeout(() => btnTheme.style.transform = 'none', 111);
+
+            // Atualiza o gráfico instantaneamente para pintar o fundo e textos
+            Chart.defaults.color = getComputedStyle(document.body).getPropertyValue('--text-main').trim();
+            updateChart('none');
+        });
 
         chkComparativo.addEventListener('change', handleUI);
 
@@ -1419,6 +2073,15 @@ const urlsESAF = {
                 if(myChart) myChart.update('none'); 
             }
             updateChart('none'); // Atualiza instantaneamente sem recriar a curva
+        });
+		
+		const chkIpca = document.getElementById('ipca');
+        const fonteIpca = document.getElementById('fonte-ipca');
+        chkIpca.addEventListener('change', () => { 
+            if (fonteIpca) {
+                fonteIpca.style.display = chkIpca.checked ? 'block' : 'none';
+            }
+            updateChart('none'); 
         });
 
         document.getElementById('btn-font-minus').addEventListener('click', () => {
@@ -1459,7 +2122,7 @@ const urlsESAF = {
         selectFim.addEventListener('change', () => { ensureDatesOrder(); updateChart(); });
 
         document.querySelectorAll('input[name="nivel"]').forEach(el => el.addEventListener('change', updateChart));
-        document.querySelectorAll('input[name="visao"]').forEach(el => el.addEventListener('change', updateChart));
+        document.querySelectorAll('input[name="escala"]').forEach(el => el.addEventListener('change', updateChart));
 
         // Lógicas dos Botões (O "✖" agora opera inteligentemente com o display visível do modo atual)
         document.getElementById('btn-clear1').addEventListener('click', () => { select1.value = ''; updateSelectOptions(); updateChart(); });
@@ -1472,15 +2135,20 @@ const urlsESAF = {
 
         document.getElementById('btn-prev').addEventListener('click', () => {
             let idx = select1.selectedIndex;
-            if (idx > 1) { select1.selectedIndex = idx - 1; updateSelectOptions(); updateChart(); }
+            if (idx > 1) { 
+                select1.selectedIndex = idx - 1; 
+                select1.dispatchEvent(new Event('change')); // Força a execução das travas
+            }
         });
 
         document.getElementById('btn-next').addEventListener('click', () => {
             let idx = select1.selectedIndex;
             if (idx > 0 && idx < select1.options.length - 1) { 
-                select1.selectedIndex = idx + 1; updateSelectOptions(); updateChart(); 
+                select1.selectedIndex = idx + 1; 
+                select1.dispatchEvent(new Event('change')); // Força a execução das travas
             } else if (idx === 0 && select1.options.length > 1) { 
-                select1.selectedIndex = 1; updateSelectOptions(); updateChart(); 
+                select1.selectedIndex = 1; 
+                select1.dispatchEvent(new Event('change'));
             }
         });
 
@@ -1491,7 +2159,7 @@ const urlsESAF = {
         document.addEventListener('keydown', (e) => {
             if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
 
-            const isComp = document.getElementById('comparativo').checked;
+            const isComp = document.getElementById('desafio').checked;
 
             // [ LIMPAR ] - Tecla X
             if (e.key.toLowerCase() === 'x') {
@@ -1531,20 +2199,25 @@ const urlsESAF = {
             
             // [ ESCALA ] - $ (absoluto) e % (relativo)
             else if (e.key === '$') {
-                const rb = document.querySelector('input[name="visao"][value="valor"]');
+                const rb = document.querySelector('input[name="escala"][value="valor"]');
                 if (rb && !rb.disabled) rb.click();
             }
             else if (e.key === '%') {
-                const rb = document.querySelector('input[name="visao"][value="percentual"]');
+                const rb = document.querySelector('input[name="escala"][value="percentual"]');
                 if (rb && !rb.disabled) rb.click();
             }
             
             // [ OPÇÕES ] - # (desafio) e @ (rótulos)
             else if (e.key === '#') {
-                document.getElementById('comparativo').click();
+                document.getElementById('desafio').click();
             }
             else if (e.key === '@') {
                 document.getElementById('rotulos').click();
+            }
+
+			else if (e.key.toLowerCase() === '&') {
+                const ipcaCheck = document.getElementById('ipca');
+                if (ipcaCheck) ipcaCheck.click();
             }
 
             // ==========================================
@@ -1820,7 +2493,7 @@ const urlsESAF = {
         // ------------------------------------------
         function generateFakeAISummary() {
             if (!myChart || myChart.data.datasets.length === 0) return "Nenhum dado plotado; selecione ambas as séries 'desafiante' e 'desafiado' ou uma série avulsa, se desmarcada a opção 'desafio'.";
-            const isRelative = document.querySelector('input[name="visao"]:checked').value === 'percentual';
+            const isRelative = document.querySelector('input[name="escala"]:checked').value === 'percentual';
             
             let text = "📊 *Resumo Estatístico dos Dados Plotados:*\n\n";
             
@@ -1924,7 +2597,7 @@ const urlsESAF = {
             if (currentAction === 'audio') {
                 toggleAudio();
             } else if (!myChart || !myChart.data || myChart.data.datasets.length === 0) {
-                showCustomToast("<strong style='font-size: 15px;'>Nenhum dado plotado!</strong><br>Selecione ambas as séries 'desafiante' e 'desafiado' ou uma série avulsa, se desmarcada a opção 'desafio'.", 5000);
+                showCustomToast("<strong style='font-size: 15px;'>Nenhum dado plotado!</strong><br>Selecione ambas as séries 'desafiante' e 'desafiado' ou uma série avulsa, se desmarcada a opção 'desafio'.", 5555);
                 return;
             } else {
 				if (currentAction === 'snapshot') {
@@ -1948,7 +2621,7 @@ const urlsESAF = {
 					btnActiveAction.textContent = '💬';
 					playSFX('robot'); // <-- SOM DO ROBÔ
 					navigator.clipboard.writeText(generateIAPrompt()).then(() => {
-						showCustomToast("<strong style='font-size: 15px;'>Prompt copiado para a área de transferência!</strong><br>Cole num assistente de IA(ChatGPT, Claude, Gemini etc) para melhor interpretar os dados.", 6000);
+						showCustomToast("<strong style='font-size: 15px;'>Prompt copiado para a área de transferência!</strong><br>Cole num assistente de IA (ChatGPT, Claude, Gemini etc) para melhor interpretar os dados.", 6666);
 						setTimeout(() => { btnActiveAction.textContent = '🤖'; }, 999);
 					});
 				}
@@ -1956,14 +2629,45 @@ const urlsESAF = {
 					btnActiveAction.textContent = '📝';
 					playSFX('typing'); // <-- SOM DO TECLADO (Pode trocar por 'scribble' se preferir)
 					navigator.clipboard.writeText(generateFakeAISummary()).then(() => {
-						showCustomToast("<strong style='font-size: 15px;'>Resumo copiado para a área de transferência!</strong><br>Cole como legenda da imagem do gráfico ao compartilhar via WhatsApp.", 6000);
+						showCustomToast("<strong style='font-size: 15px;'>Resumo copiado para a área de transferência!</strong><br>Cole como legenda da imagem do gráfico ao compartilhar via WhatsApp.", 6666);
 						setTimeout(() => { btnActiveAction.textContent = '📋'; }, 999);
 					});
 				}
 			}
         });
 
+        // ==========================================
+        // INICIALIZAÇÃO E DEEP LINKING
+        // ==========================================
+
+        // 1. Lê a URL e aplica as flags ocultas (ex: altera o checkbox de desafio se &desafio=0)
+        const urlState = lerEstadoDaURL();
+        
+        // 2. AGORA acionamos a interface! Ela vai ler os checkboxes e montar o formulário certo (Avulso ou Comparativo)
         handleUI(true);
+
+        // 3. Sincroniza a visibilidade dos botões de +/- com o status da URL (Rótulos)
+        const initChkRotulos = document.getElementById('rotulos');
+        const initBtnMinus = document.getElementById('btn-font-minus');
+        const initBtnPlus = document.getElementById('btn-font-plus');
+        
+        if (initChkRotulos && initChkRotulos.checked) {
+            initBtnMinus.style.display = 'inline-block';
+            initBtnPlus.style.display = 'inline-block';
+        } else {
+            initBtnMinus.style.display = 'none';
+            initBtnPlus.style.display = 'none';
+        }
+
+        // 4. Se houver parâmetros de série na URL, injetamos nas combos e atualizamos a tela
+        if (window.location.search) {
+            if (urlState.s1) select1.value = urlState.s1;
+            if (urlState.s2) select2.value = urlState.s2;
+            
+            updateSelectOptions(); // Refaz os bloqueios de seleções iguais
+            atualizarTravasUI();   // Garante que o checkbox do IPCA fique no estado correto
+            updateChart('none');   // Desenha o gráfico inicial
+        }
     </script>
 </body>
 </html>
