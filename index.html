@@ -97,35 +97,59 @@
             background: #f1f3f5;
         }
 		:root {
-            /* 1. Cores de Fundo (Estrutura) */
-            --bg-color: #f0f2f5;        /* Fundo da tela inteira (atrás de tudo) */
-            --controls-bg: #ffffff;     /* Fundo da caixa de controles (onde estão os selects) */
-            --chart-bg: #fdfdfd;        /* Fundo exclusivo da área de plotagem (Canvas) */
+            /* 1. Cores de Fundo (Estrutura em Camadas) */
+            --bg-color: #dcdcdc;        /* Camada 0: Fundo da tela (cinza sutil para destacar o painel) */
+            --card-bg: #e9ecef;         /* Camada 1: Fundo do painel principal (branco puro) */
+            --controls-bg: #f8f9fa;     /* Camada 2: Fundo da barra de filtros (cinza bem claro) */
+            --chart-bg: #ffffff;        /* Fundo exclusivo do gráfico */
             
             /* 2. Cores de Fonte */
-            --text-main: #333333;       /* Textos principais da interface externa */
-            --text-muted: #666666;      /* Textos secundários da interface externa */
-            --chart-text: #666666;      /* Letras e números de dentro do gráfico (eixos) */
+            --text-main: #24292f;
+            --text-muted: #57606a;
+            --chart-text: #666666;
             
             /* 3. Elementos Interativos e Bordas */
-            --border: #cccccc;          /* Linhas divisórias gerais */
-            --input-bg: #ffffff;        /* Fundo dos Selects, Inputs e Botões */
-            --input-hover: #f1f3f5;     /* Cor quando passa o mouse nos botões */
+            --border: #d0d7de;
+            --input-bg: #ffffff;
+            --input-hover: #f3f4f6;
         }
 
         /* INJEÇÃO CSS: MODO ESCURO */
         [data-theme="dark"] {
-            --bg-color: #0f1115;
-            --controls-bg: #1e232b;     /* Caixa de controles fica grafite escuro */
-            --chart-bg: #fdfdfd;        /* MANTÉM BRANCO (Se quiser o gráfico escuro, mude para #121418) */
-            --chart-text: #666666;      /* Mantém cinza para continuar legível no fundo branco */
+            --bg-color: #0d1117;        /* Camada 0: Fundo da tela (preto profundo) */
+            --card-bg: #161b22;         /* Camada 1: Fundo do painel principal (cinza escuro) */
+            --controls-bg: #21262d;     /* Camada 2: Fundo da barra de filtros (um tom acima do painel) */
+            --chart-bg: #fdfdfd;        
             
-            --text-main: #e8eaed;
-            --text-muted: #9aa0a6;
-            --border: #3c4043;
+            --text-main: #c9d1d9;       /* Texto legível no escuro */
+            --text-muted: #8b949e;      
+            --border: #30363d;          
             
-            --input-bg: #2b303b;        /* Selects e botões ganham um tom destacado no escuro */
-            --input-hover: #3a414f;
+            --input-bg: #0d1117;        /* Fundo dos selects e botões escuros */
+            --input-hover: #30363d;
+        }
+		
+		/* OVERRIDE CIRÚRGICO: Anula os estilos inline dos formulários para respeitar o tema */
+        .controls-grid select, 
+        .controls-grid button,
+        .split-action-container,
+        #split-menu,
+        .split-dropdown-item,
+        details summary {
+            background-color: var(--input-bg) !important;
+            color: var(--text-main) !important;
+            border-color: var(--border) !important;
+        }
+
+        /* Corrige a bordinha divisória do botão dropdown da câmera */
+        #btn-toggle-menu {
+            border-left-color: var(--border) !important;
+        }
+
+        /* Ajusta o fundo da caixa de Fontes Específicas para combinar com os filtros */
+        #container-fontes-dinamicas {
+            background-color: var(--controls-bg) !important;
+            border-color: var(--border) !important;
         }
 
         /* Garante que os formulários e botões sigam as cores calibradas acima */
@@ -227,6 +251,25 @@
             font-family: 'Consolas', 'Courier New', monospace;
             color: #F1C40F;
         }
+		
+		/* CAIXINHA DO ALFINETE (Tooltips Fixados) */
+        .pinned-tooltip {
+            position: absolute;
+            background-color: rgba(30, 35, 45, 0.95);
+            color: #ffffff;
+            padding: 12px;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            pointer-events: auto; /* Permite o clique */
+            cursor: pointer;
+            z-index: 100;
+            transition: transform 0.1s, opacity 0.2s;
+            font-size: 14px;
+        }
+        .pinned-tooltip:hover {
+            transform: translate(-50%, -105%) scale(1.02) !important;
+            background-color: rgba(40, 45, 55, 0.98);
+        }
     </style>
 </head>
 <body>
@@ -240,33 +283,33 @@
             <!-- Grupo 1: Seleção de Séries -->
             <div id="container-series1" style="display: flex; flex-direction: column; gap: 2px; flex-shrink: 0;">
                 <u><b><label id="label-series1" style="font-size: 13px; font-weight: 666; color: var(--text-muted); cursor: default;">Desafiante</label></b></u>
-                <select id="series1" style="width: 180px; padding: 4px 8px; border-radius: 4px; border: 1px solid #ccc; font-size: 14px; background: #fff; height: 30px; outline: none; box-sizing: border-box;"></select>
+                <select id="series1" style="width: 180px; padding: 4px 8px; font-size: 14px; height: 30px; outline: none; box-sizing: border-box;"></select>
             </div>
 
             <!-- Botões Swap/Navegação -->
             <div id="wrapper-nav-btns" style="display: flex; align-items: center; gap: 2px; height: 30px; flex-shrink: 0;">
-                <button id="btn-swap" style="cursor:pointer; padding: 0px 5px; background:#fff; border:1px solid #ccc; border-radius:4px; width:30px; height:30px; font-size:24px;" title="Inverter">⇄</button>
-                <button id="btn-prev" style="display:none; cursor:pointer; padding: 0px 8px 2px; background:#fff; border:1px solid #ccc; border-radius:4px; width:30px; height:30px; font-size:16px;" title="Anterior">◀</button>
-                <button id="btn-next" style="display:none; cursor:pointer; padding: 0px 10px 2px; background:#fff; border:1px solid #ccc; border-radius:4px; width:30px; height:30px; font-size:16px;" title="Próximo">▶</button>
-                <button id="btn-clear1" style="cursor:pointer; padding: 0px 6px; background:#fff; border:1px solid #ccc; border-radius:4px; width:30px; height:30px; font-weight:bold; font-size:18px;" title="Limpar">✖</button>
+                <button id="btn-swap" style="cursor:pointer; padding: 0px 5px; width:30px; height:30px; font-size:24px;" title="Inverter">⇄</button>
+                <button id="btn-prev" style="display:none; cursor:pointer; padding: 0px 8px 2px; width:30px; height:30px; font-size:16px;" title="Anterior">◀</button>
+                <button id="btn-next" style="display:none; cursor:pointer; padding: 0px 10px 2px; width:30px; height:30px; font-size:16px;" title="Próximo">▶</button>
+                <button id="btn-clear1" style="cursor:pointer; padding: 0px 6px; width:30px; height:30px; font-weight:bold; font-size:18px;" title="Limpar">✖</button>
             </div>
 
             <!-- Grupo 2: Desafiado (Apenas Comparativo) -->
             <div id="container-series2" style="display: flex; flex-direction: column; gap: 2px; flex-shrink: 0;">
                 <u><b><label style="font-size: 13px; font-weight: 666; color: var(--text-muted); cursor: default;">Desafiado</label></b></u>
-                <select id="series2" style="width: 180px; padding: 4px 8px; border-radius: 4px; border: 1px solid #ccc; font-size: 14px; background: #fff; height: 30px; outline: none; box-sizing: border-box;"></select>
+                <select id="series2" style="width: 180px; padding: 4px 8px; font-size: 14px; height: 30px; outline: none; box-sizing: border-box;"></select>
             </div>
             
             <div id="wrapper-clear2" style="display: flex; align-items: center; height: 30px; flex-shrink: 0;">
-                <button id="btn-clear2" style="cursor:pointer; padding: 0px 6px; background:#fff; border:1px solid #ccc; border-radius:4px; width:30px; height:30px; font-weight:bold; font-size:18px;" title="Limpar">✖</button>
+                <button id="btn-clear2" style="cursor:pointer; padding: 0px 6px; width:30px; height:30px; font-weight:bold; font-size:18px;" title="Limpar">✖</button>
             </div>
 
             <!-- Grupo Filtros: Período (Avulso) -->
             <div id="container-datas" style="display: none; flex-direction: column; gap: 2px; flex-shrink: 0;">
                 <u><b><label style="font-size: 13px; font-weight: 666; color: var(--text-muted); cursor: default;">Período</label></b></u>
                 <div style="display: flex; gap: 2px; align-items: center; height: 30px;">
-                    <select id="data-inicio" style="width: 80px; padding: 4px 5px; border-radius: 4px; border: 1px solid #ccc; font-size: 13px; background: #fff; height: 30px; outline: none; box-sizing: border-box;"></select>
-                    <select id="data-fim" style="width: 80px; padding: 4px 5px; border-radius: 4px; border: 1px solid #ccc; font-size: 13px; background: #fff; height: 30px; outline: none; box-sizing: border-box;"></select>
+                    <select id="data-inicio" style="width: 80px; padding: 4px 5px; font-size: 13px; height: 30px; outline: none; box-sizing: border-box;"></select>
+                    <select id="data-fim" style="width: 80px; padding: 4px 5px; font-size: 13px; height: 30px; outline: none; box-sizing: border-box;"></select>
                 </div>
             </div>
 
@@ -289,31 +332,30 @@
                 </div>
             </div>
 
-			<!-- Grupo: Opções (Ambos) -->
-			
-			
+            <!-- Grupo: Opções (Ambos) -->
             <div id="wrapper-opcoes" style="display: flex; flex-direction: column; gap: 2px; flex-shrink: 0;">
                 <u><b><label style="font-size: 13px; font-weight: 666; color: var(--text-muted); cursor: default;">Opções</label></b></u>
                 <div style="display: flex; gap: 3px; align-items: center; height: 30px; padding-left: 3px">
                     <label style="display: flex; align-items: center; gap: 3px; cursor: pointer; font-size: 14px; color: var(--text-main); margin: 0;"><input type="checkbox" id="desafio" checked> desafio</label>
                     <div style="display: flex; align-items: center; gap: 5px;">
                         <label style="display: flex; align-items: center; gap: 3px; cursor: pointer; font-size: 14px; color: var(--text-main); margin: 0;"><input type="checkbox" id="rotulos"> rótulos</label>
-                        <button id="btn-font-minus" style="cursor:pointer; padding: 0px; background:#fff; border:1px solid #ccc; border-radius:4px; width:22px; height:22px; font-weight:bold; display:none; line-height:1; font-size:18px;" title="Diminuir fonte">–</button>
-                        <button id="btn-font-plus" style="cursor:pointer; padding: 0px; background:#fff; border:1px solid #ccc; border-radius:4px; width:22px; height:22px; font-weight:bold; display:none; line-height:1; font-size:18px;" title="Aumentar fonte">+</button>
+                        <button id="btn-font-minus" style="cursor:pointer; padding: 0px; width:22px; height:22px; font-weight:bold; display:none; line-height:1; font-size:18px;" title="Diminuir fonte">–</button>
+                        <button id="btn-font-plus" style="cursor:pointer; padding: 0px; width:22px; height:22px; font-weight:bold; display:none; line-height:1; font-size:18px;" title="Aumentar fonte">+</button>
                         <label style="display: flex; align-items: center; gap: 3px; cursor: pointer; font-size: 14px; color: var(--text-main); margin: 0;"><input type="checkbox" id="ipca" title="Deflacionar a valor presente"> IPCA</label>
                         
-						<div class="split-action-container" id="split-container" style="position: relative; display: inline-flex; align-items: center; background: #fff; border: 1px solid #ccc; border-radius: 4px; height: 45px; margin-left: 10px; margin-bottom: 12px;">
-							<button id="btn-active-action" style="background: transparent; border: none; cursor: pointer; padding: 0 0px; padding-bottom: 10px; line-height: 1; font-size: 40px; height: 100%; display: flex; align-items: center; justify-content: center;" title="Capturar em PNG">📷</button>
-							<button id="btn-toggle-menu" style="background: transparent; border: none; border-left: 1px solid #ccc; cursor: pointer; padding: 0 6px; font-size: 15px; color: #555; height: 100%;" title="Selecionar função">▼</button>
-							
-							<div id="split-menu" style="position: absolute; top: 100%; right: 0; margin-top: 4px; background: #fff; border: 1px solid #ccc; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); display: none; flex-direction: column; padding: 4px; z-index: 1000; min-width: 40px;">
-								<button class="split-dropdown-item" data-action="snapshot" 	title="Capturar em PNG" style="background: transparent; border: none; cursor: pointer; padding: 6px 10px; font-size: 25px; transition: background 0.2s; border-radius: 4px;">📷</button>
-								<button class="split-dropdown-item" data-action="audio" 	title="Áudio em TTS"    style="background: transparent; border: none; cursor: pointer; padding: 6px 10px; font-size: 25px; transition: background 0.2s; border-radius: 4px;">🔈</button>
-								<button class="split-dropdown-item" data-action="prompt" 	title="Prompt para IA"  style="background: transparent; border: none; cursor: pointer; padding: 6px 10px; font-size: 25px; transition: background 0.2s; border-radius: 4px;">🤖</button>
-								<button class="split-dropdown-item" data-action="summary" 	title="Legenda em MD"   style="background: transparent; border: none; cursor: pointer; padding: 6px 10px; font-size: 25px; transition: background 0.2s; border-radius: 4px;">📋</button>
-								<button class="split-dropdown-item" data-action="csv" 		title="Extrair em CSV"  style="background: transparent; border: none; cursor: pointer; padding: 6px 10px; font-size: 25px; transition: background 0.2s; border-radius: 4px;">💾</button>
-							</div>
-						</div>
+                        <!-- CAMERA SPLIT BUTTON -->
+                        <div class="split-action-container" id="split-container" style="position: relative; display: inline-flex; align-items: center; background-color: var(--input-bg); border: 1px solid var(--border); border-radius: 4px; height: 45px; margin-left: 10px; margin-bottom: 12px; transition: background-color 0.2s, border-color 0.2s;">
+                            <button id="btn-active-action" style="background: transparent; border: none; cursor: pointer; padding: 0 0px; padding-bottom: 10px; line-height: 1; font-size: 40px; height: 100%; display: flex; align-items: center; justify-content: center; color: var(--text-main);" title="Capturar em PNG">📷</button>
+                            <button id="btn-toggle-menu" style="background: transparent; border: none; border-left: 1px solid var(--border); cursor: pointer; padding: 0 6px; font-size: 15px; color: var(--text-muted); height: 100%; transition: border-color 0.2s, color 0.2s;" title="Selecionar função">▼</button>
+                            
+                            <div id="split-menu" style="position: absolute; top: 100%; right: 0; margin-top: 4px; background-color: var(--input-bg); border: 1px solid var(--border); border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); display: none; flex-direction: column; padding: 4px; z-index: 1000; min-width: 40px;">
+                                <button class="split-dropdown-item" data-action="snapshot" 	title="Capturar em PNG" style="background: transparent; border: none; cursor: pointer; padding: 6px 10px; font-size: 25px; transition: background 0.2s; border-radius: 4px; color: var(--text-main);">📷</button>
+                                <button class="split-dropdown-item" data-action="audio" 	title="Áudio em TTS"    style="background: transparent; border: none; cursor: pointer; padding: 6px 10px; font-size: 25px; transition: background 0.2s; border-radius: 4px; color: var(--text-main);">🔈</button>
+                                <button class="split-dropdown-item" data-action="prompt" 	title="Prompt para IA"  style="background: transparent; border: none; cursor: pointer; padding: 6px 10px; font-size: 25px; transition: background 0.2s; border-radius: 4px; color: var(--text-main);">🤖</button>
+                                <button class="split-dropdown-item" data-action="summary" 	title="Legenda em MD"   style="background: transparent; border: none; cursor: pointer; padding: 6px 10px; font-size: 25px; transition: background 0.2s; border-radius: 4px; color: var(--text-main);">📋</button>
+                                <button class="split-dropdown-item" data-action="csv" 		title="Extrair em CSV"  style="background: transparent; border: none; cursor: pointer; padding: 6px 10px; font-size: 25px; transition: background 0.2s; border-radius: 4px; color: var(--text-main);">💾</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -369,6 +411,27 @@
                         <div style="font-size: 10px; color: var(--text-muted); font-weight: bold; letter-spacing: 0.5px;">TETO NO PERÍODO</div>
                         <div id="kpi-max-val" style="font-size: 16px; font-weight: 900; color: var(--text-main); margin-top: 2px;">-</div>
                         <div id="kpi-max-data" style="font-size: 11px; color: var(--text-muted);">-</div>
+                    </div>
+                </div>
+				
+				<!-- LINHA 3: ACUMULADO (CUSTO DE OPORTUNIDADE) -->
+                <div id="kpi-row-acumulado" style="display: flex; gap: 20px; align-items: center; justify-content: space-between; border-top: 1px solid rgba(128, 128, 128, 0.2); padding-top: 10px; margin-top: 2px;">
+                    <div style="text-align: left; min-width: 110px; flex: 1;">
+                        <div style="font-size: 10px; color: var(--text-muted); font-weight: bold; letter-spacing: 0.5px;">ACUMULADO EM <i><span id="kpi-acum-tempo">-</span></i></div>
+                        <div id="kpi-acum-val1" style="font-size: 15px; font-weight: 900; color: var(--text-main); margin-top: 2px;">-</div>
+                        <div id="kpi-acum-lbl1" style="font-size: 10px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 150px;">-</div>
+                    </div>
+                    
+                    <div id="kpi-acum-diff-box" style="text-align: center; padding: 0 10px; flex: 1; display: none;">
+                        <div style="font-size: 10px; color: var(--text-muted); font-weight: bold; letter-spacing: 0.5px;">DIFERENÇA</div>
+                        <div id="kpi-acum-diff-val" style="font-size: 15px; font-weight: 900; margin-top: 2px;">-</div>
+                        <div id="kpi-acum-diff-pct" style="font-size: 11px; font-weight: bold; margin-top: 1px;">-</div>
+                    </div>
+
+                    <div id="kpi-acum-box2" style="text-align: right; min-width: 110px; flex: 1; display: none;">
+                        <div style="font-size: 10px; color: var(--text-muted); font-weight: bold; letter-spacing: 0.5px;">ACUMULADO</div>
+                        <div id="kpi-acum-val2" style="font-size: 15px; font-weight: 900; color: var(--text-main); margin-top: 2px;">-</div>
+                        <div id="kpi-acum-lbl2" style="font-size: 10px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 150px;">-</div>
                     </div>
                 </div>
             </div>
@@ -428,13 +491,13 @@
             </details>
 -->
 			<details style="cursor: pointer; outline: none;">
-                <summary style="font-weight: 600; color: var(--text-muted); user-select: none; display: inline-block; padding: 5px 10px; background: #fdfbf7; border: 1px solid var(--border); border-radius: 4px;">
+                <summary style="font-weight: 600; color: var(--text-muted); user-select: none; display: inline-block; padding: 5px 10px; background-color: var(--controls-bg); border: 1px solid var(--border); border-radius: 4px;">
                     Fontes Específicas ▾
                 </summary>
                 
                 <!-- Contêiner de Coluna Única (Flexbox em coluna) que será alimentado pelo JS -->
-                <div id="container-fontes-dinamicas" style="margin-top: 10px; padding: 20px; background-color: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; color: var(--text-muted); display: flex; flex-direction: column; gap: 18px;">
-                    <em style="color: #999;">Nenhum dado plotado; selecione ambas as séries 'desafiante' e 'desafiado' ou uma série avulsa, se desmarcada a opção 'desafio'.</em>
+                <div id="container-fontes-dinamicas" style="margin-top: 10px; padding: 20px; background-color: var(--controls-bg); border: 1px solid var(--border); border-radius: 8px; color: var(--text-main); display: flex; flex-direction: column; gap: 18px;">
+                    <em style="color: var(--text-muted);">Nenhum dado plotado; selecione ambas as séries 'desafiante' e 'desafiado' ou uma série avulsa, se desmarcada a opção 'desafio'.</em>
                 </div>
             </details>
         </div>
@@ -522,6 +585,8 @@ const dicionarioLinhas = {
             21: { nome: "Lei nº 15.367/2026 - Anexo 12", url: `${dominioPlanalto}2023-2026/2026/lei/l15367.htm#anexo12` },
             22: { nome: "Lei nº 15.141/2025 - Anexo 321", url: `${dominioPlanalto}2023-2026/2025/lei/anexo/anexo254a323-lei15141.htm#anexo321` }
         };
+		
+		
 
 		const urlsCGPP = {
 			indiceEficiencia: `${dominioCGPP}/indice-de-eficiencia-institucional`,
@@ -550,7 +615,11 @@ const dicionarioLinhas = {
 			painelPrincipal: `${dominioCCHA}&pageName=951fb5b48411cd406c02`,
 			infoRelevantes: `${dominioCCHA}&pageName=ReportSection`, 
 			honorariosResultados: `${dominioCCHA}&pageName=ReportSection1`, 
-			detalhamentoDistribuicao: `${dominioCCHA}&pageName=ReportSection2`  
+			detalhamentoDistribuicao: `${dominioCCHA}&pageName=ReportSection2`,
+            // Novos documentos de Controle e Saúde (2026)
+            boletimTCU: "https://btcu.apps.tcu.gov.br/api/obterDocumentoPdf/80341587",
+            manualSaude: "https://gestor-conteudo.anajur.org.br/uploads/Manual_de_Aux_A_lio_Sa_A_de_CCHA_2_0_cpt_d26d972333.pdf",
+            notaOficial: "https://anajur.org.br/noticias/nota-oficial-ccha-esclarece-pontos-sobre-o-auxilio-saude-da-advocacia-publica-federal"
 		};
 
 		const urlsESAF = {
@@ -559,26 +628,267 @@ const dicionarioLinhas = {
 			editalRegulador: `${dominioENAP}/bitstream/1/5504/4/edital-2%20regulador.pdf`,
 			anexo1: `${dominioENAP}/bitstream/1/5504/3/anexo-i1.pdf`
 		};
+		
+		const historicoSTF = [
+            { data: "1987/11", nome: "Decreto-Lei nº 2.371/1987", url: "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2371.htm" },
+            { data: "1992/07", nome: "Lei nº 8.448/1992", url: "https://www.planalto.gov.br/ccivil_03/leis/l8448.htm" },
+            { data: "1992/08", nome: "Lei Delegada nº 13/1992", url: "https://www.planalto.gov.br/ccivil_03/leis/ldl/ldl13.htm" },
+            { data: "1994/02", nome: "Lei nº 8.852/1994", url: "https://www.planalto.gov.br/ccivil_03/leis/l8852.htm" },
+            { data: "1994/05", nome: "Lei nº 8.880/1994", url: "https://www.planalto.gov.br/ccivil_03/leis/l8880.htm" },
+            { data: "2000/02", nome: "Resolução STF nº 195/2000", url: "https://www.stf.jus.br/ARQUIVO/NORMA/RESOLUCAO195.PDF" },
+            { data: "2001/12", nome: "Lei nº 10.331/2001", url: "https://www.planalto.gov.br/ccivil_03/leis/leis_2001/l10331.htm" },
+            { data: "2002/06", nome: "Lei nº 10.474/2002", url: "https://www.planalto.gov.br/ccivil_03/leis/2002/l10474.htm" },
+            { data: "2002/07", nome: "Resolução STF nº 235/2002", url: "https://www.stf.jus.br/ARQUIVO/NORMA/RESOLUCAO235.PDF" },
+            { data: "2002/07", nome: "Resolução STF nº 236/2002", url: "https://www.stf.jus.br/ARQUIVO/NORMA/RESOLUCAO236.PDF" },
+            { data: "2003/07", nome: "Lei nº 10.697/2003", url: "https://www.planalto.gov.br/ccivil_03/leis/2003/l10.697.htm" },
+            { data: "2003/07", nome: "Lei nº 10.698/2003", url: "https://www.planalto.gov.br/ccivil_03/leis/2003/l10.698.htm" },
+            { data: "2003/07", nome: "Resolução STF nº 256 de 10/07/2003", url: "https://www.legisweb.com.br/legislacao/?id=99625" },
+            { data: "2003/12", nome: "Notícia Senado: Teto entra em vigor", url: "https://www12.senado.leg.br/noticias/materias/2003/12/11/teto-salarial-entra-em-vigor-mas-controle-dependera-de-cooperacao" },
+            { data: "2003/12", nome: "Resolução STF nº 280 de 23/12/2003", url: "https://www.legisweb.com.br/legislacao/?id=99584" },
+            { data: "2004/02", nome: "Voto STF: Definição do Teto", url: "https://noticias.stf.jus.br/postsnoticias/ministro-mauricio-correa-divulga-voto-que-definiu-o-teto-salarial-do-stf/" },
+            { data: "2005/01", nome: "Lei nº 11.143/2005 (Ref. 2005)", url: "https://www.planalto.gov.br/ccivil_03/_ato2004-2006/2005/lei/l11143.htm" },
+            { data: "2006/01", nome: "Lei nº 11.143/2005 (Ref. 2006)", url: "https://www.planalto.gov.br/ccivil_03/_ato2004-2006/2005/lei/l11143.htm" }
+        ];
 
         const atosNormativos = {
-            1: { path: "2007-2010/2008/mpv/anexos/anmpv440.htm", nome_base: "MPV nº 440/2008" },
-            2: { path: "2007-2010/2008/lei/anexos/anl11890-01-10a.htm", nome_base: "Lei nº 11.890/2008" },
-            3: { path: "2011-2014/2012/lei/l12775.htm", nome_base: "Lei nº 12.775/2012" },
-            4: { path: "2015-2018/2016/lei/l13327.htm", nome_base: "Lei nº 13.327/2016" }
-            // ... (Você vai preenchendo os IDs únicos conforme a sua lista)
+            1: { path: "mpv/Antigas/2048-26.htm", nome_base: "MPV nº 2.048-26/2000" },
+            2: { path: "mpv/Antigas/2048-28.htm", nome_base: "MPV nº 2.048-28/2000" },
+            3: { path: "mpv/2229-43.htm", nome_base: "MPV nº 2.229-43/2001" },
+            4: { path: "LEIS/2003/L10.769.htm", nome_base: "Lei nº 10.769/2003" },
+            5: { path: "_Ato2004-2006/2004/Mpv/210.htm", nome_base: "MPV nº 210/2004" },
+            6: { path: "_Ato2004-2006/2005/Lei/L11094.htm", nome_base: "Lei nº 11.094/2005" },
+            7: { path: "_ato2004-2006/2006/mpv/302.htm", nome_base: "MPV nº 302/2006" },
+            8: { path: "_Ato2004-2006/2006/Lei/L11356.htm", nome_base: "Lei nº 11.356/2006" },
+            9: { path: "_ato2004-2006/2006/mpv/305impressao.htm", nome_base: "MPV nº 305/2006" },
+            10: { path: "_ato2004-2006/2006/mpv/305.htm", nome_base: "MPV nº 305/2006" },
+            11: { path: "_ato2004-2006/2006/lei/l11358.htm", nome_base: "Lei nº 11.358/2006" },
+            12: { path: "_ato2007-2010/2007/mpv/386.htm", nome_base: "MPV nº 386/2007" },
+            13: { path: "_ato2007-2010/2007/lei/l11538.htm", nome_base: "Lei nº 11.538/2007" },
+            14: { path: "_ato2007-2010/2008/mpv/anexos/anmpv440.htm", nome_base: "MPV nº 440/2008" },
+            15: { path: "_ato2007-2010/2008/lei/anexos/anl11890-01-10a.htm", nome_base: "Lei nº 11.890/2008" },
+            16: { path: "_ato2007-2010/2008/lei/anexos/anl11890.htm", nome_base: "Lei nº 11.890/2008" },
+            17: { path: "_ato2011-2014/2012/lei/l12775.htm", nome_base: "Lei nº 12.775/2012" },
+            18: { path: "_ato2011-2014/2013/lei/l12808.htm", nome_base: "Lei nº 12.808/2013" },
+            19: { path: "_ato2011-2014/2014/mpv/mpv650.htm", nome_base: "MPV nº 650/2014" },
+            20: { path: "_ato2011-2014/2014/lei/l13034.htm", nome_base: "Lei nº 13.034/2014" },
+            21: { path: "_ato2015-2018/2016/lei/l13327.htm", nome_base: "Lei nº 13.327/2016" },
+            22: { path: "_ato2015-2018/2016/lei/l13371.htm", nome_base: "Lei nº 13.371/2016" },
+            23: { path: "_ato2015-2018/2016/mpv/mpv765.htm", nome_base: "MPV nº 765/2016" },
+            24: { path: "_ato2015-2018/2017/lei/l13464.htm", nome_base: "Lei nº 13.464/2017" },
+            25: { path: "_ato2023-2026/2023/mpv/mpv1170anexo2.htm", nome_base: "MPV nº 1.170/2023" },
+            26: { path: "_ato2023-2026/2023/mpv/mpv1170anexo3.htm", nome_base: "MPV nº 1.170/2023" },
+            27: { path: "_ato2023-2026/2023/lei/l14673anexo3.htm", nome_base: "Lei nº 14.673/2023" },
+            28: { path: "_ato2023-2026/2023/lei/l14673anexo4.htm", nome_base: "Lei nº 14.673/2023" },
+            29: { path: "_ato2023-2026/2023/decreto/d11545.htm", nome_base: "Decreto nº 11.545/2023" },
+            30: { path: "_ato2023-2026/2024/mpv/anexos/mpv1286anexo254a321.htm", nome_base: "MPV nº 1.286/2024" },
+            31: { path: "_ato2023-2026/2024/lei/l14875.htm", nome_base: "Lei nº 14.875/2024" },
+            32: { path: "_ato2023-2026/2025/lei/anexo/anexo254a323-lei15141.htm", nome_base: "Lei nº 15.141/2025" },
+            33: { path: "_ato2023-2026/2026/lei/l15367.htm", nome_base: "Lei nº 15.367/2026" },
+            34: { path: "leis/l9266.htm", nome_base: "Lei nº 9.266/1996" }
         };
 
         const legislacaoHistorica = {
             "AFFC": [
-                { data: "2008/07", atoId: 1, txt_anexo: "#AnexoIV", num_anexo: "IV" },
-                { data: "2009/07", atoId: 2, txt_anexo: "#AnexoIV", num_anexo: "IV" },
-                { data: "2016/08", atoId: 4, txt_anexo: "#anexoi", num_anexo: "I" }
+                { data: "2000/06", atoId: 1, txt_anexo: "#AnexoVII", desc: "Anexo VII", niveis: ['base', 'meio', 'topo'] },
+                { data: "2000/09", atoId: 2, txt_anexo: "#AnexoVII", desc: "Anexo VII", niveis: ['base', 'meio', 'topo'] },
+                { data: "2001/09", atoId: 3, txt_anexo: "#AnexoVII", desc: "Anexo VII", niveis: ['base', 'meio', 'topo'] },
+                { data: "2003/12", atoId: 4, txt_anexo: "#AnexoVIIa", desc: "Anexo VII-A", niveis: ['base', 'meio', 'topo'] },
+                { data: "2006/07", atoId: 7, txt_anexo: "#AnexoX", desc: "Anexo X", niveis: ['base', 'meio', 'topo'] },
+                { data: "2007/07", atoId: 8, txt_anexo: "#AnexoX", desc: "Anexo X", niveis: ['base', 'meio', 'topo'] },
+                { data: "2008/07", atoId: 14, txt_anexo: "#AnexoIV", desc: "Anexo IV", niveis: ['base', 'meio', 'topo'] },
+                { data: "2009/07", atoId: 15, txt_anexo: "#AnexoIV", desc: "Anexo IV", niveis: ['base', 'meio', 'topo'] },
+                { data: "2010/07", atoId: 16, txt_anexo: "#AnexoIV", desc: "Anexo IV", niveis: ['base', 'meio', 'topo'] },
+                { data: "2013/01", atoId: 17, txt_anexo: "#anexoiv", desc: "Anexo IV", niveis: ['base', 'meio', 'topo'] },
+                { data: "2014/01", atoId: 17, txt_anexo: "#anexoiv", desc: "Anexo IV", niveis: ['base', 'meio', 'topo'] },
+                { data: "2015/01", atoId: 17, txt_anexo: "#anexoiv", desc: "Anexo IV", niveis: ['base', 'meio', 'topo'] },
+                { data: "2016/08", atoId: 21, txt_anexo: "#anexoi", desc: "Anexo I", niveis: ['base', 'meio', 'topo'] },
+                { data: "2017/01", atoId: 21, txt_anexo: "#anexoi", desc: "Anexo I", niveis: ['base', 'meio', 'topo'] },
+                { data: "2018/01", atoId: 21, txt_anexo: "#anexoi", desc: "Anexo I", niveis: ['base', 'meio', 'topo'] },
+                { data: "2019/01", atoId: 21, txt_anexo: "#anexoi", desc: "Anexo I", niveis: ['base', 'meio', 'topo'] },
+                { data: "2023/05", atoId: 25, txt_anexo: "#anexo134", desc: "Anexo 134", niveis: ['base', 'meio', 'topo'] },
+                { data: "2025/01", atoId: 30, txt_anexo: "#anexo320", desc: "Anexo 320", niveis: ['base', 'meio', 'topo'] },
+                { data: "2026/04", atoId: 32, txt_anexo: "#anexo320", desc: "Anexo 320", niveis: ['base', 'meio', 'topo'] }
+            ],
+            "TFFC": [
+                { data: "2000/06", atoId: 1, txt_anexo: "#AnexoVIII", desc: "Anexo VIII", niveis: ['base', 'meio', 'topo'] },
+                { data: "2000/09", atoId: 2, txt_anexo: "#AnexoVIII", desc: "Anexo VIII", niveis: ['base', 'meio', 'topo'] },
+                { data: "2001/09", atoId: 3, txt_anexo: "#AnexoVIII", desc: "Anexo VIII", niveis: ['base', 'meio', 'topo'] },
+                { data: "2003/12", atoId: 4, txt_anexo: "#AnexoVIIIa", desc: "Anexo VIII-A", niveis: ['base', 'meio', 'topo'] },
+                { data: "2004/08", atoId: 5, txt_anexo: "#AnexoI", desc: "Anexo I", niveis: ['base', 'meio', 'topo'] },
+                { data: "2005/04", atoId: 6, txt_anexo: "#AnexoI", desc: "Anexo I", niveis: ['base', 'meio', 'topo'] },
+                { data: "2006/07", atoId: 7, txt_anexo: "#AnexoXI", desc: "Anexo XI", niveis: ['base', 'meio', 'topo'] },
+                { data: "2007/07", atoId: 8, txt_anexo: "#AnexoXI", desc: "Anexo XI", niveis: ['base', 'meio', 'topo'] },
+                { data: "2008/07", atoId: 14, txt_anexo: "#AnexoIV", desc: "Anexo IV", niveis: ['base', 'meio', 'topo'] },
+                { data: "2009/07", atoId: 15, txt_anexo: "#AnexoIV", desc: "Anexo IV", niveis: ['base', 'meio', 'topo'] },
+                { data: "2010/07", atoId: 16, txt_anexo: "#AnexoIV", desc: "Anexo IV", niveis: ['base', 'meio', 'topo'] },
+                { data: "2013/01", atoId: 17, txt_anexo: "#anexoiv", desc: "Anexo IV", niveis: ['base', 'meio', 'topo'] },
+                { data: "2014/01", atoId: 17, txt_anexo: "#anexoiv", desc: "Anexo IV", niveis: ['base', 'meio', 'topo'] },
+                { data: "2015/01", atoId: 17, txt_anexo: "#anexoiv", desc: "Anexo IV", niveis: ['base', 'meio', 'topo'] },
+                { data: "2016/08", atoId: 21, txt_anexo: "#anexoi", desc: "Anexo I", niveis: ['base', 'meio', 'topo'] },
+                { data: "2017/01", atoId: 21, txt_anexo: "#anexoi", desc: "Anexo I", niveis: ['base', 'meio', 'topo'] },
+                { data: "2018/01", atoId: 21, txt_anexo: "#anexoi", desc: "Anexo I", niveis: ['base', 'meio', 'topo'] },
+                { data: "2019/01", atoId: 21, txt_anexo: "#anexoi", desc: "Anexo I", niveis: ['base', 'meio', 'topo'] },
+                { data: "2023/05", atoId: 25, txt_anexo: "#anexo134", desc: "Anexo 134", niveis: ['base', 'meio', 'topo'] },
+                { data: "2025/01", atoId: 30, txt_anexo: "#anexo320", desc: "Anexo 320", niveis: ['base', 'meio', 'topo'] },
+                { data: "2026/04", atoId: 32, txt_anexo: "#anexo320", desc: "Anexo 320", niveis: ['base', 'meio', 'topo'] }
             ],
             "AFRFB": [
-                { data: "2008/07", atoId: 1, txt_anexo: "#AnexoII", num_anexo: "II" },
-                { data: "2016/08", atoId: 4, txt_anexo: "#anexoxxxv", num_anexo: "XXXV" }
+                { data: "2008/07", atoId: 14, txt_anexo: "#anexoii", desc: "Anexo II", niveis: ['base', 'meio', 'topo'] },
+                { data: "2009/07", atoId: 15, txt_anexo: "#anexoii", desc: "Anexo II", niveis: ['base', 'meio', 'topo'] },
+                { data: "2010/07", atoId: 16, txt_anexo: "#anexoii", desc: "Anexo II", niveis: ['base', 'meio', 'topo'] },
+                { data: "2013/01", atoId: 18, txt_anexo: "#anexoi", desc: "Anexo I", niveis: ['base', 'meio', 'topo'] },
+                { data: "2014/01", atoId: 18, txt_anexo: "#anexoi", desc: "Anexo I", niveis: ['base', 'meio', 'topo'] },
+                { data: "2015/01", atoId: 18, txt_anexo: "#anexoi", desc: "Anexo I", niveis: ['base', 'meio', 'topo'] },
+                { data: "2016/09", atoId: 23, txt_anexo: "#Art20", desc: "Art. 20", niveis: ['meio', 'topo'] },
+                { data: "2016/12", atoId: 23, txt_anexo: "#AnexoVII", desc: "Anexo VII", niveis: ['base', 'meio', 'topo'] },
+                { data: "2017/01", atoId: 23, txt_anexo: "#AnexoVII", desc: "Anexo VII", niveis: ['base', 'meio', 'topo'] },
+                { data: "2018/01", atoId: 24, txt_anexo: "#anexo7", desc: "Anexo VII", niveis: ['base', 'meio', 'topo'] },
+                { data: "2019/01", atoId: 24, txt_anexo: "#anexo7", desc: "Anexo VII", niveis: ['base', 'meio', 'topo'] },
+                { data: "2023/05", atoId: 25, txt_anexo: "#anexo127", desc: "Anexo 127", niveis: ['base', 'meio', 'topo'] },
+                { data: "2023/05", atoId: 27, txt_anexo: "#anexo127", desc: "Anexo 127", niveis: ['base', 'meio', 'topo'] },
+                { data: "2024/03", atoId: 29, txt_anexo: "#Art8%C2%A72I", desc: "Art. 8º §2º I", niveis: ['meio', 'topo'] },
+                { data: "2024/08", atoId: 29, txt_anexo: "#Art8%C2%A72II", desc: "Art. 8º §2º II", niveis: ['meio', 'topo'] },
+                { data: "2025/02", atoId: 29, txt_anexo: "#Art8%C2%A72IIIa", desc: "Art. 8º §2º III 'a'", niveis: ['meio', 'topo'] },
+                { data: "2025/11", atoId: 29, txt_anexo: "#Art8%C2%A72IIIb", desc: "Art. 8º §2º III 'b'", niveis: ['meio', 'topo'] },
+                { data: "2026/02", atoId: 29, txt_anexo: "#Art8%C2%A72B", desc: "Art. 8º §2º (Alínea B)", niveis: ['meio', 'topo'] },
+                { data: "2026/04", atoId: 33, txt_anexo: "#anexo12", desc: "Anexo 12", niveis: ['topo'] },
+                { data: "2027/02", atoId: 29, txt_anexo: "#Art8%C2%A72A", desc: "Art. 8º §2º (Alínea A)", niveis: ['meio', 'topo'] }
+            ],
+            "ATRFB": [
+                { data: "2008/07", atoId: 14, txt_anexo: "#anexoii", desc: "Anexo II", niveis: ['base', 'meio', 'topo'] },
+                { data: "2009/07", atoId: 15, txt_anexo: "#anexoii", desc: "Anexo II", niveis: ['base', 'meio', 'topo'] },
+                { data: "2010/07", atoId: 16, txt_anexo: "#anexoii", desc: "Anexo II", niveis: ['base', 'meio', 'topo'] },
+                { data: "2013/01", atoId: 18, txt_anexo: "#anexoi", desc: "Anexo I", niveis: ['base', 'meio', 'topo'] },
+                { data: "2014/01", atoId: 18, txt_anexo: "#anexoi", desc: "Anexo I", niveis: ['base', 'meio', 'topo'] },
+                { data: "2015/01", atoId: 18, txt_anexo: "#anexoi", desc: "Anexo I", niveis: ['base', 'meio', 'topo'] },
+                { data: "2016/09", atoId: 23, txt_anexo: "#Art20", desc: "Art. 20", niveis: ['meio', 'topo'] },
+                { data: "2016/12", atoId: 23, txt_anexo: "#AnexoVII", desc: "Anexo VII", niveis: ['base', 'meio', 'topo'] },
+                { data: "2017/01", atoId: 23, txt_anexo: "#AnexoVII", desc: "Anexo VII", niveis: ['base', 'meio', 'topo'] },
+                { data: "2018/01", atoId: 24, txt_anexo: "#anexo7", desc: "Anexo VII", niveis: ['base', 'meio', 'topo'] },
+                { data: "2019/01", atoId: 24, txt_anexo: "#anexo7", desc: "Anexo VII", niveis: ['base', 'meio', 'topo'] },
+                { data: "2023/05", atoId: 25, txt_anexo: "#anexo127", desc: "Anexo 127", niveis: ['base', 'meio', 'topo'] },
+                { data: "2023/05", atoId: 27, txt_anexo: "#anexo127", desc: "Anexo 127", niveis: ['base', 'meio', 'topo'] },
+                { data: "2024/03", atoId: 29, txt_anexo: "#Art8%C2%A72I", desc: "Art. 8º §2º I", niveis: ['meio', 'topo'] },
+                { data: "2024/08", atoId: 29, txt_anexo: "#Art8%C2%A72II", desc: "Art. 8º §2º II", niveis: ['meio', 'topo'] },
+                { data: "2025/02", atoId: 29, txt_anexo: "#Art8%C2%A72IIIa", desc: "Art. 8º §2º III 'a'", niveis: ['meio', 'topo'] },
+                { data: "2025/11", atoId: 29, txt_anexo: "#Art8%C2%A72IIIb", desc: "Art. 8º §2º III 'b'", niveis: ['meio', 'topo'] },
+                { data: "2026/02", atoId: 29, txt_anexo: "#Art8%C2%A72B", desc: "Art. 8º §2º (Alínea B)", niveis: ['meio', 'topo'] },
+                { data: "2026/04", atoId: 33, txt_anexo: "#anexo12", desc: "Anexo 12", niveis: ['topo'] },
+                { data: "2027/02", atoId: 29, txt_anexo: "#Art8%C2%A72A", desc: "Art. 8º §2º (Alínea A)", niveis: ['meio', 'topo'] }
+            ],
+            "PFN": [
+                { data: "2006/07", atoId: 9, txt_anexo: "", desc: "Geral", niveis: ['base', 'meio', 'topo'] },
+                { data: "2007/01", atoId: 11, txt_anexo: "#AnexoI", desc: "Anexo I", niveis: ['base', 'meio', 'topo'] },
+                { data: "2008/01", atoId: 11, txt_anexo: "#AnexoI", desc: "Anexo I", niveis: ['base', 'meio', 'topo'] },
+                { data: "2008/07", atoId: 14, txt_anexo: "#anexoiii", desc: "Anexo III", niveis: ['base', 'meio', 'topo'] },
+                { data: "2009/06", atoId: 11, txt_anexo: "#AnexoI", desc: "Anexo I", niveis: ['base', 'meio', 'topo'] },
+                { data: "2009/07", atoId: 15, txt_anexo: "#anexoiii", desc: "Anexo III", niveis: ['base', 'meio', 'topo'] },
+                { data: "2010/07", atoId: 16, txt_anexo: "#anexoiii", desc: "Anexo III", niveis: ['base', 'meio', 'topo'] },
+                { data: "2013/01", atoId: 17, txt_anexo: "#AnexoXII", desc: "Anexo XII", niveis: ['base', 'meio', 'topo'] },
+                { data: "2014/01", atoId: 17, txt_anexo: "#AnexoXII", desc: "Anexo XII", niveis: ['base', 'meio', 'topo'] },
+                { data: "2015/01", atoId: 17, txt_anexo: "#AnexoXII", desc: "Anexo XII", niveis: ['base', 'meio', 'topo'] },
+                { data: "2016/08", atoId: 21, txt_anexo: "#AnexoXXXV", desc: "Anexo XXXV", niveis: ['base', 'meio', 'topo'] },
+                { data: "2017/01", atoId: 21, txt_anexo: "#AnexoXXXV", desc: "Anexo XXXV", niveis: ['base', 'meio', 'topo'] },
+                { data: "2018/01", atoId: 21, txt_anexo: "#AnexoXXXV", desc: "Anexo XXXV", niveis: ['base', 'meio', 'topo'] },
+                { data: "2019/01", atoId: 21, txt_anexo: "#AnexoXXXV", desc: "Anexo XXXV", niveis: ['base', 'meio', 'topo'] },
+                { data: "2023/05", atoId: 26, txt_anexo: "#anexo150", desc: "Anexo 150", niveis: ['base', 'meio', 'topo'] },
+                { data: "2023/05", atoId: 28, txt_anexo: "#anexo150", desc: "Anexo 150", niveis: ['base', 'meio', 'topo'] },
+                { data: "2025/01", atoId: 30, txt_anexo: "#anexo321", desc: "Anexo 321", niveis: ['base'] },
+                { data: "2025/06", atoId: 32, txt_anexo: "#anexo321", desc: "Anexo 321", niveis: ['meio', 'topo'] },
+                { data: "2026/04", atoId: 32, txt_anexo: "#anexo321", desc: "Anexo 321", niveis: ['base', 'meio', 'topo'] }
+            ],
+            "DPF": [
+                { data: "1996/03", atoId: 34, txt_anexo: "#anexoii", desc: "Anexo II", niveis: ['base', 'meio', 'topo'] },
+                { data: "2006/07", atoId: 10, txt_anexo: "", desc: "Geral", niveis: ['base', 'meio', 'topo'] },
+                { data: "2006/07", atoId: 11, txt_anexo: "#anexoii", desc: "Anexo II", niveis: ['base', 'meio', 'topo'] },
+                { data: "2007/09", atoId: 12, txt_anexo: "#anexo", desc: "Anexo", niveis: ['base', 'meio', 'topo'] },
+                { data: "2008/02", atoId: 13, txt_anexo: "#anexo", desc: "Anexo", niveis: ['base', 'meio', 'topo'] },
+                { data: "2009/02", atoId: 13, txt_anexo: "#anexo", desc: "Anexo", niveis: ['base', 'meio', 'topo'] },
+                { data: "2013/01", atoId: 17, txt_anexo: "#anexoviii", desc: "Anexo VIII", niveis: ['base', 'meio', 'topo'] },
+                { data: "2014/01", atoId: 17, txt_anexo: "#anexoviii", desc: "Anexo VIII", niveis: ['base', 'meio', 'topo'] },
+                { data: "2015/01", atoId: 17, txt_anexo: "#anexoviii", desc: "Anexo VIII", niveis: ['base', 'meio', 'topo'] },
+                { data: "2017/01", atoId: 22, txt_anexo: "#anexo1", desc: "Anexo I", niveis: ['base', 'meio', 'topo'] },
+                { data: "2018/01", atoId: 22, txt_anexo: "#anexo1", desc: "Anexo I", niveis: ['base', 'meio', 'topo'] },
+                { data: "2019/01", atoId: 22, txt_anexo: "#anexo1", desc: "Anexo I", niveis: ['base', 'meio', 'topo'] },
+                { data: "2023/05", atoId: 26, txt_anexo: "#anexo151", desc: "Anexo 151", niveis: ['base', 'meio', 'topo'] },
+                { data: "2023/05", atoId: 28, txt_anexo: "#anexo151", desc: "Anexo 151", niveis: ['base', 'meio', 'topo'] },
+                { data: "2024/08", atoId: 31, txt_anexo: "#anexo26", desc: "Anexo 26", niveis: ['base', 'meio', 'topo'] },
+                { data: "2025/05", atoId: 31, txt_anexo: "#anexo26", desc: "Anexo 26", niveis: ['base', 'meio', 'topo'] },
+                { data: "2026/05", atoId: 31, txt_anexo: "#anexo26", desc: "Anexo 26", niveis: ['base', 'meio', 'topo'] }
+            ],
+            "PCF": [
+                { data: "1996/03", atoId: 34, txt_anexo: "#anexoii", desc: "Anexo II", niveis: ['base', 'meio', 'topo'] },
+                { data: "2006/07", atoId: 10, txt_anexo: "", desc: "Geral", niveis: ['base', 'meio', 'topo'] },
+                { data: "2006/07", atoId: 11, txt_anexo: "#anexoii", desc: "Anexo II", niveis: ['base', 'meio', 'topo'] },
+                { data: "2007/09", atoId: 12, txt_anexo: "#anexo", desc: "Anexo", niveis: ['base', 'meio', 'topo'] },
+                { data: "2008/02", atoId: 13, txt_anexo: "#anexo", desc: "Anexo", niveis: ['base', 'meio', 'topo'] },
+                { data: "2009/02", atoId: 13, txt_anexo: "#anexo", desc: "Anexo", niveis: ['base', 'meio', 'topo'] },
+                { data: "2013/01", atoId: 17, txt_anexo: "#anexoviii", desc: "Anexo VIII", niveis: ['base', 'meio', 'topo'] },
+                { data: "2014/01", atoId: 17, txt_anexo: "#anexoviii", desc: "Anexo VIII", niveis: ['base', 'meio', 'topo'] },
+                { data: "2015/01", atoId: 17, txt_anexo: "#anexoviii", desc: "Anexo VIII", niveis: ['base', 'meio', 'topo'] },
+                { data: "2017/01", atoId: 22, txt_anexo: "#anexo1", desc: "Anexo I", niveis: ['base', 'meio', 'topo'] },
+                { data: "2018/01", atoId: 22, txt_anexo: "#anexo1", desc: "Anexo I", niveis: ['base', 'meio', 'topo'] },
+                { data: "2019/01", atoId: 22, txt_anexo: "#anexo1", desc: "Anexo I", niveis: ['base', 'meio', 'topo'] },
+                { data: "2023/05", atoId: 26, txt_anexo: "#anexo151", desc: "Anexo 151", niveis: ['base', 'meio', 'topo'] },
+                { data: "2023/05", atoId: 28, txt_anexo: "#anexo151", desc: "Anexo 151", niveis: ['base', 'meio', 'topo'] },
+                { data: "2024/08", atoId: 31, txt_anexo: "#anexo26", desc: "Anexo 26", niveis: ['base', 'meio', 'topo'] },
+                { data: "2025/05", atoId: 31, txt_anexo: "#anexo26", desc: "Anexo 26", niveis: ['base', 'meio', 'topo'] },
+                { data: "2026/05", atoId: 31, txt_anexo: "#anexo26", desc: "Anexo 26", niveis: ['base', 'meio', 'topo'] }
+            ],
+            "APF": [
+                { data: "1996/03", atoId: 34, txt_anexo: "#anexoii", desc: "Anexo II", niveis: ['base', 'meio', 'topo'] },
+                { data: "2006/07", atoId: 10, txt_anexo: "", desc: "Geral", niveis: ['base', 'meio', 'topo'] },
+                { data: "2006/07", atoId: 11, txt_anexo: "#anexoii", desc: "Anexo II", niveis: ['base', 'meio', 'topo'] },
+                { data: "2007/09", atoId: 12, txt_anexo: "#anexo", desc: "Anexo", niveis: ['base', 'meio', 'topo'] },
+                { data: "2008/02", atoId: 13, txt_anexo: "#anexo", desc: "Anexo", niveis: ['base', 'meio', 'topo'] },
+                { data: "2009/02", atoId: 13, txt_anexo: "#anexo", desc: "Anexo", niveis: ['base', 'meio', 'topo'] },
+                { data: "2014/06", atoId: 19, txt_anexo: "#anexoi", desc: "Anexo I", niveis: ['base', 'meio', 'topo'] },
+                { data: "2015/01", atoId: 20, txt_anexo: "", desc: "Geral", niveis: ['base', 'meio', 'topo'] },
+                { data: "2017/01", atoId: 22, txt_anexo: "#anexo1", desc: "Anexo I", niveis: ['base', 'meio', 'topo'] },
+                { data: "2018/01", atoId: 22, txt_anexo: "#anexo1", desc: "Anexo I", niveis: ['base', 'meio', 'topo'] },
+                { data: "2019/01", atoId: 22, txt_anexo: "#anexo1", desc: "Anexo I", niveis: ['base', 'meio', 'topo'] },
+                { data: "2023/05", atoId: 26, txt_anexo: "#anexo151", desc: "Anexo 151", niveis: ['base', 'meio', 'topo'] },
+                { data: "2023/05", atoId: 28, txt_anexo: "#anexo151", desc: "Anexo 151", niveis: ['base', 'meio', 'topo'] },
+                { data: "2024/08", atoId: 31, txt_anexo: "#anexo26", desc: "Anexo 26", niveis: ['base', 'meio', 'topo'] },
+                { data: "2025/05", atoId: 31, txt_anexo: "#anexo26", desc: "Anexo 26", niveis: ['base', 'meio', 'topo'] },
+                { data: "2026/05", atoId: 31, txt_anexo: "#anexo26", desc: "Anexo 26", niveis: ['base', 'meio', 'topo'] }
+            ],
+            "EPF": [
+                { data: "1996/03", atoId: 34, txt_anexo: "#anexoii", desc: "Anexo II", niveis: ['base', 'meio', 'topo'] },
+                { data: "2006/07", atoId: 10, txt_anexo: "", desc: "Geral", niveis: ['base', 'meio', 'topo'] },
+                { data: "2006/07", atoId: 11, txt_anexo: "#anexoii", desc: "Anexo II", niveis: ['base', 'meio', 'topo'] },
+                { data: "2007/09", atoId: 12, txt_anexo: "#anexo", desc: "Anexo", niveis: ['base', 'meio', 'topo'] },
+                { data: "2008/02", atoId: 13, txt_anexo: "#anexo", desc: "Anexo", niveis: ['base', 'meio', 'topo'] },
+                { data: "2009/02", atoId: 13, txt_anexo: "#anexo", desc: "Anexo", niveis: ['base', 'meio', 'topo'] },
+                { data: "2014/06", atoId: 19, txt_anexo: "#anexoi", desc: "Anexo I", niveis: ['base', 'meio', 'topo'] },
+                { data: "2015/01", atoId: 20, txt_anexo: "", desc: "Geral", niveis: ['base', 'meio', 'topo'] },
+                { data: "2017/01", atoId: 22, txt_anexo: "#anexo1", desc: "Anexo I", niveis: ['base', 'meio', 'topo'] },
+                { data: "2018/01", atoId: 22, txt_anexo: "#anexo1", desc: "Anexo I", niveis: ['base', 'meio', 'topo'] },
+                { data: "2019/01", atoId: 22, txt_anexo: "#anexo1", desc: "Anexo I", niveis: ['base', 'meio', 'topo'] },
+                { data: "2023/05", atoId: 26, txt_anexo: "#anexo151", desc: "Anexo 151", niveis: ['base', 'meio', 'topo'] },
+                { data: "2023/05", atoId: 28, txt_anexo: "#anexo151", desc: "Anexo 151", niveis: ['base', 'meio', 'topo'] },
+                { data: "2024/08", atoId: 31, txt_anexo: "#anexo26", desc: "Anexo 26", niveis: ['base', 'meio', 'topo'] },
+                { data: "2025/05", atoId: 31, txt_anexo: "#anexo26", desc: "Anexo 26", niveis: ['base', 'meio', 'topo'] },
+                { data: "2026/05", atoId: 31, txt_anexo: "#anexo26", desc: "Anexo 26", niveis: ['base', 'meio', 'topo'] }
+            ],
+            "PPF": [
+                { data: "1996/03", atoId: 34, txt_anexo: "#anexoii", desc: "Anexo II", niveis: ['base', 'meio', 'topo'] },
+                { data: "2006/07", atoId: 10, txt_anexo: "", desc: "Geral", niveis: ['base', 'meio', 'topo'] },
+                { data: "2006/07", atoId: 11, txt_anexo: "#anexoii", desc: "Anexo II", niveis: ['base', 'meio', 'topo'] },
+                { data: "2007/09", atoId: 12, txt_anexo: "#anexo", desc: "Anexo", niveis: ['base', 'meio', 'topo'] },
+                { data: "2008/02", atoId: 13, txt_anexo: "#anexo", desc: "Anexo", niveis: ['base', 'meio', 'topo'] },
+                { data: "2009/02", atoId: 13, txt_anexo: "#anexo", desc: "Anexo", niveis: ['base', 'meio', 'topo'] },
+                { data: "2014/06", atoId: 19, txt_anexo: "#anexoi", desc: "Anexo I", niveis: ['base', 'meio', 'topo'] },
+                { data: "2015/01", atoId: 20, txt_anexo: "", desc: "Geral", niveis: ['base', 'meio', 'topo'] },
+                { data: "2017/01", atoId: 22, txt_anexo: "#anexo1", desc: "Anexo I", niveis: ['base', 'meio', 'topo'] },
+                { data: "2018/01", atoId: 22, txt_anexo: "#anexo1", desc: "Anexo I", niveis: ['base', 'meio', 'topo'] },
+                { data: "2019/01", atoId: 22, txt_anexo: "#anexo1", desc: "Anexo I", niveis: ['base', 'meio', 'topo'] },
+                { data: "2023/05", atoId: 26, txt_anexo: "#anexo151", desc: "Anexo 151", niveis: ['base', 'meio', 'topo'] },
+                { data: "2023/05", atoId: 28, txt_anexo: "#anexo151", desc: "Anexo 151", niveis: ['base', 'meio', 'topo'] },
+                { data: "2024/08", atoId: 31, txt_anexo: "#anexo26", desc: "Anexo 26", niveis: ['base', 'meio', 'topo'] },
+                { data: "2025/05", atoId: 31, txt_anexo: "#anexo26", desc: "Anexo 26", niveis: ['base', 'meio', 'topo'] },
+                { data: "2026/05", atoId: 31, txt_anexo: "#anexo26", desc: "Anexo 26", niveis: ['base', 'meio', 'topo'] }
             ]
-			// ... (E assim por diante para TFFC, ATRFB, PFN, etc.)
         };
 		
         const gruposCarreiras = {
@@ -781,6 +1091,14 @@ const dicionarioLinhas = {
         const ctx = document.getElementById('mainChart').getContext('2d');
         let myChart;
         
+        // MÁGICA: Limpa todos os alfinetes se o usuário der duplo clique na área do gráfico
+        document.getElementById('mainChart').addEventListener('dblclick', () => {
+            if (window.pinnedTooltips && window.pinnedTooltips.length > 0) {
+                limparAlfinetes();
+                showCustomToast("<strong style='font-size: 15px;'>🧹 TELA LIMPA</strong><br>Todos os alfinetes foram removidos.", 2000);
+            }
+        });
+        
         let currentLabelFontSize = 15;
         let userFontOverridden = false;
         
@@ -788,36 +1106,46 @@ const dicionarioLinhas = {
         let toastShownDesafio = false;
         let toastTimeout;
 
-		function encontrarLeiVigente(cargo, competenciaAtual) {
+		function encontrarLeisDoPeriodo(cargo, dataInicio, dataFim, nivelAtual) {
             const leis = legislacaoHistorica[cargo];
-            if (!leis) return null;
+            if (!leis) return [];
 
-            let vigenciaEncontrada = null;
-            
-            // Busca a vigência mais recente que seja menor ou igual ao mês na tela
-            for (let i = 0; i < leis.length; i++) {
-                if (leis[i].data <= competenciaAtual) {
-                    vigenciaEncontrada = leis[i];
-                } else {
-                    break; // Passou da data, encerra a busca
-                }
+            // 1. Encontra a lei que governava o INÍCIO do gráfico
+            const leisAteInicio = leis.filter(lei => lei.data <= dataInicio && lei.niveis.includes(nivelAtual));
+            let leiInicial = [];
+            if (leisAteInicio.length > 0) {
+                const dataMaisRecenteInicio = leisAteInicio[leisAteInicio.length - 1].data;
+                leiInicial = leisAteInicio.filter(lei => lei.data === dataMaisRecenteInicio);
             }
 
-            if (vigenciaEncontrada) {
-                // Faz o "JOIN" com o dicionário de atos
-                const ato = atosNormativos[vigenciaEncontrada.atoId];
-                
+            // 2. Encontra as leis que entraram em vigor DENTRO do período visível
+            const leisNoMeio = leis.filter(lei => lei.data > dataInicio && lei.data <= dataFim && lei.niveis.includes(nivelAtual));
+
+            // 3. Junta o histórico
+            const todasLeis = [...leiInicial, ...leisNoMeio];
+
+            // 4. Mapeia e remove duplicatas (para não repetir URLs)
+            const leisUnicas = [];
+            const urlsVistas = new Set();
+
+            todasLeis.forEach(vigencia => {
+                const ato = atosNormativos[vigencia.atoId];
                 if (ato) {
-                    return {
-                        // Concatena: "Lei nº 11.890/2008 - Anexo IV"
-                        nome: `${ato.nome_base} - Anexo ${vigenciaEncontrada.num_anexo}`,
-                        
-                        // Concatena: "https://.../_ato2007-2010/.../anl11890.htm#AnexoIV"
-                        url: `${dominioPlanalto}${ato.path}${vigenciaEncontrada.txt_anexo}`
-                    };
+                    const numAnexo = vigencia.desc ? ` - ${vigencia.desc}` : '';
+                    const urlStr = `${dominioPlanalto}${ato.path}${vigencia.txt_anexo}`;
+                    
+                    if (!urlsVistas.has(urlStr)) {
+                        urlsVistas.add(urlStr);
+                        leisUnicas.push({
+                            nome: `${ato.nome_base}${numAnexo}`,
+                            url: urlStr,
+                            dataVigencia: vigencia.data
+                        });
+                    }
                 }
-            }
-            return null;
+            });
+
+            return leisUnicas;
         }
 
         // Função que exibe a colinha de atalhos
@@ -1174,10 +1502,14 @@ const dicionarioLinhas = {
             updateChart();
         });
 
+        // ==========================================
+        // REGRA DINÂMICA DE PRECISÃO (CASAS DECIMAIS)
+        // ==========================================
         function formatYAxisNumber(value, isPercent, isQtd, isCont, isIndice, isFator) {
-            // A ordem importa! Se for percentual (relativo), ignora as outras regras e crava 1 casa decimal.
-            if (isPercent) return value.toLocaleString('pt-BR', {minimumFractionDigits: 1, maximumFractionDigits: 1}) + '%';
-            
+            if (isPercent) {
+                const dec = (value !== null && value.toFixed(2) === "52.04") ? 2 : 1;
+                return value.toLocaleString('pt-BR', {minimumFractionDigits: dec, maximumFractionDigits: dec}) + '%';
+            }
             if (isFator) return value.toLocaleString('pt-BR', {minimumFractionDigits: 6, maximumFractionDigits: 6});
             if (isIndice) return (value * 100).toLocaleString('pt-BR', {minimumFractionDigits: 4, maximumFractionDigits: 4}) + '%';
             if (isCont) return new Intl.NumberFormat('pt-BR', {minimumFractionDigits: 4, maximumFractionDigits: 4}).format(value);
@@ -1189,8 +1521,11 @@ const dicionarioLinhas = {
         function formatDatalabel(value, isPercent, isQtd, isCont, isIndice, isFator) {
             if (value === null || value === undefined) return '';
             
-            // Mesma coisa nos rótulos das bolinhas
-            if (isPercent) return value % 1 === 0 ? value.toFixed(0) : value.toLocaleString('pt-BR', {minimumFractionDigits: 1, maximumFractionDigits: 1});
+            if (isPercent) {
+                if (value.toFixed(2) === "52.04") return "52,04";
+                if (value % 1 === 0) return value.toFixed(0);
+                return value.toLocaleString('pt-BR', {minimumFractionDigits: 1, maximumFractionDigits: 1});
+            }
             
             if (isFator) return value.toLocaleString('pt-BR', {minimumFractionDigits: 6, maximumFractionDigits: 6});
             if (isIndice) return (value * 100).toLocaleString('pt-BR', {minimumFractionDigits: 4, maximumFractionDigits: 4});
@@ -1198,6 +1533,121 @@ const dicionarioLinhas = {
             if (isQtd) return value.toString();
             let num = value / 1000;
             return num.toLocaleString('pt-BR', {minimumFractionDigits: 1, maximumFractionDigits: 1});
+        }
+		
+		// ==========================================
+        // MOTOR DE ALFINETES (TOOLTIPS CONGELADOS)
+        // ==========================================
+        window.pinnedTooltips = [];
+
+        function limparAlfinetes() {
+            document.querySelectorAll('.pinned-tooltip').forEach(el => el.remove());
+            window.pinnedTooltips = [];
+        }
+
+        function criarAlfinete(chart, index) {
+            const isComp = document.getElementById('desafio').checked;
+            const escala = document.querySelector('input[name="escala"]:checked').value;
+            const isRelative = escala === 'percentual';
+            const dateLabel = chart.data.labels[index];
+            
+            let bodyHtml = '';
+            let val0 = null, val1 = null;
+            let isMono = isComp && chart.data.datasets.length >= 2 && !isRelative;
+
+            // Extrai as informações de formatação da primeira série (Desafiante)
+            const ds1lbl = chart.data.datasets[0].label || '';
+            const sQtd = ds1lbl.toLowerCase().includes('quantidade') && !ds1lbl.includes('Índice');
+            const sCont = ds1lbl.includes('Contagem');
+            const sInd = ds1lbl.includes('Índice') || ds1lbl.includes('Indice');
+            const sFator = ds1lbl === 'Fator_IPCA';
+
+            chart.data.datasets.forEach((ds, i) => {
+                const val = ds.data[index];
+                if (val === null || val === undefined) return;
+                
+                if (i === 0) val0 = val;
+                if (i === 1) val1 = val;
+                
+                let valFormatted = '';
+                if (ds.borderDash && isRelative) valFormatted = '100%';
+                else valFormatted = formatYAxisNumber(val, isRelative, sQtd, sCont, sInd, sFator);
+                
+                // INJEÇÃO DAS EQUAÇÕES HISTÓRICAS DO BEP/HAS
+                if (isComp && isRelative) {
+                    const numArredondado = val.toFixed(2);
+                    if (numArredondado === "37.00") valFormatted = "37,00% = {100% - [7% × 9]}";
+                    else if (numArredondado === "35.00") valFormatted = "35,00% = {100% - [7% × 8] - 9%}";
+                    else if (numArredondado === "52.00") valFormatted = "52,00% ≈ {[100% - 7%]⁹}";
+                    else if (numArredondado === "52.04") valFormatted = "52,04% = {[100% - 7%]⁹}";
+                }
+                
+                const color = ds.borderColor || '#fff';
+                
+                if (isMono) {
+                    const role = i === 0 ? 'Desafiante:' : 'Desafiado:';
+                    bodyHtml += `<div style="display:flex; align-items:center; gap:8px; margin-bottom:4px; font-family: Consolas, 'Courier New', monospace; font-size:14px;">
+                                    <span style="display:inline-block; width:12px; height:12px; border-radius:50%; background-color:${color};"></span>
+                                    <span style="white-space: pre;">${role.padEnd(12, ' ')} ${valFormatted.padStart(16, ' ')}</span>
+                                 </div>`;
+                } else {
+                    bodyHtml += `<div style="display:flex; align-items:center; gap:8px; margin-bottom:4px; font-family: 'Segoe UI', Arial, sans-serif; font-size:14px;">
+                                    <span style="display:inline-block; width:12px; height:12px; border-radius:50%; background-color:${color};"></span>
+                                    <span>${ds.label}: <strong>${valFormatted}</strong></span>
+                                 </div>`;
+                }
+            });
+
+            let footerHtml = '';
+            if (isMono && val0 !== null && val1 !== null) {
+                const diff = val0 - val1;
+                const diffFormatted = formatYAxisNumber(diff, false, sQtd, sCont, sInd, sFator);
+                
+                let pct = 'N/A';
+                if (val1 !== 0) {
+                    const rawPct = (diff / val1) * 100;
+                    const dec = (rawPct.toFixed(2) === "52.04") ? 2 : 1;
+                    pct = rawPct.toLocaleString('pt-BR', {minimumFractionDigits: dec, maximumFractionDigits: dec}) + '%';
+                }                                            
+                
+                const pDiff = ' - Diferença:';
+                const pVar  = ' Δ Variação:';
+                
+                footerHtml = `<div style="margin-top:8px; padding-top:8px; border-top:1px dashed #666; font-family: Consolas, 'Courier New', monospace; font-size:14px; white-space: pre;">${pDiff.padEnd(15, ' ')} ${diffFormatted.padStart(16, ' ')}<br>${pVar.padEnd(15, ' ')} ${pct.padStart(16, ' ')}</div>`;
+            }
+
+            // Posição no eixo X e Y (Pixel exato da bolinha gerado pelo ChartJS)
+            const meta = chart.getDatasetMeta(0);
+            let x = meta.data[index] ? meta.data[index].x : 100;
+            let y = meta.data[index] ? meta.data[index].y : 100;
+
+            // Cria o Balão Físico
+            const pinId = 'pin-' + Date.now();
+            const pinDiv = document.createElement('div');
+            pinDiv.id = pinId;
+            pinDiv.className = 'pinned-tooltip';
+            
+            // Impede que o balão vaze para fora da tela nas pontas do gráfico
+            if (x < 110) x = 110;
+            if (x > chart.width - 110) x = chart.width - 110;
+
+            pinDiv.style.left = x + 'px';
+            pinDiv.style.top = (y - 15) + 'px'; // Sobe 15px para ficar acima da bolinha
+            pinDiv.style.transform = 'translate(-50%, -100%)'; // Centraliza e joga para cima
+            
+            pinDiv.innerHTML = `<div style="font-weight:bold; margin-bottom:8px; font-family: 'Segoe UI', sans-serif;">${dateLabel} <span style="float:right; opacity:0.6; font-size:12px; margin-left:15px;" title="Clique para remover">📌✖</span></div>
+                                ${bodyHtml}
+                                ${footerHtml}`;
+
+            // Regra de auto-destruição no clique (com som)
+            pinDiv.onclick = function() {
+                pinDiv.remove();
+                window.pinnedTooltips = window.pinnedTooltips.filter(p => p.id !== pinId);
+            };
+
+            // Anexa no contêiner do gráfico
+            document.querySelector('.chart-container').appendChild(pinDiv);
+            window.pinnedTooltips.push({ id: pinId, index: index });
         }
 
 		// ==========================================
@@ -1212,38 +1662,29 @@ const dicionarioLinhas = {
                 return;
             }
 
-            // 1. Variáveis Temporais e de Contexto
-            const dataFim = dbData.Competencia[endIdx]; // Ex: "2026/07"
+            // Pega o início e o fim da janela atual do gráfico
+            const dataInicio = dbData.Competencia[startIdx];
+            const dataFim = dbData.Competencia[endIdx]; 
             const [anoFim, mesFim] = dataFim.split('/');
             
             const nomeS1 = s1.toUpperCase();
             const nomeS2 = s2 ? s2.toUpperCase() : "";
             const contexto = nomeS1 + " " + nomeS2;
 
-            // Flags gerais de carreiras
             const isSerieCCHA = contexto.includes('CCHA');
             const isSerieCGPP = contexto.includes('CGPP');
-			const isSerieSTF  = contexto.includes('STF'); // <-- NOVA FLAG DO STF
+			const isSerieSTF  = contexto.includes('STF'); 
 
-            // 2. Filtros de Exclusão (Verifica se a série na tela é PURA de Subsídio ou VB, sem HAS ou BEP)
-            // Se as séries tiverem apenas a sigla "AFRFB", isso dará false (o que é ótimo, pois queremos mostrar os links na série agregada)
             const isS1OnlyOld = (nomeS1.includes('SUBSÍDIO') || nomeS1.includes('SUBSIDIO') || /\bVB\b/.test(nomeS1) || nomeS1.includes('VENCIMENTO BÁSICO')) && !nomeS1.includes('HAS') && !nomeS1.includes('BEP');
             const isS2OnlyOld = s2 ? ((nomeS2.includes('SUBSÍDIO') || nomeS2.includes('SUBSIDIO') || /\bVB\b/.test(nomeS2) || nomeS2.includes('VENCIMENTO BÁSICO')) && !nomeS2.includes('HAS') && !nomeS2.includes('BEP')) : true;
-            
             const ocultarPaineis = isS1OnlyOld && isS2OnlyOld;
 
-            // 3. Condicionais de Aparição baseadas no Tempo e na Carreira
-            // HAS passou a existir em 01/08/2016
             const showHAS = (isSerieCCHA || contexto.includes('PFN')) && (dataFim >= '2016/08') && !ocultarPaineis;
-            
-            // BEP passou a existir em 30/12/2016 (Mês 12)
             const showBEP = (isSerieCGPP || contexto.includes('AFRFB') || contexto.includes('ATRFB')) && (dataFim >= '2016/12') && !ocultarPaineis;
 
             let html = "";
 
-            // ---------------------------------------------------------
             // BLOCO 1: LEGISLAÇÃO DO PLANALTO
-            // ---------------------------------------------------------
             html += `<div>
                         <strong style="color: var(--text-muted);">Portal do Planalto (Legislação Correlata)</strong>
                         <ul style="padding-left: 20px; margin-top: 5px; margin-bottom: 0;">`;
@@ -1254,26 +1695,34 @@ const dicionarioLinhas = {
                 html += `<li><a href="${dominioPlanalto}2015-2018/2017/lei/l13464.htm" target="_blank" style="color: #666; text-decoration: underline;">Lei nº 13.464/2017 (Bônus de Eficiência)</a></li>`;
                 html += `<li><a href="${dominioPlanalto}2023-2026/2026/lei/l15367.htm" target="_blank" style="color: #666; text-decoration: underline;">Lei nº 15.367/2026 (Ajuste CGPP)</a></li>`;
             } else {
-                // A LÓGICA PADRÃO VAI FUNCIONAR PERFEITAMENTE PARA O STF AQUI!
-                // Basta você colocar o "STF" no seu JSON legislacaoHistorica com as respectivas datas e leis.
                 const cargoS1 = s1.split(' ')[0]; 
-                const leiS1 = encontrarLeiVigente(cargoS1, dataFim);
-                if (leiS1) html += `<li><a href="${leiS1.url}" target="_blank" style="color: #666; text-decoration: underline;">${leiS1.nome}</a></li>`;
+                let nivelS1 = 'topo'; 
+                const matchN1 = s1.match(/\((base|meio|topo)\)/);
+                if (matchN1) nivelS1 = matchN1[1];
+
+                const leisS1 = encontrarLeisDoPeriodo(cargoS1, dataInicio, dataFim, nivelS1);
+                leisS1.forEach(lei => {
+                    html += `<li><a href="${lei.url}" target="_blank" style="color: #666; text-decoration: underline;">${lei.nome}</a></li>`;
+                });
 
                 if (s2) {
                     const cargoS2 = s2.split(' ')[0];
-                    const leiS2 = encontrarLeiVigente(cargoS2, dataFim);
-                    if (leiS2 && (!leiS1 || leiS2.url !== leiS1.url)) {
-                        html += `<li><a href="${leiS2.url}" target="_blank" style="color: #666; text-decoration: underline;">${leiS2.nome}</a></li>`;
-                    }
+                    let nivelS2 = 'topo';
+                    const matchN2 = s2.match(/\((base|meio|topo)\)/);
+                    if (matchN2) nivelS2 = matchN2[1];
+
+                    const leisS2 = encontrarLeisDoPeriodo(cargoS2, dataInicio, dataFim, nivelS2);
+                    leisS2.forEach(lei => {
+                        if (!leisS1.some(l1 => l1.url === lei.url)) {
+                            html += `<li><a href="${lei.url}" target="_blank" style="color: #666; text-decoration: underline;">${lei.nome}</a></li>`;
+                        }
+                    });
                 }
             }
             html += `   </ul>
                      </div>`;
 
-            // ---------------------------------------------------------
             // BLOCO 2: ÓRGÃOS ESPECÍFICOS (CCHA / CGPP)
-            // ---------------------------------------------------------
             if (showBEP || showHAS) {
                 html += `<div>
                             <strong style="color: var(--text-muted);">Informações Colegiadas (Atas e Painéis)</strong>
@@ -1284,28 +1733,51 @@ const dicionarioLinhas = {
                 }
                 if (showHAS) {
                     html += `<li><a href="${urlsCCHA.painelPrincipal}" target="_blank" style="color: #666; text-decoration: underline;">Painel do CCHA (Verbas Indenizatórias e Remuneratórias de ${dataFim})</a></li>`;
+                    
+                    if (dataFim >= '2026/01') {
+                        html += `<li><a href="${urlsCCHA.boletimTCU}" target="_blank" style="color: #666; text-decoration: underline;">Boletim TCU (Maio/2026) - Processo 010.118/2026-8</a></li>`;
+                        html += `<li><a href="${urlsCCHA.manualSaude}" target="_blank" style="color: #666; text-decoration: underline;">Manual do Auxílio-Saúde CCHA v2.0 (Anajur)</a></li>`;
+                        html += `<li><a href="${urlsCCHA.notaOficial}" target="_blank" style="color: #666; text-decoration: underline;">Nota Oficial CCHA: Esclarecimentos Auxílio-Saúde</a></li>`;
+                    }
                 }
                 html += `   </ul>
                          </div>`;
             }
 			
-			// ---------------------------------------------------------
-            // NOVO BLOCO: REFERÊNCIAS EXCLUSIVAS DO STF
-            // ---------------------------------------------------------
+			// BLOCO 3: REFERÊNCIAS EXCLUSIVAS DO STF
             if (isSerieSTF) {
-                html += `<div>
-                            <strong style="color: var(--text-muted);">Teto Constitucional (Referências Diversas)</strong>
-                            <ul style="padding-left: 20px; margin-top: 5px; margin-bottom: 0;">
-                                <!-- Exemplo 1: Portal do STF (Portarias Antigas em PDF) -->
-                                <li><a href="URL_DA_PORTARIA_AQUI" target="_blank" style="color: #666; text-decoration: underline;">Portaria STF nº XX/XXXX (Repositório Oficial)</a></li>
+                // Mesma lógica de período aplicada à base independente do STF
+                const historicoAteInicio = historicoSTF.filter(h => h.data <= dataInicio);
+                let stfInicial = [];
+                if (historicoAteInicio.length > 0) {
+                    const dataMaisRecenteInicio = historicoAteInicio[historicoAteInicio.length - 1].data;
+                    stfInicial = historicoAteInicio.filter(h => h.data === dataMaisRecenteInicio);
+                }
+                
+                const stfNoMeio = historicoSTF.filter(h => h.data > dataInicio && h.data <= dataFim);
+                const todasSTF = [...stfInicial, ...stfNoMeio];
+                
+                const urlsVistasSTF = new Set();
+                const stfUnicas = [];
+                todasSTF.forEach(v => {
+                    if (!urlsVistasSTF.has(v.url)) {
+                        urlsVistasSTF.add(v.url);
+                        stfUnicas.push(v);
+                    }
+                });
+
+                if (stfUnicas.length > 0) {
+                    html += `<div>
+                                <strong style="color: var(--text-muted);">Teto Constitucional (STF) - Período Selecionado</strong>
+                                <ul style="padding-left: 20px; margin-top: 5px; margin-bottom: 0;">`;
                                 
-                                <!-- Exemplo 2: Site Extraoficial -->
-                                <li><a href="URL_DO_SITE_AQUI" target="_blank" style="color: #666; text-decoration: underline;">Histórico de Subsídios (Base Extraoficial)</a></li>
-                                
-                                <!-- Exemplo 3: Notícias -->
-                                <li><a href="URL_DA_NOTICIA_AQUI" target="_blank" style="color: #666; text-decoration: underline;">Notícia: Reajuste do Teto Remuneratório</a></li>
-                            </ul>
-                         </div>`;
+                    stfUnicas.forEach(v => {
+                        html += `<li><a href="${v.url}" target="_blank" style="color: #666; text-decoration: underline;">${v.nome}</a></li>`;
+                    });
+                    
+                    html += `   </ul>
+                             </div>`;
+                }
             }
 
             container.innerHTML = html;
@@ -1370,7 +1842,10 @@ const dicionarioLinhas = {
 
             // Usa a sua função oficial de formatação para garantir consistência total!
             const formatKPI = (v) => {
-                if (isRelative) return v.toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + '%';
+                if (isRelative) {
+                    const dec = (v !== null && v.toFixed(2) === "52.04") ? 2 : 1;
+                    return v.toLocaleString('pt-BR', { minimumFractionDigits: dec, maximumFractionDigits: dec }) + '%';
+                }
                 return formatYAxisNumber(v, isRelative, isQtd, isCont, isIndice, isFator);
             };
 
@@ -1411,9 +1886,96 @@ const dicionarioLinhas = {
             container.style.background = `linear-gradient(${baseBg}, ${baseBg}), linear-gradient(${hexToRgba(borderColor, 0.06)}, ${hexToRgba(borderColor, 0.06)})`;
 
             container.style.display = 'flex';
+			
+			// ==========================================
+            // INJEÇÃO DA LINHA 3: CUSTO DE OPORTUNIDADE (ACUMULADO)
+            // ==========================================
+            const isComp = document.getElementById('desafio').checked;
+            const isSerieIgnorada = !isComp && (lbl.startsWith('CGPP') || lbl.startsWith('CCHA'));
+            const rowAcumulado = document.getElementById('kpi-row-acumulado');
+            
+            if (isSerieIgnorada || !ds.absoluteData) {
+                rowAcumulado.style.display = 'none';
+            } else {
+                rowAcumulado.style.display = 'flex';
+
+                // MÁGICA DO ZOOM: Captura os limites atuais da tela
+                let minIndex = chart.scales.x.min !== undefined ? Math.floor(chart.scales.x.min) : 0;
+                let maxIndex = chart.scales.x.max !== undefined ? Math.ceil(chart.scales.x.max) : chart.data.labels.length - 1;
+                
+                // Travas de segurança para os índices
+                if (minIndex < 0) minIndex = 0;
+                if (maxIndex >= chart.data.labels.length) maxIndex = chart.data.labels.length - 1;
+                
+                // Contar meses válidos DENTRO da janela de zoom
+                let totalMeses = 0;
+                for (let i = minIndex; i <= maxIndex; i++) {
+                    if (ds.absoluteData[i] !== null && ds.absoluteData[i] !== undefined) totalMeses++;
+                }
+                
+                const anos = Math.floor(totalMeses / 12);
+                const meses = totalMeses % 12;
+                let strTempo = `${anos > 0 ? anos + ' ANOS' : ''}${anos > 0 && meses > 0 ? ' E ' : ''}${meses > 0 ? meses + ' MESES' : ''}`;
+                if (totalMeses === 0) strTempo = '0 meses';
+                
+                document.getElementById('kpi-acum-tempo').textContent = strTempo;
+                
+                if (isComp && chart.data.datasets.length >= 2) {
+                    const ds0 = chart.data.datasets[0];
+                    const ds1 = chart.data.datasets[1];
+                    
+                    let sum0 = 0, sum1 = 0;
+                    
+                    // SOMA ISOLADA PARA O ZOOM ATUAL
+                    for (let i = minIndex; i <= maxIndex; i++) {
+                        if (ds0.absoluteData[i] !== null && ds0.absoluteData[i] !== undefined) sum0 += ds0.absoluteData[i];
+                        if (ds1.absoluteData[i] !== null && ds1.absoluteData[i] !== undefined) sum1 += ds1.absoluteData[i];
+                    }
+                    
+                    document.getElementById('kpi-acum-val1').textContent = formatYAxisNumber(sum0, false, false, false, false, false);
+                    document.getElementById('kpi-acum-lbl1').innerHTML = '<u>Desafiante</u>: ' + ds0.label.split(' | ')[0];
+                    
+                    document.getElementById('kpi-acum-val2').textContent = formatYAxisNumber(sum1, false, false, false, false, false);
+                    document.getElementById('kpi-acum-lbl2').innerHTML = '<u>Desafiado</u>: ' + ds1.label.split(' | ')[0];
+                    
+                    // Cálculo da Diferença Absoluta e Proporção (Desafiado / Desafiante)
+                    const diffAbs = sum1 - sum0;
+                    const pctDiff = sum0 !== 0 ? (sum1 / sum0) * 100 : 0;
+                    
+                    const sinal = diffAbs > 0 ? '▲ +' : (diffAbs < 0 ? '▼ ' : '');
+                    const colorDiff = diffAbs > 0 ? '#27ae60' : (diffAbs < 0 ? '#e74c3c' : 'var(--text-muted)');
+                    
+                    // Espaçamento do R$ ajustado (removido o .replace)
+                    document.getElementById('kpi-acum-diff-val').textContent = sinal + formatYAxisNumber(Math.abs(diffAbs), false, false, false, false, false);
+                    document.getElementById('kpi-acum-diff-val').style.color = colorDiff;
+                    
+                    document.getElementById('kpi-acum-diff-pct').textContent = pctDiff.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + '% (Relativo)';
+                    document.getElementById('kpi-acum-diff-pct').style.color = colorDiff;
+                    
+                    document.getElementById('kpi-acum-box2').style.display = 'block';
+                    document.getElementById('kpi-acum-diff-box').style.display = 'block';
+                    
+                } else {
+                    // MODO AVULSO
+                    let sumHover = 0;
+                    
+                    // SOMA ISOLADA PARA O ZOOM ATUAL (Modo Avulso)
+                    for (let i = minIndex; i <= maxIndex; i++) {
+                        if (ds.absoluteData[i] !== null && ds.absoluteData[i] !== undefined) sumHover += ds.absoluteData[i];
+                    }
+                    
+                    document.getElementById('kpi-acum-val1').textContent = formatYAxisNumber(sumHover, false, isQtd, isCont, isIndice, isFator);
+                    document.getElementById('kpi-acum-lbl1').innerHTML = lbl.split(' | ')[0];
+                    
+                    document.getElementById('kpi-acum-box2').style.display = 'none';
+                    document.getElementById('kpi-acum-diff-box').style.display = 'none';
+                }
+            }
         }
 
 		function updateChart(mode) {
+			limparAlfinetes();
+			
             const isComp = chkComparativo.checked;
             const escala = document.querySelector('input[name="escala"]:checked').value;
             const isRelative = escala === 'percentual';
@@ -1482,17 +2044,29 @@ const dicionarioLinhas = {
                 let raw1 = dbData[key1] || new Array(dbData.Competencia.length).fill(null);
                 let raw2 = dbData[key2] || new Array(dbData.Competencia.length).fill(null);
                 let data1 = [], data2 = [];
+                let absData1 = [], absData2 = []; // NOVO: Armazena o valor absoluto para o Acumulado
                 let points1 = [], points2 = [];
                 let lastVal1 = undefined, lastVal2 = undefined;
 
                 let firstValidG = -1, lastValidG = -1;
                 for (let i = 0; i < dbData.Competencia.length; i++) {
-                    // Ignora 0s frontais para não criar linha reta no passado do desafio
-                    if ((raw1[i] !== null && raw1[i] !== 0) || (raw2[i] !== null && raw2[i] !== 0)) {
-                        if (firstValidG === -1) firstValidG = i;
-                    }
-                    if (raw1[i] !== null || raw2[i] !== null) {
-                        lastValidG = i;
+                    let v1 = raw1[i], v2 = raw2[i];
+                    // TRAVA DE AÇO: Ignora nulls, zeros e NaNs!
+                    let r1Valido = v1 !== null && v1 !== undefined && !isNaN(v1) && v1 !== 0;
+                    let r2Valido = v2 !== null && v2 !== undefined && !isNaN(v2) && v2 !== 0;
+                    
+                    if (isRelative) {
+                        // MODO %: Gráfico só começa quando AMBAS as carreiras passam a existir juntas
+                        if (r1Valido && r2Valido) {
+                            if (firstValidG === -1) firstValidG = i;
+                            lastValidG = i;
+                        }
+                    } else {
+                        // MODO R$: Gráfico começa assim que QUALQUER UMA das carreiras nascer
+                        if (r1Valido || r2Valido) {
+                            if (firstValidG === -1) firstValidG = i;
+                            lastValidG = i;
+                        }
                     }
                 }
                 if (firstValidG !== -1) { startIdx = firstValidG; endIdx = lastValidG; }
@@ -1500,10 +2074,23 @@ const dicionarioLinhas = {
 				let lastRaw1 = undefined, lastRaw2 = undefined;
                 
                 for (let i = startIdx; i <= endIdx; i++) {
-                    let v1 = raw1[i], v2 = raw2[i];
+                    // SANITIZAÇÃO BLINDADA: Converte para float e mata textos/traços do Excel
+                    let v1 = raw1 && raw1[i] !== null ? parseFloat(raw1[i]) : null;
+                    if (isNaN(v1)) v1 = null;
                     
-                    // Salva o valor original/bruto ANTES da matemática do IPCA
+                    let v2 = raw2 && raw2[i] !== null ? parseFloat(raw2[i]) : null;
+                    if (isNaN(v2)) v2 = null;
+
                     let originalV1 = v1, originalV2 = v2;
+					
+					let v1_abs = originalV1;
+                    let v2_abs = originalV2;
+                    if (isIpcaActive) {
+                        if (v1_abs !== null) v1_abs *= fatorIpca[i];
+                        if (v2_abs !== null) v2_abs *= fatorIpca[i];
+                    }
+                    absData1.push(v1_abs !== null ? v1_abs : null);
+                    absData2.push(v2_abs !== null ? v2_abs : null);
                     
                     if (isIpcaActive && !isRelative) {
                         if (v1 !== null) v1 *= fatorIpca[i];
@@ -1513,9 +2100,13 @@ const dicionarioLinhas = {
                     let cv1 = null, cv2 = null;
                     
                     if (isRelative) {
+                        // A TRAVA: Só calcula se o Desafiado existir E não for zero
                         if (v2 !== null && v2 !== 0) {
                             cv2 = 100.0;
-                            cv1 = (v1 !== null) ? parseFloat(((v1 / v2) * 100).toFixed(1)) : null;
+                            cv1 = (v1 !== null) ? parseFloat(((v1 / v2) * 100).toFixed(2)) : null;
+                            
+                            // SEGUNDA TRAVA: Se o Desafiante não existe neste mês, o Desafiado também some da tela (para não ficar uma linha de 100% voando sozinha)
+                            if (v1 === null) cv2 = null;
                         } else {
                             cv1 = null; cv2 = null;
                         }
@@ -1524,6 +2115,7 @@ const dicionarioLinhas = {
                     }
                     
                     data1.push(cv1); data2.push(cv2);
+					
                     validIndices.push(i);
 
                     const isTsv1 = cargosDesafio.some(c => key1.startsWith(c));
@@ -1542,12 +2134,12 @@ const dicionarioLinhas = {
                 }
                 
                 datasets.push({
-                    label: key1, data: data1, borderColor: '#C00000', backgroundColor: 'rgba(192, 0, 0, 0.25)',
+                    label: key1, data: data1, absoluteData: absData1, borderColor: '#C00000', backgroundColor: 'rgba(192, 0, 0, 0.25)',
                     stepped: isIpcaActive && !isRelative ? false : true, //'middle', // Deixa a curva de corrosão lisa e perfeita!
                     borderWidth: 3, pointRadius: points1, pointHoverRadius: 6, spanGaps: true, fill: false
                 });
                 datasets.push({
-                    label: key2, data: data2, borderColor: '#0070C0', backgroundColor: 'rgba(0, 112, 192, 0.25)',
+                    label: key2, data: data2, absoluteData: absData2, borderColor: '#0070C0', backgroundColor: 'rgba(0, 112, 192, 0.25)',
                     stepped: isIpcaActive && !isRelative ? false : true, //'middle', 
                     borderWidth: 3, pointRadius: points2, pointHoverRadius: 6, spanGaps: true, fill: false
                 });
@@ -1563,7 +2155,10 @@ const dicionarioLinhas = {
 
                 let fValid = -1, lValid = -1;
                 for (let i = startIdx; i <= endIdx; i++) {
-                    if (raw[i] !== null) {
+                    let v = raw[i];
+                    // TRAVA DE AÇO para série avulsa
+                    let isValid = v !== null && v !== undefined && !isNaN(v) && v !== 0;
+                    if (isValid) {
                         if (fValid === -1) fValid = i;
                         lValid = i;
                     }
@@ -1574,6 +2169,7 @@ const dicionarioLinhas = {
                 let rawRef = refKey ? dbData[refKey] : null;
                 
                 let data = [], dataRef = [], points = [];
+                let absData = []; // NOVO
                 let lastRaw = undefined, firstValidVal = null; 
 
                 if (isRelative) {
@@ -1591,8 +2187,13 @@ const dicionarioLinhas = {
                 
                 for (let i = startIdx; i <= endIdx; i++) {
                     validIndices.push(i);
-                    let v = raw[i];
-                    let rV = rawRef ? rawRef[i] : null;
+					
+                    // SANITIZAÇÃO BLINDADA
+                    let v = raw && raw[i] !== null ? parseFloat(raw[i]) : null;
+                    if (isNaN(v)) v = null;
+                    
+                    let rV = rawRef && rawRef[i] !== null ? parseFloat(rawRef[i]) : null;
+                    if (isNaN(rV)) rV = null;
                     
                     let originalV = v; 
 
@@ -1601,12 +2202,19 @@ const dicionarioLinhas = {
                         if (rV !== null) rV *= fatorIpca[i];
                     }
 
+                    // NOVO: Captura isolada do valor absoluto para o Acumulado
+                    let v_abs = originalV;
+                    if (isIpcaActive && !s1_Qtd && !s1_Cont && !s1_Ind && !s1_Fator) {
+                        if (v_abs !== null) v_abs *= fatorIpca[i];
+                    }
+                    absData.push(v_abs !== null ? v_abs : null);
+
                     let currentVal = null, currentRef = null;
                     
                     if (v !== null) {
                         if (isRelative) {
-                            if (rawRef) currentVal = (rV !== null && rV !== 0) ? parseFloat(((v / rV) * 100).toFixed(1)) : null;
-                            else currentVal = firstValidVal ? parseFloat(((v / firstValidVal) * 100).toFixed(1)) : null;
+                            if (rawRef) currentVal = (rV !== null && rV !== 0) ? parseFloat(((v / rV) * 100).toFixed(2)) : null;
+                            else currentVal = firstValidVal ? parseFloat(((v / firstValidVal) * 100).toFixed(2)) : null;
                         } else {
                             currentVal = v;
                         }
@@ -1641,7 +2249,7 @@ const dicionarioLinhas = {
                 }
                 
                 datasets.push({
-                    label: formatSerieOption(key), data: data, borderColor: '#00B050', backgroundColor: 'rgba(0, 176, 80, 0.25)',
+                    label: formatSerieOption(key), data: data, absoluteData: absData, borderColor: '#00B050', backgroundColor: 'rgba(0, 176, 80, 0.25)',
                     stepped: isIpcaActive && !s1_Qtd && !s1_Cont && !s1_Ind && !s1_Fator ? false : true, //'middle', 
                     borderWidth: 3, pointRadius: points, pointHoverRadius: 6, spanGaps: true, fill: false
                 });
@@ -1663,8 +2271,8 @@ const dicionarioLinhas = {
                                 
                                 if (v !== null) {
                                     if (isRelative) {
-                                        if (rawRef && rawRef[i] !== null && rawRef[i] !== 0) currentValExtra = parseFloat(((v / rawRef[i]) * 100).toFixed(1));
-                                        else if (firstValidVal) currentValExtra = parseFloat(((v / firstValidVal) * 100).toFixed(1));
+                                        if (rawRef && rawRef[i] !== null && rawRef[i] !== 0) currentValExtra = parseFloat(((v / rawRef[i]) * 100).toFixed(2));
+                                        else if (firstValidVal) currentValExtra = parseFloat(((v / firstValidVal) * 100).toFixed(2));
                                     } else {
                                         currentValExtra = v;
                                     }
@@ -1724,8 +2332,8 @@ const dicionarioLinhas = {
                             
                             if (v !== null) {
                                 if (isRelative) {
-                                    if (rawRef[i] !== null && rawRef[i] !== 0) currentValCota = parseFloat(((v / rawRef[i]) * 100).toFixed(1));
-                                    else if (firstValidVal) currentValCota = parseFloat(((v / firstValidVal) * 100).toFixed(1));
+                                    if (rawRef[i] !== null && rawRef[i] !== 0) currentValCota = parseFloat(((v / rawRef[i]) * 100).toFixed(2));
+                                    else if (firstValidVal) currentValCota = parseFloat(((v / firstValidVal) * 100).toFixed(2));
                                 } else {
                                     currentValCota = v;
                                 }
@@ -1751,6 +2359,9 @@ const dicionarioLinhas = {
                     }
                 }
             }
+
+            // Remove o raio fixo embutido nas séries para que a regra global de Picos/Vales assuma o controle
+            datasets.forEach(ds => delete ds.pointRadius);
 
             const chartLabels = validIndices.map(i => dbData.Competencia[i]);
 
@@ -1836,16 +2447,103 @@ const dicionarioLinhas = {
                 type: 'line',
                 data: { labels: chartLabels, datasets: datasets },
                 options: {
+					onClick: function(event, elements, chart) {
+                        if (elements.length === 0) return;
+                        
+                        // 1. Se já existe um timer rodando, é porque este é o SEGUNDO clique (duplo clique)
+                        if (window.pinClickTimer) {
+                            clearTimeout(window.pinClickTimer); // Aborta a criação do alfinete
+                            window.pinClickTimer = null;
+                            return; // Sai da função sem fazer nada
+                        }
+                        
+                        const index = elements[0].index;
+                        
+                        // 2. Inicia o Timer para o primeiro clique (espera 250ms)
+                        window.pinClickTimer = setTimeout(() => {
+                            window.pinClickTimer = null; // Reseta o timer para os próximos cliques
+                            
+                            // 3. A lógica original que crava o alfinete
+                            if (window.pinnedTooltips && window.pinnedTooltips.find(p => p.index === index)) return;
+                            
+                            if (window.pinnedTooltips && window.pinnedTooltips.length >= 3) {
+                                showCustomToast("<strong style='font-size: 15px;'>LIMITE ATINGIDO 📌</strong><br>Três alfinetes já fixados; dê um duplo clique no gráfico para limpar todos.", 4000);
+                                return;
+                            }
+                            
+                            criarAlfinete(chart, index);
+                        }, 333); // 250 milissegundos é o tempo padrão universal para separar cliques simples de duplos
+                    },
                     responsive: true,
                     maintainAspectRatio: false,
                     layout: { padding: { top: 10, left: 5, right: 20, bottom: 15 } },
                     interaction: { mode: 'index', intersect: false },
+					// DEIXA O GRÁFICO LIMPO: Bolinhas ativas apenas nas quinas, topos e fundos.
+					elements: {
+						point: {
+							radius: function(context) {
+								const dataset = context.dataset.data;
+								const index = context.dataIndex;
+								const val = dataset[index];
+								
+								if (val === null || val === undefined) return 0;
+								if (index === 0 || index === dataset.length - 1) return 3;
+								
+								const prev = dataset[index - 1];
+								const next = dataset[index + 1];
+								
+								const valStr = val.toFixed(4);
+                                const prevStr = prev !== null && prev !== undefined ? prev.toFixed(4) : null;
+                                const nextStr = next !== null && next !== undefined ? next.toFixed(4) : null;
+								
+								if (valStr === prevStr && valStr === nextStr) return 0;
+                                
+                                // Escadinha
+                                const isStepStart = valStr !== prevStr && valStr === nextStr;
+                                const isStepEnd = valStr === prevStr && valStr !== nextStr;
+                                // Volatilidade extrema (Mostra apenas Picos e Vales)
+                                const isPeak = prev !== null && next !== null && val > prev && val > next;
+                                const isValley = prev !== null && next !== null && val < prev && val < next;
+                                
+								if (isStepStart || isStepEnd || isPeak || isValley) return 3;
+                                return 0; // Esconde no meio de ladeiras
+							},
+							hitRadius: 5, 
+							hoverRadius: 6
+						}
+					},
                     plugins: {
                         datalabels: {
-							clip: false,
-                            display: function(context) {
-                                return chkRotulos.checked && context.dataset.pointRadius[context.dataIndex] > 0;
-                            },
+							// NOVA LÓGICA: Combate o "engavetamento" usando a engine 'auto' do Chart.js
+							display: function(context) {
+								if (!document.getElementById('rotulos').checked) return false;
+								
+								const dataset = context.dataset.data;
+								const index = context.dataIndex;
+								const value = dataset[index];
+								
+								if (value === null || value === undefined) return false;
+								if (index === 0 || index === dataset.length - 1) return 'auto';
+								
+								const prev = dataset[index - 1];
+								const next = dataset[index + 1];
+								
+								const valStr = value.toFixed(2);
+								const prevStr = prev !== null && prev !== undefined ? prev.toFixed(2) : null;
+								const nextStr = next !== null && next !== undefined ? next.toFixed(2) : null;
+								
+								if (valStr === prevStr && valStr === nextStr) return false;
+                                
+                                const isStepStart = valStr !== prevStr && valStr === nextStr;
+                                const isStepEnd = valStr === prevStr && valStr !== nextStr;
+                                const isPeak = prev !== null && next !== null && value > prev && value > next;
+                                const isValley = prev !== null && next !== null && value < prev && value < next;
+								
+                                // Retorna 'auto' apenas para pontos cruciais. O ChartJS oculta sozinho se sobrepuser!
+								if (isStepStart || isStepEnd || isPeak || isValley) return 'auto';
+								
+								return false;
+							},
                             align: 'top',
 						
                             // NOVA REGRA DE INCLINAÇÃO (ROTAÇÃO)
@@ -1908,9 +2606,19 @@ const dicionarioLinhas = {
                                     if (context.dataset.borderDash && isRelative) valFormatted = '100%';
                                     else valFormatted = formatYAxisNumber(context.parsed.y, isRelative, s1_Qtd, s1_Cont, s1_Ind, s1_Fator);
                                     
+                                    // ==========================================
+                                    // INJEÇÃO DAS EQUAÇÕES HISTÓRICAS DO BEP/HAS
+                                    // ==========================================
+                                    if (isComp && isRelative && context.parsed.y !== null) {
+                                        const numArredondado = context.parsed.y.toFixed(2);
+                                        if (numArredondado === "37.00") valFormatted = "37,00% = {100% - [7% × 9]}";
+                                        else if (numArredondado === "35.00") valFormatted = "35,00% = {100% - [7% × 8] - 9%}";
+                                        else if (numArredondado === "52.00") valFormatted = "52,00% ≈ {[100% - 7%]⁹}";
+                                        else if (numArredondado === "52.04") valFormatted = "52,04% = {[100% - 7%]⁹}";
+                                    }
+                                    
                                     // MODO DESAFIO (Cálculo Monoespaçado)
                                     if (isComp && context.chart.data.datasets.length >= 2 && !isRelative) {
-                                        // Garante espaçamentos idênticos para manter as colunas alinhadas
                                         const role = context.datasetIndex === 0 ? 'Desafiante:' : 'Desafiado:';
                                         return role.padEnd(12, ' ') + valFormatted.padStart(16, ' ');
                                     }
@@ -1931,10 +2639,14 @@ const dicionarioLinhas = {
                                         
                                         if (val0 !== null && val1 !== null) {
                                             const diff = val0 - val1;
-
                                             const diffFormatted = formatYAxisNumber(diff, false, s1_Qtd, s1_Cont, s1_Ind, s1_Fator);
-                                            // Substituímos o toFixed(1) pela localização em pt-BR aqui também
-                                            const pct = val1 !== 0 ? ((diff / val1) * 100).toLocaleString('pt-BR', {minimumFractionDigits: 1, maximumFractionDigits: 1}) + '%' : 'N/A';                                            
+                                            
+                                            let pct = 'N/A';
+                                            if (val1 !== 0) {
+                                                const rawPct = (diff / val1) * 100;
+                                                const dec = (rawPct.toFixed(2) === "52.04") ? 2 : 1;
+                                                pct = rawPct.toLocaleString('pt-BR', {minimumFractionDigits: dec, maximumFractionDigits: dec}) + '%';
+                                            }                                            
                                             
                                             const pDiff = ' - Diferença:';
                                             const pVar  = ' Δ Variação:';
@@ -1969,12 +2681,14 @@ const dicionarioLinhas = {
                                 enabled: true,
                                 mode: 'x', // Permite arrastar para os lados
                                 modifierKey: 'shift', // Segura shift para arrastar no desktop
+								onPan: limparAlfinetes // Limpa ao arrastar a tela
                             },
                             zoom: {
                                 wheel: { enabled: true }, // Rodinha do mouse
                                 drag: { enabled: true },  // Clicar e arrastar um retângulo para zoom
                                 pinch: { enabled: true }, // Pinça no mobile
                                 mode: 'x', // Zoom apenas no tempo
+								onZoom: limparAlfinetes // Limpa ao redimensionar a tela
                             }
                         },
 						annotation: {
@@ -1994,17 +2708,18 @@ const dicionarioLinhas = {
                                 drawBorder: false
                             },
                             ticks: {
-                                autoSkip: false,
+                                autoSkip: true,
                                 maxRotation: 45, 
                                 minRotation: 45,
-								color: '#666666',
-                                callback: function(value, index) {
-                                    const hasPoint = datasets.some(ds => ds.pointRadius && ds.pointRadius[index] > 0);
-                                    return hasPoint ? this.getLabelForValue(value) : null;
-                                }
+                                maxTicksLimit: 30,
+                                color: '#666666',
+                                font: { size: 11, family: "'Segoe UI', sans-serif" }
+                                // A propriedade 'callback' que ficava aqui foi completamente removida!
                             }
                         },
                         y: {
+							// Trava o zero como piso se for escala em reais
+							min: escala === 'percentual' ? undefined : 0,
                             grace: '15%',
                             suggestedMin: suggestedMin, // Aplica o novo piso calculado acima
                             ticks: { color: '#666666', callback: function(value) { return formatYAxisNumber(value, isRelative, s1_Qtd, s1_Cont, s1_Ind, s1_Fator); } }
@@ -2505,7 +3220,7 @@ const dicionarioLinhas = {
                 let last = validData[validData.length - 1];
                 let max = Math.max(...validData);
                 
-                let varPct = first !== 0 ? (((last - first) / first) * 100).toFixed(1) : 0;
+                let varPct = first !== 0 ? (((last - first) / first) * 100).toFixed(2) : 0;
                 let direction = varPct > 0 ? "crescimento" : (varPct < 0 ? "queda" : "estabilidade");
                 
                 // Ignora linhas de 100% liso no modo relativo para não poluir o resumo
