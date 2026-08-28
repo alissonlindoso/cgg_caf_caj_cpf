@@ -13,7 +13,7 @@
     <!-- O novo motor de marcos visuais -->
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
     
-    <script src="cgg_caf_caj_cpf.js"></script>
+    <script src="CGG x CAF x CAJ x CPF.js"></script>
     
     <style>
 		/* Estilos do Botão Duplo / Split Button */
@@ -2263,6 +2263,10 @@ const dicionarioLinhas = {
                             
 							for (let i = startIdx; i <= endIdx; i++) {
                                 let v = dbData[extraKey][i];
+                                if (isNaN(v)) v = null; // HIGIENE: Transforma NaN do Excel em null
+                                
+                                let vPrev = i > startIdx ? dbData[extraKey][i-1] : null;
+                                if (isNaN(vPrev)) vPrev = null;
                                 
                                 // INJEÇÃO 4A: IPCA NAS LINHAS PONTILHADAS
                                 if (v !== null && isIpcaActive) v *= fatorIpca[i];
@@ -2276,7 +2280,7 @@ const dicionarioLinhas = {
                                     } else {
                                         currentValExtra = v;
                                     }
-                                } else if (i > startIdx && dbData[extraKey][i-1] !== null) {
+                                } else if (vPrev !== null) { // Usa a variável higienizada
                                     currentValExtra = dataExtra[dataExtra.length - 1];
                                 }
                                 
@@ -2478,7 +2482,7 @@ const dicionarioLinhas = {
                     maintainAspectRatio: false,
                     layout: { padding: { top: 10, left: 5, right: 20, bottom: 15 } },
                     interaction: { mode: 'index', intersect: false },
-					// DEIXA O GRÁFICO LIMPO: Bolinhas ativas apenas nas quinas, topos e fundos.
+					// DEIXA O GRÁFICO LIMPO: Bolinhas ativas apenas nas quinas, topos, fundos e pontas isoladas.
 					elements: {
 						point: {
 							radius: function(context) {
@@ -2498,6 +2502,10 @@ const dicionarioLinhas = {
 								
 								if (valStr === prevStr && valStr === nextStr) return 0;
                                 
+                                // O SEGREDO DO LARANJA: Nasce do vazio ou morre no vazio
+                                const isAfterNull = prev === null || prev === undefined;
+                                const isBeforeNull = next === null || next === undefined;
+                                
                                 // Escadinha
                                 const isStepStart = valStr !== prevStr && valStr === nextStr;
                                 const isStepEnd = valStr === prevStr && valStr !== nextStr;
@@ -2505,7 +2513,7 @@ const dicionarioLinhas = {
                                 const isPeak = prev !== null && next !== null && val > prev && val > next;
                                 const isValley = prev !== null && next !== null && val < prev && val < next;
                                 
-								if (isStepStart || isStepEnd || isPeak || isValley) return 3;
+								if (isAfterNull || isBeforeNull || isStepStart || isStepEnd || isPeak || isValley) return 3;
                                 return 0; // Esconde no meio de ladeiras
 							},
 							hitRadius: 5, 
@@ -2534,13 +2542,17 @@ const dicionarioLinhas = {
 								
 								if (valStr === prevStr && valStr === nextStr) return false;
                                 
+                                // O SEGREDO DO LARANJA: Nasce do vazio ou morre no vazio
+                                const isAfterNull = prev === null || prev === undefined;
+                                const isBeforeNull = next === null || next === undefined;
+                                
                                 const isStepStart = valStr !== prevStr && valStr === nextStr;
                                 const isStepEnd = valStr === prevStr && valStr !== nextStr;
                                 const isPeak = prev !== null && next !== null && value > prev && value > next;
                                 const isValley = prev !== null && next !== null && value < prev && value < next;
 								
                                 // Retorna 'auto' apenas para pontos cruciais. O ChartJS oculta sozinho se sobrepuser!
-								if (isStepStart || isStepEnd || isPeak || isValley) return 'auto';
+								if (isAfterNull || isBeforeNull || isStepStart || isStepEnd || isPeak || isValley) return 'auto';
 								
 								return false;
 							},
