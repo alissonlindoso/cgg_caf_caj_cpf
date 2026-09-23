@@ -591,10 +591,22 @@
             31: { url: "_ato2023-2026/2024/lei/l14875.htm", 					 legislacao: "Lei nº 14.875/2024" },
             32: { url: "_ato2023-2026/2025/lei/anexo/anexo254a323-lei15141.htm", legislacao: "Lei nº 15.141/2025" },
             33: { url: "_ato2023-2026/2026/lei/l15367.htm", 					 legislacao: "Lei nº 15.367/2026" },
-            34: { url: "leis/l9266.htm", 										 legislacao: "Lei nº 9.266/1996" }
+            34: { url: "leis/l9266.htm", 										 legislacao: "Lei nº 9.266/1996" },
+            35: { url: "leis/2003/l10.698.htm", 								 legislacao: "Lei nº 10.698/2003" }
         };
 
-        const anexosPlanalto = {
+		const anexosPlanalto = {
+            "ALL": [
+                { data: "2003/07/02", id: 35, niveis: ['base', 'meio', 'topo'] }
+            ],
+			"GCG": [
+                { data: "2000/06/30", id: 1,  ancora: "#art56i",	anexo: "Art. 56, I",				niveis: ['base', 'meio', 'topo'] },
+                { data: "2001/01/01", id: 2,  ancora: "#art8",		anexo: "Art. 8º",					niveis: ['base', 'meio', 'topo'] },
+                { data: "2003/12/01", id: 3,  ancora: "#art8a§2",	anexo: "Art. 8º-A, §2º, I e II",	niveis: ['base', 'meio', 'topo'] },
+                { data: "2003/12/01", id: 4,  ancora: "#art1",		anexo: "Art. 1º",					niveis: ['base', 'meio', 'topo'] },
+                { data: "2004/08/01", id: 5,  ancora: "#art2i",		anexo: "Art. 2º, I, 'a' e 'b'",		niveis: ['base', 'meio', 'topo'] },
+                { data: "2005/04/01", id: 6,  ancora: "#art3ii",	anexo: "Art. 3º, II, 'a' e 'b'",	niveis: ['base', 'meio', 'topo'] }
+            ],
             "AFFC": [
                 { data: "2000/06/30", id: 1,  ancora: "#AnexoVII",  anexo: "Anexo VII",		niveis: ['base', 'meio', 'topo'] },
                 { data: "2000/09/28", id: 2,  ancora: "#AnexoVII",  anexo: "Anexo VII",		niveis: ['base', 'meio', 'topo'] },
@@ -646,9 +658,10 @@
                 { data: "2013/01/01", id: 18, ancora: "#anexoi",     anexo: "Anexo I",				niveis: ['base', 'meio', 'topo'] },
                 { data: "2014/01/01", id: 18, ancora: "#anexoi",     anexo: "Anexo I",				niveis: ['base', 'meio', 'topo'] },
                 { data: "2015/01/01", id: 18, ancora: "#anexoi",     anexo: "Anexo I",				niveis: ['base', 'meio', 'topo'] },
-                { data: "2016/09/01", id: 23, ancora: "#Art20",      anexo: "Art. 20",				niveis: ['meio', 'topo'] },
+                { data: "2016/09/01", id: 23, ancora: "#Art10",      anexo: "Art. 10, I e §1º",		niveis: ['meio', 'topo'] },
                 { data: "2016/12/30", id: 23, ancora: "#AnexoVII",   anexo: "Anexo VII",			niveis: ['base', 'meio', 'topo'] },
                 { data: "2017/01/01", id: 23, ancora: "#AnexoVII",   anexo: "Anexo VII",			niveis: ['base', 'meio', 'topo'] },
+                { data: "2017/02/01", id: 24, ancora: "#Art11",      anexo: "Art. 11, §2º",			niveis: ['meio', 'topo'] },
                 { data: "2018/01/01", id: 24, ancora: "#anexo7",     anexo: "Anexo VII",			niveis: ['base', 'meio', 'topo'] },
                 { data: "2019/01/01", id: 24, ancora: "#anexo7",     anexo: "Anexo VII",			niveis: ['base', 'meio', 'topo'] },
                 { data: "2023/05/01", id: 25, ancora: "#anexo127",   anexo: "Anexo CXXVII",			niveis: ['base', 'meio', 'topo'] },
@@ -668,9 +681,10 @@
                 { data: "2013/01/01", id: 18, ancora: "#anexoi",     anexo: "Anexo I",				niveis: ['base', 'meio', 'topo'] },
                 { data: "2014/01/01", id: 18, ancora: "#anexoi",     anexo: "Anexo I",				niveis: ['base', 'meio', 'topo'] },
                 { data: "2015/01/01", id: 18, ancora: "#anexoi",     anexo: "Anexo I",				niveis: ['base', 'meio', 'topo'] },
-                { data: "2016/09/01", id: 23, ancora: "#Art20",      anexo: "Art. 20",				niveis: ['meio', 'topo'] },
+                { data: "2016/09/01", id: 23, ancora: "#Art10",      anexo: "Art. 10, II e §1º",	niveis: ['meio', 'topo'] },
                 { data: "2016/12/30", id: 23, ancora: "#AnexoVII",   anexo: "Anexo VII",			niveis: ['base', 'meio', 'topo'] },
                 { data: "2017/01/01", id: 23, ancora: "#AnexoVII",   anexo: "Anexo VII",			niveis: ['base', 'meio', 'topo'] },
+                { data: "2017/02/01", id: 24, ancora: "#Art11",      anexo: "Art. 11, §2º",			niveis: ['meio', 'topo'] },
                 { data: "2018/01/01", id: 24, ancora: "#anexo7",     anexo: "Anexo VII",			niveis: ['base', 'meio', 'topo'] },
                 { data: "2019/01/01", id: 24, ancora: "#anexo7",     anexo: "Anexo VII",			niveis: ['base', 'meio', 'topo'] },
                 { data: "2023/05/01", id: 25, ancora: "#anexo127",   anexo: "Anexo CXXVII",			niveis: ['base', 'meio', 'topo'] },
@@ -694,6 +708,7 @@
                 { data: "2013/01/01", id: 17, ancora: "#AnexoXII",   anexo: "Anexo XII",  	niveis: ['base', 'meio', 'topo'] },
                 { data: "2014/01/01", id: 17, ancora: "#AnexoXII",   anexo: "Anexo XII",  	niveis: ['base', 'meio', 'topo'] },
                 { data: "2015/01/01", id: 17, ancora: "#AnexoXII",   anexo: "Anexo XII",  	niveis: ['base', 'meio', 'topo'] },
+                { data: "2016/08/01", id: 21, ancora: "#Art39",      anexo: "Art. 39",		niveis: ['meio', 'topo'] },
                 { data: "2016/08/01", id: 21, ancora: "#AnexoXXXV",  anexo: "Anexo XXXV", 	niveis: ['base', 'meio', 'topo'] },
                 { data: "2017/01/01", id: 21, ancora: "#AnexoXXXV",  anexo: "Anexo XXXV", 	niveis: ['base', 'meio', 'topo'] },
                 { data: "2018/01/01", id: 21, ancora: "#AnexoXXXV",  anexo: "Anexo XXXV", 	niveis: ['base', 'meio', 'topo'] },
@@ -817,11 +832,12 @@
         ];
 		
         const gruposCarreiras = {
-            'CGG': 	  ['TFC', 'AFC'],
-            'CFC': 	  ['TFFC', 'AFFC'],
-            'CAF': 	  ['ATRFB', 'AFRFB'],
-            'CARF':   ['TRF', 'AFRF'],
-            'CTARFB': ['ATRFB', 'AFRFB'],
+            'CGG': 	  ['TFC', 'AFC', 'TFFC', 'AFFC'],
+            'CFC': 	  ['TFC', 'AFC', 'TFFC', 'AFFC'],
+            'CAF': 	  ['TRF', 'AFRF', 'ATRFB', 'AFRFB'],
+            'CARF':   ['TRF', 'AFRF', 'ATRFB', 'AFRFB'],
+            'CARFB':  ['TRF', 'AFRF', 'ATRFB', 'AFRFB'],
+            'CTARFB': ['TRF', 'AFRF', 'ATRFB', 'AFRFB'],
             'CAJ': 	  ['PFN'],
             'CPFN':   ['PFN'],
             'CPF': 	  ['APF-EPF-PPF', 'DPF-PCF'],
@@ -829,85 +845,367 @@
         };
 
         const marcosHistoricos = [
-            { data: "2000/06", serie: "CGG", 	evento: "Adoção da GCG pela CFC" },
+            { data: "2000/07", tipo: "x", serie: "CGG", 		evento: "Adoção da GCG em 25% do VB" },
+            { data: "2001/01", tipo: "x", serie: "CGG", 		evento: "Ajuste da GCG para 50% do VB" },
+            { data: "2003/12", tipo: "x", serie: "CGG", 		evento: "Ajuste da GCG para 30% do VB próprio e 25% do cargo" },
+            { data: "2004/08", tipo: "x", serie: "CGG", 		evento: "Ajuste da GCG para 40% do VB próprio e 37,5% do cargo" },
+            { data: "2005/04", tipo: "x", serie: "CGG", 		evento: "Ajuste da GCG para 50% do VB próprio e 50% do cargo" },
 
-            { data: "2004/08", serie: "TFC", 	evento: "Reajuste de VB apenas para TFC)" },
-            { data: "2005/04", serie: "TFC", 	evento: "Reajuste de VB apenas para TFC)" },
-            { data: "2006/07", serie: "AFC", 	evento: "Reajuste de VB também para AFC)" },
-            { data: "2008/07", serie: "CGG", 	evento: "Abandono do VB pela CFC" },
-            { data: "2008/07", serie: "CFC", 	evento: "Adoção do subsídio pela CFC" },
+		  //{ data: "2000/10", tipo: "+", serie: "CFC", 		evento: "Reajuste no VB para AFC e TFC" },
+            { data: "2000/10", tipo: "+", serie: "TFC (base)", 	evento: "Reajuste de +0,3% no VB+GCG para TFC" },
+            { data: "2000/10", tipo: "+", serie: "TFC (meio)", 	evento: "Reajuste de +3,6% no VB+GCG para TFC" },
+            { data: "2000/10", tipo: "+", serie: "TFC (topo)", 	evento: "Reajuste de +0,1% no VB+GCG para TFC" },
+            { data: "2000/10", tipo: "+", serie: "AFC (base)", 	evento: "Reajuste de +0,3% no VB+GCG para AFC" },
+            { data: "2000/10", tipo: "-", serie: "AFC (meio)", 	evento: "Reajuste de -1,5% no VB+GCG para AFC" },
+            { data: "2000/10", tipo: "+", serie: "AFC (topo)", 	evento: "Reajuste de +0,1% no VB+GCG para AFC" },
 
-            { data: "2008/07", serie: "CARF", 	evento: "Adoção do subsídio pela CARF" },
-            { data: "2016/09", serie: "CTARFB", evento: "Parcelas adiantadas do BEP" },
-            { data: "2024/03", serie: "CAF", 	evento: "Pagamento regulamentado do BEP" },
+		  //{ data: "2003/12", tipo: "+", serie: "CFC", 		evento: "Reajuste no VB para AFC e TFC" },
+            { data: "2003/12", tipo: "+", serie: "TFC (base)", 	evento: "Reajuste de 22,6% no VB+GCG para TFC" },
+            { data: "2003/12", tipo: "+", serie: "TFC (meio)", 	evento: "Reajuste de 20,5% no VB+GCG para TFC" },
+            { data: "2003/12", tipo: "+", serie: "TFC (topo)", 	evento: "Reajuste de 25,6% no VB+GCG para TFC" },
+            { data: "2003/12", tipo: "+", serie: "AFC (base)", 	evento: "Reajuste de 26,6% no VB+GCG para AFC" },
+            { data: "2003/12", tipo: "+", serie: "AFC (meio)", 	evento: "Reajuste de 15,4% no VB+GCG para AFC" },
+            { data: "2003/12", tipo: "+", serie: "AFC (topo)", 	evento: "Reajuste de 3,5% no VB+GCG para AFC" },
+
+          //{ data: "2004/08", tipo: "+", serie: "TFC", 		evento: "Reajuste no VB apenas para TFC" },
+            { data: "2004/08", tipo: "+", serie: "TFC", 		evento: "Reajuste de 1% no VB de TFC" },
+			{ data: "2004/08", tipo: "0", serie: "AFC", 		evento: "Reajuste de 0% no VB de AFC" },
+
+          //{ data: "2005/04", tipo: "+", serie: "TFC", 		evento: "Reajuste no VB apenas para TFC" },
+			{ data: "2005/04", tipo: "+", serie: "TFC", 		evento: "Reajuste de 15% no VB de TFC" },
+			{ data: "2005/04", tipo: "0", serie: "AFC", 		evento: "Reajuste de 0% no VB de AFC" },
+		  
+          //{ data: "2006/07", tipo: "+", serie: "TFC", 		evento: "Reajuste no VB também para AFC" },
+            { data: "2006/07", tipo: "+", serie: "TFC", 		evento: "Reajuste de 20,0% no VB de TFC" },
+          //{ data: "2006/07", tipo: "+", serie: "AFC", 		evento: "Reajuste no VB também para AFC" },
+            { data: "2006/07", tipo: "+", serie: "AFC", 		evento: "Reajuste de 21,2% no VB de AFC" },
+
+            { data: "2007/07", tipo: "+", serie: "CFC", 		evento: "Reajuste de 4% no VB de TFC e AFC" },
+          //{ data: "2008/07", tipo: "+", serie: "CFC", 		evento: "Reajuste de 4% no VB de TFC e AFC" },
+          //{ data: "2009/07", tipo: "+", serie: "CFC", 		evento: "Reajuste de 4% no VB de TFC e AFC" },
+
+            { data: "2008/06", tipo: "x", serie: "CFC", 		evento: "Abandono do VB pela CFC" },
+			
+          //{ data: "2008/07", tipo: "+", serie: "CFC", 		evento: "Adoção do subsídio pela CFC (87% das CAF e CAJ)" },
+            { data: "2008/07", tipo: "+", serie: "TFC (base)", 	evento: "Adoção do subsídio com +25,1% para TFC (87% das CAF e CAJ)" },
+            { data: "2008/07", tipo: "+", serie: "TFC (meio)", 	evento: "Adoção do subsídio com +28,1% para TFC (87% das CAF e CAJ)" },
+            { data: "2008/07", tipo: "+", serie: "TFC (topo)", 	evento: "Adoção do subsídio com +31,8% para TFC (87% das CAF e CAJ)" },
+            { data: "2008/07", tipo: "+", serie: "AFC (base)", 	evento: "Adoção do subsídio com +28,5% para AFC (87% das CAF e CAJ)" },
+            { data: "2008/07", tipo: "+", serie: "AFC (meio)", 	evento: "Adoção do subsídio com +27,1% para AFC (87% das CAF e CAJ)" },
+            { data: "2008/07", tipo: "+", serie: "AFC (topo)", 	evento: "Adoção do subsídio com +23,2% para AFC (87% das CAF e CAJ)" },
+
+          //{ data: "2009/07", tipo: "+", serie: "CFC", 		evento: "Reajuste no subsídio para CFC (95% das CAF e CAJ)" },
+            { data: "2009/07", tipo: "+", serie: "TFC (base)", 	evento: "Reajuste de 0,2% no subsídio de TFC (95% das CAF e CAJ)" },
+            { data: "2009/07", tipo: "+", serie: "TFC (meio)", 	evento: "Reajuste de 3,8% no subsídio de TFC (95% das CAF e CAJ)" },
+            { data: "2009/07", tipo: "+", serie: "TFC (topo)", 	evento: "Reajuste de 5,8% no subsídio de TFC (95% das CAF e CAJ)" },
+            { data: "2009/07", tipo: "+", serie: "AFC (base)", 	evento: "Reajuste de 13,8% no subsídio de AFC (95% das CAF e CAJ)" },
+            { data: "2009/07", tipo: "+", serie: "AFC (meio)", 	evento: "Reajuste de 20,2% no subsídio de AFC (95% das CAF e CAJ)" },
+            { data: "2009/07", tipo: "+", serie: "AFC (topo)", 	evento: "Reajuste de 19,5% no subsídio de AFC (95% das CAF e CAJ)" },
+
+          //{ data: "2010/07", tipo: "+", serie: "CFC", 		evento: "Reajuste no subsídio para CFC (95% das CAF e CAJ)" },
+            { data: "2010/07", tipo: "+", serie: "TFC (base)", 	evento: "Reajuste de 0,4% no subsídio de TFC (95% das CAF e CAJ)" },
+            { data: "2010/07", tipo: "+", serie: "TFC (meio)", 	evento: "Reajuste de 10,3% no subsídio de TFC (95% das CAF e CAJ)" },
+            { data: "2010/07", tipo: "+", serie: "TFC (topo)", 	evento: "Reajuste de 12,1% no subsídio de TFC (95% das CAF e CAJ)" },
+            { data: "2010/07", tipo: "+", serie: "AFC (base)", 	evento: "Reajuste de 4,4% no subsídio de AFC (95% das CAF e CAJ)" },
+            { data: "2010/07", tipo: "+", serie: "AFC (meio)", 	evento: "Reajuste de 5,6% no subsídio de AFC (95% das CAF e CAJ)" },
+            { data: "2010/07", tipo: "+", serie: "AFC (topo)", 	evento: "Reajuste de 6,5% no subsídio de AFC (95% das CAF e CAJ)" },
+
+            { data: "2013/01", tipo: "+", serie: "CFC", 		evento: "Reajuste de 5,0% no subsídio para CFC" },
+            { data: "2014/01", tipo: "+", serie: "CFC", 		evento: "Reajuste de 4,9% no subsídio para CFC" },
+            { data: "2015/01", tipo: "+", serie: "CFC", 		evento: "Reajuste de 5,1% no subsídio para CFC" },
+
+            { data: "2016/08", tipo: "+", serie: "CFC", 		evento: "Reajuste de 5,50% no subsídio para CFC" },
+            { data: "2017/01", tipo: "+", serie: "CFC", 		evento: "Reajuste de 6,98% no subsídio para CFC" },
+            { data: "2018/01", tipo: "+", serie: "CFC", 		evento: "Reajuste de 6,64% no subsídio para CFC" },
+            { data: "2019/01", tipo: "+", serie: "CFC", 		evento: "Reajuste de 6,31% no subsídio para CFC" },
+
+            { data: "2023/05", tipo: "+", serie: "CFC", 		evento: "Reajuste de 9% no subsídio para CFC" },
+
+            { data: "2025/01", tipo: "-", serie: "TFFC (base)", evento: "Reajuste de -6,1% no subsídio de TFFC" },
+            { data: "2025/01", tipo: "+", serie: "TFFC (meio)", evento: "Reajuste de +1,6% no subsídio de TFFC" },
+            { data: "2025/01", tipo: "+", serie: "TFFC (topo)", evento: "Reajuste de +11,4% no subsídio de TFFC" },
+            { data: "2025/01", tipo: "-", serie: "AFFC (base)", evento: "Reajuste de -13,8% no subsídio de AFFC" },
+            { data: "2025/01", tipo: "-", serie: "AFFC (meio)", evento: "Reajuste de -3,2% no subsídio de AFFC" },
+            { data: "2025/01", tipo: "+", serie: "AFFC (topo)", evento: "Reajuste de +10,9% no subsídio de AFFC" },
+
+            { data: "2026/04", tipo: "+", serie: "TFFC", 		evento: "Reajuste de 11,4% no subsídio de TFFC" },
+            { data: "2026/04", tipo: "+", serie: "AFFC", 		evento: "Reajuste de 10,9% no subsídio de AFFC" },
 
 
-            { data: "2000/03", serie: "STF", evento: "VB + RM + Parcelas" },
-            { data: "2005/01", serie: "STF", evento: "Adoção do Subsídio" },
-            { data: "2006/07", serie: "STF", evento: "Reajuste" },
-            { data: "2007/07", serie: "STF", evento: "Reajuste" },
-            { data: "2013/01", serie: "STF", evento: "Reajuste (Parcela 1/3)" },
-            { data: "2014/01", serie: "STF", evento: "Reajuste (Parcela 2/3)" },
-            { data: "2015/01", serie: "STF", evento: "Reajuste repactuado (Parcela 3/3)" },
-            { data: "2018/11", serie: "STF", evento: "Reajuste" },
-            { data: "2023/04", serie: "STF", evento: "Reajuste (Parcela 1/3)" },
-            { data: "2024/02", serie: "STF", evento: "Reajuste (Parcela 2/3)" },
-            { data: "2025/02", serie: "STF", evento: "Reajuste (Parcela 3/3)" },
+            { data: "2008/06", tipo: "x", serie: "CARFB", 		 evento: "Abandono do VB pela CARFB" },
+			{ data: "2008/07", tipo: "x", serie: "CARFB", 		 evento: "Adoção do subsídio pela CARFB" },
 
-            { data: "2003/12", serie: "ALL", 	evento: "Fim da paridade e integralidade (EC 41/2003)" },
-            { data: "2012/05", serie: "ALL", 	evento: "Regime de previdência complementar (EC 20/1998)" },
-            { data: "2019/11", serie: "ALL", 	evento: "Nova reforma previdenciária (EC 103/2019)" }
-/*
-            // Aplica a todos os níveis apenas dos Auditores
-            { data: "2016/12", serie: "AFRFB", 	evento: "Retorno ao VB + Bônus de Eficiência (BEP)" },
-            
-            // Aplica a todos os níveis da PGFN
-            { data: "2016/08", serie: "CAJ", 	evento: "Início do rateio de Honorários (HAS)" },
-            
-            // Aplica APENAS à linha específica dos inativos da PGFN
-            { data: "2023/01", serie: "PFN (aposentado)", evento: "Início da aplicação do piso de 52,04%" },
-            
-            // Aplica a todos os 5 cargos da Polícia Federal
-            { data: "2006/03", serie: "CPF", 	evento: "Implementação do Subsídio Policial" },
+            { data: "2009/07", tipo: "+", serie: "ATRFB (base)", evento: "Reajuste de 7,5% no subsídio de ATRFB" },
+            { data: "2009/07", tipo: "+", serie: "ATRFB (meio)", evento: "Reajuste de 9,5% no subsídio de ATRFB" },
+            { data: "2009/07", tipo: "+", serie: "ATRFB (topo)", evento: "Reajuste de 12,2% no subsídio de ATRFB" },
+            { data: "2009/07", tipo: "+", serie: "AFRFB (base)", evento: "Reajuste de 4,2% no subsídio de AFRFB" },
+            { data: "2009/07", tipo: "+", serie: "AFRFB (meio)", evento: "Reajuste de 9,8% no subsídio de AFRFB" },
+            { data: "2009/07", tipo: "+", serie: "AFRFB (topo)", evento: "Reajuste de 9,5% no subsídio de AFRFB" },
 
-            // Aplica ao STF
-            { data: "2025/02", serie: "STF", 	evento: "Último reajuste do teto constitucional" }
+            { data: "2010/07", tipo: "+", serie: "ATRFB (base)", evento: "Reajuste de 4,9% no subsídio de ATRFB" },
+            { data: "2010/07", tipo: "+", serie: "ATRFB (meio)", evento: "Reajuste de 6,0% no subsídio de ATRFB" },
+            { data: "2010/07", tipo: "+", serie: "ATRFB (topo)", evento: "Reajuste de 9,3% no subsídio de ATRFB" },
+            { data: "2010/07", tipo: "+", serie: "AFRFB (base)", evento: "Reajuste de 4,1% no subsídio de AFRFB" },
+            { data: "2010/07", tipo: "+", serie: "AFRFB (meio)", evento: "Reajuste de 5,6% no subsídio de AFRFB" },
+            { data: "2010/07", tipo: "+", serie: "AFRFB (topo)", evento: "Reajuste de 6,5% no subsídio de AFRFB" },
 
-            // ==========================================
-            // MARCOS GERAIS (Todas as carreiras)
-            // ==========================================
-            { data: "2003/12", serie: "ALL", 	evento: "Fim da paridade e integralidade (EC 41/2003)" },
-            { data: "2012/05", serie: "ALL", 	evento: "Regime de previdência complementar (EC 20/1998)" },
-            { data: "2019/11", serie: "ALL", 	evento: "Nova reforma previdenciária (EC 103/2019)" },
+            { data: "2013/01", tipo: "+", serie: "CARFB", 		 evento: "Reajuste de 5,0% no subsídio para CARFB" },
+            { data: "2014/01", tipo: "+", serie: "CARFB", 		 evento: "Reajuste de 4,8% no subsídio para CARFB" },
+            { data: "2015/01", tipo: "+", serie: "CARFB", 		 evento: "Reajuste de 5,2% no subsídio para CARFB" },
 
-            // ==========================================
-            // GESTÃO GOVERNAMENTAL (CGG / CFC)
-            // ==========================================
-            { data: "2004/08", serie: "TFC", 	evento: "Reajuste de VB apenas para TFC" },
-            { data: "2005/04", serie: "TFC", 	evento: "Reajuste de VB apenas para TFC" },
-            { data: "2005/04", serie: "AFC", 	evento: "Reajuste de VB também para AFC" },
-            { data: "2008/07", serie: "CFC", 	evento: "Adoção do subsídio pela CFC" },
+            { data: "2016/11", tipo: "x", serie: "CTARFB", 		 evento: "Abandono do subsídio pela CTARFB" },
 
-            // ==========================================
-            // AUDITORIA E TRIBUTAÇÃO (CARF / CAF)
-            // ==========================================
-            { data: "2008/07", serie: "CARF", 	evento: "Adoção do subsídio pela CARF" },
-            { data: "2016/09", serie: "CTARFB", evento: "Parcelas adiantadas do BEP" },
-            { data: "2016/12", serie: "AFRFB", 	evento: "Retorno ao VB + Bônus de Eficiência (BEP)" },
-            { data: "2024/03", serie: "CAF", 	evento: "Pagamento regulamentado do BEP" },
+            { data: "2016/12", tipo: "+", serie: "ATRFB (base)", evento: "Readoção do VB com +9,83% para ATRFB" },
+            { data: "2016/12", tipo: "+", serie: "ATRFB (meio)", evento: "Readoção do VB com +9,72% para ATRFB" },
+            { data: "2016/12", tipo: "+", serie: "ATRFB (topo)", evento: "Readoção do VB com +5,50% para ATRFB" },
+            { data: "2016/12", tipo: "+", serie: "AFRFB (base)", evento: "Readoção do VB com +16,21% para AFRFB" },
+            { data: "2016/12", tipo: "+", serie: "AFRFB (meio)", evento: "Readoção do VB com +7,61% para AFRFB" },
+            { data: "2016/12", tipo: "+", serie: "AFRFB (topo)", evento: "Readoção do VB com +5,50% para AFRFB" },
 
-            // ==========================================
-            // ÁREA JURÍDICA (CAJ / PFN)
-            // ==========================================
-            { data: "2016/08", serie: "CAJ", 	evento: "Início do rateio de Honorários (HAS)" },
-            { data: "2023/01", serie: "PFN (aposentado)", evento: "Início da aplicação do piso de 52,04%" },
+            { data: "2017/01", tipo: "+", serie: "CTARFB", 		 evento: "Reajuste de 5,00% no VB para CTARFB" },
+            { data: "2018/01", tipo: "+", serie: "CTARFB", 		 evento: "Reajuste de 4,75% no VB para CTARFB" },
+            { data: "2019/01", tipo: "+", serie: "CTARFB", 		 evento: "Reajuste de 4,50% no VB para CTARFB" },
 
-            // ==========================================
-            // POLÍCIA FEDERAL (CPF) E STF
-            // ==========================================
-            { data: "2006/03", serie: "CPF", 	evento: "Implementação do Subsídio Policial" },
-            { data: "2025/02", serie: "STF", 	evento: "Último reajuste do teto constitucional" }
-*/
+            { data: "2023/05", tipo: "+", serie: "CTARFB", 		 evento: "Reajuste de 9% no VB para CTARFB" },
+
+            { data: "2026/04", tipo: "0", serie: "ATRFB (base)", evento: "Reajuste de 0,00% no VB de ATRFB" },
+            { data: "2026/04", tipo: "0", serie: "AFRFB (base)", evento: "Reajuste de 0,00% no VB de AFRFB" },
+            { data: "2026/04", tipo: "0", serie: "ATRFB (meio)", evento: "Reajuste de 0,00% no VB de ATRFB" },
+            { data: "2026/04", tipo: "0", serie: "AFRFB (meio)", evento: "Reajuste de 0,00% no VB de AFRFB" },
+            { data: "2026/04", tipo: "+", serie: "ATRFB (topo)", evento: "Reajuste de 9,22% no VB de ATRFB" },
+            { data: "2026/04", tipo: "+", serie: "AFRFB (topo)", evento: "Reajuste de 9,22% no VB de AFRFB" },
+
+            { data: "2016/09", tipo: "x", serie: "ATRFB (meio)", evento: "Parcelas antecipadas do BEP (R$ 7.500 × 2 = 3.000 × 5)" },
+            { data: "2016/09", tipo: "x", serie: "ATRFB (topo)", evento: "Parcelas antecipadas do BEP (R$ 7.500 × 2 = 3.000 × 5)" },
+            { data: "2016/09", tipo: "x", serie: "AFRFB (meio)", evento: "Parcelas antecipadas do BEP (R$ 4.500 × 2 = 1.800 × 5)" },
+            { data: "2016/09", tipo: "x", serie: "AFRFB (topo)", evento: "Parcelas antecipadas do BEP (R$ 4.500 × 2 = 1.800 × 5)" },
+
+            { data: "2017/02", tipo: "x", serie: "ATRFB (meio)", evento: "Pagamento não-regulamentado do BEP (R$ 3.000)" },
+            { data: "2017/02", tipo: "x", serie: "ATRFB (topo)", evento: "Pagamento não-regulamentado do BEP (R$ 3.000)" },
+            { data: "2017/02", tipo: "x", serie: "AFRFB (meio)", evento: "Pagamento não-regulamentado do BEP (R$ 1.800)" },
+            { data: "2017/02", tipo: "x", serie: "AFRFB (topo)", evento: "Pagamento não-regulamentado do BEP (R$ 1.800)" },
+
+            { data: "2024/03", tipo: "x", serie: "ATRFB (meio)", evento: "Pagamento regulamentado do BEP (R$ 4.500)" },
+            { data: "2024/03", tipo: "x", serie: "ATRFB (topo)", evento: "Pagamento regulamentado do BEP (R$ 4.500)" },
+            { data: "2024/03", tipo: "x", serie: "AFRFB (meio)", evento: "Pagamento regulamentado do BEP (R$ 2.700)" },
+            { data: "2024/03", tipo: "x", serie: "AFRFB (topo)", evento: "Pagamento regulamentado do BEP (R$ 2.700)" },
+
+            { data: "2024/08", tipo: "x", serie: "ATRFB (meio)", evento: "Primeiro incremento do BEP (R$ 5.000)" },
+            { data: "2024/08", tipo: "x", serie: "ATRFB (topo)", evento: "Primeiro incremento do BEP (R$ 5.000)" },
+            { data: "2024/08", tipo: "x", serie: "AFRFB (meio)", evento: "Primeiro incremento do BEP (R$ 3.000)" },
+            { data: "2024/08", tipo: "x", serie: "AFRFB (topo)", evento: "Primeiro incremento do BEP (R$ 3.000)" },
+
+            { data: "2025/02", tipo: "x", serie: "ATRFB (meio)", evento: "Segundo incremento do BEP (R$ 7.000)" },
+            { data: "2025/02", tipo: "x", serie: "ATRFB (topo)", evento: "Segundo incremento do BEP (R$ 7.000)" },
+            { data: "2025/02", tipo: "x", serie: "AFRFB (meio)", evento: "Segundo incremento do BEP (R$ 4.200)" },
+            { data: "2025/02", tipo: "x", serie: "AFRFB (topo)", evento: "Segundo incremento do BEP (R$ 2.200)" },
+
+            { data: "2025/11", tipo: "x", serie: "ATRFB (meio)", evento: "Terceiro incremento do BEP (R$ 8.700)" },
+            { data: "2025/11", tipo: "x", serie: "ATRFB (topo)", evento: "Terceiro incremento do BEP (R$ 8.700)" },
+            { data: "2025/11", tipo: "x", serie: "AFRFB (meio)", evento: "Terceiro incremento do BEP (R$ 5.220)" },
+            { data: "2025/11", tipo: "x", serie: "AFRFB (topo)", evento: "Terceiro incremento do BEP (R$ 5.220)" },
+			
+            { data: "2026/02", tipo: "x", serie: "ATRFB (meio)", evento: "Quarto incremento do BEP (R$ 11.500)" },
+            { data: "2026/02", tipo: "x", serie: "ATRFB (topo)", evento: "Quarto incremento do BEP (R$ 11.500)" },
+            { data: "2026/02", tipo: "x", serie: "AFRFB (meio)", evento: "Quarto incremento do BEP (R$ 6.900)" },
+            { data: "2026/02", tipo: "x", serie: "AFRFB (topo)", evento: "Quarto incremento do BEP (R$ 6.900)" },
+
+            { data: "2027/02", tipo: "x", serie: "ATRFB (meio)", evento: "Correção inflacionária do BEP (R$ 12.042,80 = 11.500 + 4,72%)" },
+            { data: "2027/02", tipo: "x", serie: "ATRFB (topo)", evento: "Correção inflacionária do BEP (R$ 12.042,80 = 11.500 + 4,72%)" },
+            { data: "2027/02", tipo: "x", serie: "AFRFB (meio)", evento: "Correção inflacionária do BEP (R$ 7.225,68 = 6.900 + 4,72%)" },
+            { data: "2027/02", tipo: "x", serie: "AFRFB (topo)", evento: "Correção inflacionária do BEP (R$ 7.225,68 = 6.900 + 4,72%)" },
+
+
+            { data: "2006/06", tipo: "x", serie: "CPFN", 	   evento: "Abandono do VB pela CPFN" },
+			{ data: "2006/07", tipo: "x", serie: "CPFN", 	   evento: "Adoção do subsídio pela CPFN" },
+
+            { data: "2007/01", tipo: "+", serie: "PFN (base)", evento: "Reajuste de 10,5% no subsídio de PFN" },
+            { data: "2007/01", tipo: "+", serie: "PFN (meio)", evento: "Reajuste de 7,77% no subsídio de PFN" },
+            { data: "2007/01", tipo: "+", serie: "PFN (topo)", evento: "Reajuste de 8,86% no subsídio de PFN" },
+
+            { data: "2008/01", tipo: "+", serie: "PFN (base)", evento: "Reajuste de 7,06% no subsídio de PFN" },
+            { data: "2008/01", tipo: "+", serie: "PFN (meio)", evento: "Reajuste de 8,55% no subsídio de PFN" },
+            { data: "2008/01", tipo: "+", serie: "PFN (topo)", evento: "Reajuste de 15,93% no subsídio de PFN" },
+
+            { data: "2008/07", tipo: "+", serie: "PFN (base)", evento: "Reajuste de 25,0% no subsídio de PFN" },
+            { data: "2008/07", tipo: "+", serie: "PFN (meio)", evento: "Reajuste de 25,6% no subsídio de PFN" },
+            { data: "2008/07", tipo: "+", serie: "PFN (topo)", evento: "Reajuste de 11,5% no subsídio de PFN" },
+
+            { data: "2009/07", tipo: "+", serie: "PFN (base)", evento: "Reajuste de 3,56% no subsídio de PFN" },
+            { data: "2009/07", tipo: "+", serie: "PFN (meio)", evento: "Reajuste de 3,56% no subsídio de PFN" },
+            { data: "2009/07", tipo: "+", serie: "PFN (topo)", evento: "Reajuste de 9,47% no subsídio de PFN" },
+
+            { data: "2010/07", tipo: "+", serie: "PFN (base)", evento: "Reajuste de 2,89% no subsídio de PFN" },
+            { data: "2010/07", tipo: "+", serie: "PFN (meio)", evento: "Reajuste de 3,72% no subsídio de PFN" },
+            { data: "2010/07", tipo: "+", serie: "PFN (topo)", evento: "Reajuste de 6,52% no subsídio de PFN" },
+
+            { data: "2013/01", tipo: "+", serie: "CPFN", 	   evento: "Reajuste de 5,0% no subsídio de PFN" },
+            { data: "2014/01", tipo: "+", serie: "CPFN", 	   evento: "Reajuste de 4,9% no subsídio de PFN" },
+            { data: "2015/01", tipo: "+", serie: "CPFN", 	   evento: "Reajuste de 5,1% no subsídio de PFN" },
+
+            { data: "2016/08", tipo: "+", serie: "CPFN", 	   evento: "Reajuste de 5,50% no subsídio de PFN" },
+            { data: "2017/01", tipo: "+", serie: "CPFN", 	   evento: "Reajuste de 5,00% no subsídio de PFN" },
+            { data: "2018/01", tipo: "+", serie: "CPFN", 	   evento: "Reajuste de 4,75% no subsídio de PFN" },
+            { data: "2019/01", tipo: "+", serie: "CPFN", 	   evento: "Reajuste de 4,50% no subsídio de PFN" },
+
+            { data: "2023/05", tipo: "+", serie: "CPFN", 	   evento: "Reajuste de 9% no subsídio de PFN" },
+
+            { data: "2025/01", tipo: "+", serie: "PFN (base)", evento: "Reajuste de 9% no subsídio de PFN" },
+            { data: "2025/01", tipo: "0", serie: "PFN (meio)", evento: "Reajuste de 0% no subsídio de PFN" },
+            { data: "2025/01", tipo: "0", serie: "PFN (topo)", evento: "Reajuste de 0% no subsídio de PFN" },
+
+            { data: "2025/06", tipo: "0", serie: "PFN (base)", evento: "Reajuste de 0% no subsídio de PFN" },
+            { data: "2025/06", tipo: "+", serie: "PFN (meio)", evento: "Reajuste de 9% no subsídio de PFN" },
+            { data: "2025/06", tipo: "+", serie: "PFN (topo)", evento: "Reajuste de 9% no subsídio de PFN" },
+
+            { data: "2026/04", tipo: "+", serie: "CPFN", 	   evento: "Reajuste de 9,2% no subsídio de PFN" },
+
+            { data: "2016/08", tipo: "x", serie: "PFN (meio)", evento: "Pagamento não-regulamentado do HAS (R$ 3.000)" },
+            { data: "2016/08", tipo: "x", serie: "PFN (topo)", evento: "Pagamento não-regulamentado do HAS (R$ 3.000)" },
+
+            { data: "2017/01", tipo: "x", serie: "PFN (meio)", evento: "Pagamento regulamentado do HAS (R$ 3.744,01)" },
+            { data: "2017/01", tipo: "x", serie: "PFN (topo)", evento: "Pagamento regulamentado do HAS (R$ 3.744,01)" },
+
+            { data: "2022/11", tipo: "x", serie: "PFN",		   evento: "Começo do \"13º salário\" via CCHA (rateio extraordiário)" },
+
+            { data: "2022/12", tipo: "x", serie: "PFN",		   evento: "Última \"escadinha\" do HAS em 37% = (100% - 7% × 9)" },
+          //{ data: "2023/01", tipo: "x", serie: "PFN",		   evento: "Mudança de  para 52% na \"escadinha\" do HAS" },
+            { data: "2023/01", tipo: "x", serie: "PFN",		   evento: "Primeira \"escadinha\" do HAS em 52% ≈ (100% - 7%)⁹" },
+
+            { data: "2023/02", tipo: "x", serie: "PFN",		   evento: "Começo do \"abate-teto\" no HAS (R$ -1,84)" },
+
+            { data: "2024/05", tipo: "x", serie: "PFN",		   evento: "Reembolso de anuidade da OAB via CCHA (R$ 12.600)" },
+
+            { data: "2024/10", tipo: "x", serie: "PFN",		   evento: "Começo do \"suplemento-saúde\" via CCHA (R$ 3.000)" },
+            { data: "2024/10", tipo: "x", serie: "PFN",		   evento: "Começo do \"suplemento-alimentação\" via CCHA (R$ 393,11)" },
+
+            { data: "2025/01", tipo: "x", serie: "PFN",		   evento: "Primeiros retroativos via CCHA (alimentação & saúde)" },
+
+            { data: "2025/02", tipo: "x", serie: "PFN",		   evento: "Equalização do \"suplemento-alimentação\" via CCHA (R$ 784,42)" },
+
+            { data: "2025/06", tipo: "x", serie: "PFN",		   evento: "Fixação do \"suplemento-alimentação\" via CCHA (R$ 1.000)" },
+            { data: "2025/06", tipo: "x", serie: "PFN",		   evento: "Incremento do \"suplemento-saúde\" via CCHA (R$ 4.200)" },
+
+            { data: "2025/07", tipo: "x", serie: "PFN",		   evento: "Começo do \"⅓ de férias\" via CCHA" },
+            { data: "2025/07", tipo: "x", serie: "PFN",		   evento: "Segundos retroativos via CCHA (férias)" },
+
+            { data: "2025/12", tipo: "x", serie: "PFN",		   evento: "Limitação do \"reembolso-saúde\" a 10% do teto (R$ 4.636,62)" },
+
+            { data: "2026/01", tipo: "x", serie: "PFN",		   evento: "Hibridização do \"suplemento-alimentação\" via CCHA (R$ 1.784,42)" },
+
+            { data: "2026/05", tipo: "x", serie: "PFN",		   evento: "Limitação do \"reembolso-saúde\" a 15% do teto (R$ 6.954,93)" },
+			
+			{ data: "2026/07", tipo: "x", serie: "PFN",		   evento: "Arredondamento do \"suplemento-alimentação\" via CCHA (R$ 2.000)" },
+
+
+            { data: "2006/06", tipo: "x", serie: "CPF", 	           evento: "Abandono do VB pela CPF" },
+			{ data: "2006/07", tipo: "x", serie: "CPF", 	           evento: "Adoção do subsídio pela CPF" },
+
+            { data: "2007/09", tipo: "+", serie: "APF-EPF-PPF (base)", evento: "Reajuste de 6,36% no subsídio de APF-EPF-PPF" },
+            { data: "2007/09", tipo: "+", serie: "APF-EPF-PPF (meio)", evento: "Reajuste de 6,68% no subsídio de APF-EPF-PPF" },
+            { data: "2007/09", tipo: "+", serie: "APF-EPF-PPF (topo)", evento: "Reajuste de 7,36% no subsídio de APF-EPF-PPF" },
+            { data: "2007/09", tipo: "+", serie: "DPF-PCF (base)",     evento: "Reajuste de 6,92% no subsídio de DPF-PCF" },
+            { data: "2007/09", tipo: "+", serie: "DPF-PCF (meio)",     evento: "Reajuste de 6,92% no subsídio de DPF-PCF" },
+            { data: "2007/09", tipo: "+", serie: "DPF-PCF (topo)",     evento: "Reajuste de 8,40% no subsídio de DPF-PCF" },
+
+            { data: "2008/02", tipo: "+", serie: "APF-EPF-PPF (base)", evento: "Reajuste de 10,96% no subsídio de APF-EPF-PPF" },
+            { data: "2008/02", tipo: "+", serie: "APF-EPF-PPF (meio)", evento: "Reajuste de 11,48% no subsídio de APF-EPF-PPF" },
+            { data: "2008/02", tipo: "+", serie: "APF-EPF-PPF (topo)", evento: "Reajuste de 12,57% no subsídio de APF-EPF-PPF" },
+            { data: "2008/02", tipo: "+", serie: "DPF-PCF (base)",     evento: "Reajuste de 11,87% no subsídio de DPF-PCF" },
+            { data: "2008/02", tipo: "+", serie: "DPF-PCF (meio)",     evento: "Reajuste de 11,87% no subsídio de DPF-PCF" },
+            { data: "2008/02", tipo: "+", serie: "DPF-PCF (topo)",     evento: "Reajuste de 14,20% no subsídio de DPF-PCF" },
+
+            { data: "2009/02", tipo: "+", serie: "APF-EPF-PPF (base)", evento: "Reajuste de 2,69% no subsídio de APF-EPF-PPF" },
+            { data: "2009/02", tipo: "+", serie: "APF-EPF-PPF (meio)", evento: "Reajuste de 2,81% no subsídio de APF-EPF-PPF" },
+            { data: "2009/02", tipo: "+", serie: "APF-EPF-PPF (topo)", evento: "Reajuste de 3,04% no subsídio de APF-EPF-PPF" },
+            { data: "2009/02", tipo: "+", serie: "DPF-PCF (base)",     evento: "Reajuste de 2,89% no subsídio de DPF-PCF" },
+            { data: "2009/02", tipo: "+", serie: "DPF-PCF (meio)",     evento: "Reajuste de 2,89% no subsídio de DPF-PCF" },
+            { data: "2009/02", tipo: "+", serie: "DPF-PCF (topo)",     evento: "Reajuste de 3,39% no subsídio de DPF-PCF" },
+
+            { data: "2013/01", tipo: "+", serie: "APF-EPF-PPF",        evento: "Reajuste de 0% no subsídio de APF-EPF-PPF" },
+            { data: "2013/01", tipo: "+", serie: "DPF-PCF",            evento: "Reajuste de 5% no subsídio de DPF-PCF" },
+
+            { data: "2014/01", tipo: "+", serie: "APF-EPF-PPF",        evento: "Reajuste de 0,0% no subsídio de APF-EPF-PPF" },
+            { data: "2014/01", tipo: "+", serie: "DPF-PCF (base)",     evento: "Reajuste de 9,5% no subsídio de DPF-PCF" },
+            { data: "2014/01", tipo: "+", serie: "DPF-PCF (meio)",     evento: "Reajuste de 5,0% no subsídio de DPF-PCF" },
+            { data: "2014/01", tipo: "+", serie: "DPF-PCF (topo)",     evento: "Reajuste de 5,0% no subsídio de DPF-PCF" },
+
+            { data: "2014/06", tipo: "+", serie: "APF-EPF-PPF (base)", evento: "Reajuste de 12% no subsídio de DPF-PCF" },
+            { data: "2014/06", tipo: "+", serie: "APF-EPF-PPF (meio)", evento: "Reajuste de 12% no subsídio de DPF-PCF" },
+            { data: "2014/06", tipo: "+", serie: "APF-EPF-PPF (topo)", evento: "Reajuste de 12% no subsídio de DPF-PCF" },
+            { data: "2014/06", tipo: "+", serie: "DPF-PCF",            evento: "Reajuste de 0% no subsídio de APF-EPF-PPF" },
+
+            { data: "2015/01", tipo: "+", serie: "APF-EPF-PPF",        evento: "Reajuste de 3,4% no subsídio de APF-EPF-PPF" },
+            { data: "2015/01", tipo: "+", serie: "DPF-PCF (base)",     evento: "Reajuste de 9,5% no subsídio de DPF-PCF" },
+            { data: "2015/01", tipo: "+", serie: "DPF-PCF (meio)",     evento: "Reajuste de 5,0% no subsídio de DPF-PCF" },
+            { data: "2015/01", tipo: "+", serie: "DPF-PCF (topo)",     evento: "Reajuste de 5,0% no subsídio de DPF-PCF" },
+
+            { data: "2017/01", tipo: "+", serie: "APF-EPF-PPF (base)", evento: "Reajuste de 31,46% no subsídio de APF-EPF-PPF" },
+            { data: "2017/01", tipo: "+", serie: "APF-EPF-PPF (meio)", evento: "Reajuste de 28,69% no subsídio de APF-EPF-PPF" },
+            { data: "2017/01", tipo: "+", serie: "APF-EPF-PPF (topo)", evento: "Reajuste de 23,86% no subsídio de APF-EPF-PPF" },
+            { data: "2017/01", tipo: "+", serie: "DPF-PCF (base)",     evento: "Reajuste de 28,60% no subsídio de DPF-PCF" },
+            { data: "2017/01", tipo: "+", serie: "DPF-PCF (meio)",     evento: "Reajuste de 26,74% no subsídio de DPF-PCF" },
+            { data: "2017/01", tipo: "+", serie: "DPF-PCF (topo)",     evento: "Reajuste de 23,93% no subsídio de DPF-PCF" },
+
+            { data: "2018/01", tipo: "+", serie: "CPF", 	           evento: "Reajuste de 4,75% no subsídio para CPF" },
+
+            { data: "2019/01", tipo: "+", serie: "CPF", 	           evento: "Reajuste de 4,5% no subsídio para CPF" },
+
+            { data: "2023/05", tipo: "+", serie: "CPF", 	           evento: "Reajuste de 9% no subsídio para CPF" },
+
+            { data: "2024/08", tipo: "+", serie: "APF-EPF-PPF (base)", evento: "Reajuste de 1,84% no subsídio de APF-EPF-PPF" },
+            { data: "2024/08", tipo: "+", serie: "APF-EPF-PPF (meio)", evento: "Reajuste de 3,00% no subsídio de APF-EPF-PPF" },
+            { data: "2024/08", tipo: "+", serie: "APF-EPF-PPF (topo)", evento: "Reajuste de 3,00% no subsídio de APF-EPF-PPF" },
+            { data: "2024/08", tipo: "+", serie: "DPF-PCF (base)",     evento: "Reajuste de 1,84% no subsídio de DPF-PCF" },
+            { data: "2024/08", tipo: "+", serie: "DPF-PCF (meio)",     evento: "Reajuste de 3,00% no subsídio de DPF-PCF" },
+            { data: "2024/08", tipo: "+", serie: "DPF-PCF (topo)",     evento: "Reajuste de 3,00% no subsídio de DPF-PCF" },
+
+            { data: "2025/05", tipo: "+", serie: "APF-EPF-PPF (base)", evento: "Reajuste de 1,9% no subsídio de APF-EPF-PPF" },
+            { data: "2025/05", tipo: "+", serie: "APF-EPF-PPF (meio)", evento: "Reajuste de 5,0% no subsídio de APF-EPF-PPF" },
+            { data: "2025/05", tipo: "+", serie: "APF-EPF-PPF (topo)", evento: "Reajuste de 5,0% no subsídio de APF-EPF-PPF" },
+            { data: "2025/05", tipo: "+", serie: "DPF-PCF (base)",     evento: "Reajuste de 1,9% no subsídio de DPF-PCF" },
+            { data: "2025/05", tipo: "+", serie: "DPF-PCF (meio)",     evento: "Reajuste de 5,0% no subsídio de DPF-PCF" },
+            { data: "2025/05", tipo: "+", serie: "DPF-PCF (topo)",     evento: "Reajuste de 5,0% no subsídio de DPF-PCF" },
+
+            { data: "2026/05", tipo: "+", serie: "APF-EPF-PPF (base)", evento: "Reajuste de 3,85% no subsídio de APF-EPF-PPF" },
+            { data: "2026/05", tipo: "+", serie: "APF-EPF-PPF (meio)", evento: "Reajuste de 9,00% no subsídio de APF-EPF-PPF" },
+            { data: "2026/05", tipo: "+", serie: "APF-EPF-PPF (topo)", evento: "Reajuste de 14,84% no subsídio de APF-EPF-PPF" },
+            { data: "2026/05", tipo: "+", serie: "DPF-PCF (base)",     evento: "Reajuste de 3,85% no subsídio de DPF-PCF" },
+            { data: "2026/05", tipo: "+", serie: "DPF-PCF (meio)",     evento: "Reajuste de 7,77% no subsídio de DPF-PCF" },
+            { data: "2026/05", tipo: "+", serie: "DPF-PCF (topo)",     evento: "Reajuste de 13,38% no subsídio de DPF-PCF" },
+
+
+            { data: "2000/03", tipo: "x", serie: "STF", evento: "Remuneração por VB + RM & outros para Ministros do STF" },
+
+            { data: "2002/06", tipo: "+", serie: "STF", evento: "Reajuste de 15,64% na remuneração dos Ministros do STF" },
+            { data: "2003/01", tipo: "+", serie: "STF", evento: "Reajuste em 1% na remuneração dos Ministros do STF" },
+            { data: "2004/01", tipo: "+", serie: "STF", evento: "Reajuste em 35% na remuneração dos Ministros do STF" },
+
+            { data: "2005/01", tipo: "x", serie: "STF", evento: "Adoção do subsídio para Ministros do STF" },
+
+            { data: "2005/01", tipo: "+", serie: "STF", evento: "Reajuste em 35% no subsídio do STF" },
+            { data: "2006/01", tipo: "+", serie: "STF", evento: "Reajuste em 13,95% no subsídio do STF" },
+
+            { data: "2009/09", tipo: "+", serie: "STF", evento: "Reajuste em 5% no subsídio do STF" },
+            { data: "2010/02", tipo: "+", serie: "STF", evento: "Reajuste em 3,88% no subsídio do STF" },
+
+            { data: "2013/01", tipo: "+", serie: "STF", evento: "Reajuste em 5% no subsídio do STF" },
+            { data: "2014/01", tipo: "+", serie: "STF", evento: "Reajuste em 5% no subsídio do STF" },
+            { data: "2015/01", tipo: "+", serie: "STF", evento: "Reajuste em 5% no subsídio do STF (original)" },
+
+            { data: "2015/01", tipo: "+", serie: "STF", evento: "Reajuste em 14,6% no subsídio do STF (alterado)" },
+
+            { data: "2018/11", tipo: "+", serie: "STF", evento: "Reajuste em 16,38% no subsídio do STF" },
+
+            { data: "2023/04", tipo: "+", serie: "STF", evento: "Reajuste em 6,00% no subsídio do STF" },
+            { data: "2024/02", tipo: "+", serie: "STF", evento: "Reajuste em 5,66% no subsídio do STF" },
+            { data: "2025/02", tipo: "+", serie: "STF", evento: "Reajuste em 5,36% no subsídio do STF" },
+
+
+
+            { data: "2003/12", tipo: "o", serie: "ALL", evento: "Fim da paridade e integralidade (EC 41/2003)" },
+            { data: "2012/05", tipo: "o", serie: "ALL", evento: "Regime de previdência complementar (EC 20/1998)" },
+            { data: "2019/11", tipo: "o", serie: "ALL", evento: "Nova reforma previdenciária (EC 103/2019)" }
         ];
 		
 	
@@ -940,7 +1238,7 @@
 			"CARF":	  "Carreira Auditoria da Receita Federal",
             "TRF":	  "Técnico da Receita Federal",
             "AFRF":	  "Auditor-Fiscal da Receita Federal",
-			"CARF":	  "Carreira Auditoria da Receita Federal do Brasil",
+			"CARFB":  "Carreira Auditoria da Receita Federal do Brasil",
 			"CTARFB": "Carreira Tributária e Aduaneira da Receita Federal do Brasil",
             "ATRFB":  "Analista Tributário da Receita Federal do Brasil",
             "AFRFB":  "Auditor-Fiscal da Receita Federal do Brasil",
@@ -1137,43 +1435,51 @@ const dicionarioLinhas = {
         let toastTimeout;
 
 		function encontrarLeisDoPeriodo(cargo, dataInicio, dataFim, nivelAtual) {
-            const leis = anexosPlanalto[cargo];
-            if (!leis) return [];
-
-            // 1. Encontra a lei que governava o INÍCIO do gráfico (Fatiando para AAAA/MM)
-            const leisAteInicio = leis.filter(lei => lei.data.slice(0, 7) <= dataInicio && lei.niveis.includes(nivelAtual));
-            let leiInicial = [];
-            if (leisAteInicio.length > 0) {
-                const dataMaisRecenteInicio = leisAteInicio[leisAteInicio.length - 1].data.slice(0, 7);
-                leiInicial = leisAteInicio.filter(lei => lei.data.slice(0, 7) === dataMaisRecenteInicio);
+            
+            // Subfunção interna para varrer o histórico sem misturar as datas de leis diferentes
+            function extrairHistorico(lista) {
+                if (!lista) return [];
+                const leisAteInicio = lista.filter(lei => lei.data.slice(0, 7) <= dataInicio && lei.niveis.includes(nivelAtual));
+                let leiInicial = [];
+                if (leisAteInicio.length > 0) {
+                    const dataMaisRecenteInicio = leisAteInicio[leisAteInicio.length - 1].data.slice(0, 7);
+                    leiInicial = leisAteInicio.filter(lei => lei.data.slice(0, 7) === dataMaisRecenteInicio);
+                }
+                const leisNoMeio = lista.filter(lei => lei.data.slice(0, 7) > dataInicio && lei.data.slice(0, 7) <= dataFim && lei.niveis.includes(nivelAtual));
+                return [...leiInicial, ...leisNoMeio];
             }
 
-            // 2. Encontra as leis que entraram em vigor DENTRO do período visível (Fatiando para AAAA/MM)
-            const leisNoMeio = leis.filter(lei => lei.data.slice(0, 7) > dataInicio && lei.data.slice(0, 7) <= dataFim && lei.niveis.includes(nivelAtual));
+            // Junta as leis específicas da carreira com as leis globais ("ALL")
+            const todasLeis = [
+                ...extrairHistorico(anexosPlanalto[cargo]),
+                ...extrairHistorico(anexosPlanalto['ALL'])
+            ];
 
-            // 3. Junta o histórico
-            const todasLeis = [...leiInicial, ...leisNoMeio];
-
-            // 4. Mapeia e remove duplicatas (para não repetir URLs)
             const leisUnicas = [];
             const urlsVistas = new Set();
 
             todasLeis.forEach(vigencia => {
                 const ato = urlsPlanalto[vigencia.id];
                 if (ato) {
+                    // Trata a ausência de anexo e âncora elegantemente
                     const numAnexo = vigencia.anexo ? ` - ${vigencia.anexo}` : '';
-                    const urlStr = `${dominioPlanalto}${ato.url}${vigencia.ancora}`;
+                    const ancora = vigencia.ancora ? vigencia.ancora : '';
+                    
+                    const urlStr = `${dominioPlanalto}${ato.url}${ancora}`;
                     
                     if (!urlsVistas.has(urlStr)) {
                         urlsVistas.add(urlStr);
                         leisUnicas.push({
-                            nome: `${ato.legislacao}${numAnexo}`,
+                            nome: `${vigencia.data}: ${ato.legislacao}${numAnexo}`,
                             url: urlStr,
-                            dataVigencia: vigencia.data // Mantém o dia exato no registro final!
+                            dataVigencia: vigencia.data
                         });
                     }
                 }
             });
+
+            // Ordena cronologicamente para a VPI entrar na posição certa da lista
+            leisUnicas.sort((a, b) => a.dataVigencia.localeCompare(b.dataVigencia));
 
             return leisUnicas;
         }
@@ -1742,8 +2048,9 @@ const dicionarioLinhas = {
             let htmlPlanalto = "";
             
             if (isSerieCCHA) {
-                htmlPlanalto += `<li><a href="${dominioPlanalto}_ato2015-2018/2016/lei/l13327.htm#Art27" target="_blank" style="color: #666; text-decoration: underline;">Lei nº 13.327/2016 - Arts. 27–36</a></li>`;
+                htmlPlanalto += `<li><a href="${dominioPlanalto}_ato2015-2018/2016/lei/l13327.htm#Art27" target="_blank" style="color: #666; text-decoration: underline;">Lei nº 13.327/2016 - Arts. 29–36</a></li>`;
             } else if (isSerieCGPP) {
+                htmlPlanalto += `<li><a href="${dominioPlanalto}_ato2015-2018/2017/lei/l13464.htm#Art6" target="_blank" style="color: #666; text-decoration: underline;">Lei nº 13.464/2017 - Arts. 6º–15</a></li>`;
                 htmlPlanalto += `<li><a href="${dominioPlanalto}_ato2015-2018/2017/lei/l13464.htm#anexo3" target="_blank" style="color: #666; text-decoration: underline;">Lei nº 13.464/2017 - Anexos III-IV</a></li>`;
                 htmlPlanalto += `<li><a href="${dominioPlanalto}_ato2023-2026/2026/lei/l15367.htm#anexo13" target="_blank" style="color: #666; text-decoration: underline;">Lei nº 15.367/2026 - Anexo XIII</a></li>`;
             } else {
@@ -1760,24 +2067,51 @@ const dicionarioLinhas = {
                 cargoS1 = deParaSiglas[cargoS1] || cargoS1; 
 
                 let nivelS1 = 'topo'; 
-                const matchN1 = s1.match(/\((base|meio|topo)\)/);
+                const matchN1 = s1.match(/\((base\vert{}meio\vert{}topo)\)/);
                 if (matchN1) nivelS1 = matchN1[1];
 
                 const leisS1 = encontrarLeisDoPeriodo(cargoS1, dataInicio, dataFim, nivelS1);
+
+                // MÁGICA DA GCG: Injeta a legislação paralela se a série for do ciclo de gestão e o período coincidir
+                const isGestaoS1 = ['TFC', 'AFC', 'TFFC', 'AFFC', 'CFC', 'CGG', 'GCG'].some(sigla => nomeS1.includes(sigla));
+                if (isGestaoS1 && dataInicio <= '2008/06' && dataFim >= '2000/06') {
+                    // Trava o teto de busca da GCG na data de sua extinção (junho de 2008)
+                    const limitFim = dataFim > '2008/06' ? '2008/06' : dataFim;
+                    const leisGCG = encontrarLeisDoPeriodo('GCG', dataInicio, limitFim, nivelS1);
+                    
+                    leisGCG.forEach(lei => { 
+                        if (!leisS1.some(l => l.url === lei.url)) leisS1.push(lei); 
+                    });
+                    
+                    // Reordena cronologicamente para intercalar as leis do VB com as da GCG perfeitamente
+                    leisS1.sort((a, b) => a.dataVigencia.localeCompare(b.dataVigencia));
+                }
+
                 leisS1.forEach(lei => {
                     htmlPlanalto += `<li><a href="${lei.url}" target="_blank" style="color: #666; text-decoration: underline;">${lei.nome}</a></li>`;
                 });
 
                 if (s2) {
                     let cargoS2 = s2.split(' ')[0];
-                    // Se for sigla antiga, converte para a nova antes de buscar na matriz
                     cargoS2 = deParaSiglas[cargoS2] || cargoS2;
 
                     let nivelS2 = 'topo';
-                    const matchN2 = s2.match(/\((base|meio|topo)\)/);
+                    const matchN2 = s2.match(/\((base\vert{}meio\vert{}topo)\)/);
                     if (matchN2) nivelS2 = matchN2[1];
 
                     const leisS2 = encontrarLeisDoPeriodo(cargoS2, dataInicio, dataFim, nivelS2);
+                    
+                    // Repete a injeção para a Série 2
+                    const isGestaoS2 = ['TFC', 'AFC', 'TFFC', 'AFFC', 'CFC', 'CGG', 'GCG'].some(sigla => nomeS2.includes(sigla));
+                    if (isGestaoS2 && dataInicio <= '2008/06' && dataFim >= '2000/06') {
+                        const limitFim = dataFim > '2008/06' ? '2008/06' : dataFim;
+                        const leisGCG = encontrarLeisDoPeriodo('GCG', dataInicio, limitFim, nivelS2);
+                        leisGCG.forEach(lei => { 
+                            if (!leisS2.some(l => l.url === lei.url)) leisS2.push(lei); 
+                        });
+                        leisS2.sort((a, b) => a.dataVigencia.localeCompare(b.dataVigencia));
+                    }
+
                     leisS2.forEach(lei => {
                         if (!leisS1.some(l1 => l1.url === lei.url)) {
                             htmlPlanalto += `<li><a href="${lei.url}" target="_blank" style="color: #666; text-decoration: underline;">${lei.nome}</a></li>`;
@@ -2479,6 +2813,16 @@ const dicionarioLinhas = {
 
             // NOVA TRAVA: Oculta no modo comparativo E também bloqueia nas séries puras de apuração (CGPP/CCHA)
             if (!isComp && !contextoPlotado.includes('CGPP') && !contextoPlotado.includes('CCHA')) {
+                
+                // TRADUTOR DE ETIQUETAS TEMPORAIS:
+                // Garante que marcos históricos gravados com a sigla antiga também apareçam na série moderna
+                const deParaEtiquetas = {
+                    "TFC": ["TFC", "TFFC"],
+                    "AFC": ["AFC", "AFFC"],
+                    "TRF": ["TRF", "ATRFB"],
+                    "AFRF": ["AFRF", "AFRFB"]
+                };
+
                 marcosHistoricos.forEach(marco => {
                     let aplicaAoGrafico = false;
                     const alvo = marco.serie.toUpperCase();
@@ -2489,12 +2833,13 @@ const dicionarioLinhas = {
                     } 
                     // Regra B: É um Grupo/Carreira (ex: CFC, CAF, CPF)?
                     else if (gruposCarreiras[alvo]) {
-                        // Verifica se alguma das siglas que pertencem a esse grupo está na tela
                         aplicaAoGrafico = gruposCarreiras[alvo].some(sigla => contextoPlotado.includes(sigla));
                     } 
-                    // Regra C: É um Cargo Específico (ex: "AFRFB") ou Linha Exata (ex: "PFN (APOSENTADO)")?
+                    // Regra C: É um Cargo Específico ou Linha Exata
                     else {
-                        aplicaAoGrafico = contextoPlotado.includes(alvo);
+                        // O PULO DO GATO: Se o alvo for TFC, ele tenta achar "TFC" ou "TFFC" no nome da série plotada
+                        const termosParaBusca = deParaEtiquetas[alvo] || [alvo];
+                        aplicaAoGrafico = termosParaBusca.some(termo => contextoPlotado.includes(termo));
                     }
 
                     // Se passou no filtro do Cargo, verificamos se a data está na janela de Zoom
@@ -2502,69 +2847,107 @@ const dicionarioLinhas = {
                         const idxData = dbData.Competencia.indexOf(marco.data);
                         
                         if (idxData >= startIdx && idxData <= endIdx) {
-                            // 1. Lê o tema atual da página para adaptar o balãozinho
-                            const isDark = document.body.getAttribute('data-theme') === 'dark';
                             
-							anotacoesVisuais['linha_' + annIdx] = {
+                            // 1. LÓGICA DE CORES (Zerando os canais conforme o tipo)
+                            const tipo = marco.tipo || 'o';  // 'o' (cinza) é o fallback padrão
+                            
+                            let r125 = 125, g125 = 125, b125 = 125;	// Base Inativa
+                            let  r25 = 25,   g25 = 25,   b25 = 25;  // Base Ativa
+                            let r225 = 225, g225 = 225, b225 = 225; // Base Fundo
+							
+							r125 = 75; g125 = 75; b125 = 75;
+                        
+                            if (tipo === '0') { // Amarelo (mantém R e G; zera B)
+                                b125 = 0; b25 = 0; b225 = 0;
+								
+								r125 = 125; g125 = 125;
+								r225 = 245; g225 = 245; b225 = 125;
+                            } 
+                            else if (tipo === '+') { // Verde (mantém G; zera R e B)
+                                r125 = 0; b125 = 0; 
+                                r25  = 0;  b25 = 0; 
+                                r225 = 0; b225 = 0;
+								
+								g125 = 125;
+								r225 = 125; g225 = 245; b225 = 125;
+                            } 
+                            else if (tipo === '-') { // Vermelho (mantém R; zera G e B)
+                                g125 = 0; b125 = 0; 
+                                g25  = 0;  b25 = 0; 
+                                g225 = 0; b225 = 0;
+								
+								r125 = 125;
+                                r225 = 245; g225 = 125; b225 = 125;
+                            } 
+                            else if (tipo === 'x') { // Azul (mantém B; zera R e G)
+                                r125 = 0; g125 = 0;
+                                r25  = 0;  g25 = 0;
+                                r225 = 0; g225 = 0;
+								
+								b125 = 125;
+                                r225 = 125; g225 = 125; b225 = 245;
+                            }
+                            // Se for 'o', os valores originais de cinza são mantidos
+                        
+                            // Monta as strings finais
+                            const corInativa = `rgba(${r25}, ${g25}, ${b25}, 0.05)`;
+                            const corAtiva   = `rgba(${r125}, ${g125}, ${b125}, 1)`;
+                            const bgInativo  = `rgba(${r225}, ${g225}, ${b225}, 0.05)`;
+                            const bgAtivo    = `rgba(${r225}, ${g225}, ${b225}, 1)`;
+
+                            // 2. CRIAÇÃO DA LINHA
+                            anotacoesVisuais['linha_' + annIdx] = {
                                 type: 'line',
                                 xMin: marco.data, 
                                 xMax: marco.data,
                                 
-								drawTime: 'beforeDatasetsDraw',
-                                //z: -1, 
+                                drawTime: 'beforeDraw',
+                                
+                                // O PULO DO GATO: Salvamos as cores "cacheadas" dentro do objeto
+                                // O Chart.js ignora atributos com "_", mas eles ficam disponíveis para o hover!
+                                _corInativa: corInativa,
+                                _corAtiva: corAtiva,
+                                _bgInativo: bgInativo,
+                                _bgAtivo: bgAtivo,
 
-                                borderColor: 'rgba(125, 125, 125, 0.25)', 
+                                borderColor: corInativa, 
                                 borderWidth: 1,
                                 borderDash: [4, 4], 
 
                                 label: {
                                     display: true,
-                                    content: marco.evento, 
+                                    content: marco.data + ' | ' + marco.evento, 
                                     position: 'end', 
                                     font: { size: 11, family: 'Segoe UI', weight: '600' },
-                                    padding: { top: 6, bottom: 6, left: 10, right: 10 },
+                                    padding: { top: 3, bottom: 2, left: 4, right: 5 },
                                     rotation: -90, 
                                     yAdjust: 5, 
                                     borderRadius: 6, 
                                     borderWidth: 1, 
-                                    color: 'rgba(125, 125, 125, 0.25)',
-                                    borderColor: 'rgba(125, 125, 125, 0.25)',
-                                    backgroundColor: 'rgba(225, 225, 225, 0.25)'
-                                },
-/*								
-                                enter(context) {
-									const anotacaoVisual = context.chart.options.plugins.annotation.annotations[context.id];
-									
-									anotacaoVisual.drawTime = 'afterDraw';
-
-                                    anotacaoVisual.borderWidth = 2;
-                                    anotacaoVisual.label.borderWidth = 2;
-
-                                    anotacaoVisual.borderColor = 'rgba(125, 125, 125, 1)';
-
-                                    anotacaoVisual.label.color = 'rgba(125, 125, 125, 1)';
-                                    anotacaoVisual.label.borderColor = 'rgba(125, 125, 125, 1)';
-                                    anotacaoVisual.label.backgroundColor = 'rgba(225, 225, 225, 1)';
-                                    
-                                    context.chart.update('none');
-                                },
-                                leave(context) {
-									const anotacaoVisual = context.chart.options.plugins.annotation.annotations[context.id];
-									
-									anotacaoVisual.drawTime = 'beforeDatasetsDraw';
-
-                                    anotacaoVisual.borderWidth = 1;
-                                    anotacaoVisual.label.borderWidth = 1;
-
-                                    anotacaoVisual.borderColor = 'rgba(125, 125, 125, 0.25)';
-
-                                    anotacaoVisual.label.color = 'rgba(125, 125, 125, 0.25)';
-                                    anotacaoVisual.label.borderColor = 'rgba(125, 125, 125, 0.25)';
-                                    anotacaoVisual.label.backgroundColor = 'rgba(225, 225, 225, 0.25)';
-                                    
-                                    context.chart.update('none');
+                                    color: corInativa,
+                                    borderColor: corInativa,
+                                    backgroundColor: bgInativo
                                 }
-*/								
+/*
+								borderColor: 'rgba(125, 125, 125, 0.25)', 
+								borderWidth: 1,
+								borderDash: [4, 4], 
+
+								label: {
+									display: true,
+									content: marco.data + ' | ' + marco.evento, 
+									position: 'end', 
+									font: { size: 11, family: 'Segoe UI', weight: '600' },
+									padding: { top: 3, bottom: 2, left: 4, right: 5 },
+									rotation: -90, 
+									yAdjust: 5, 
+									borderRadius: 6, 
+									borderWidth: 1, 
+									color: 'rgba(125, 125, 125, 0.25)',
+									borderColor: 'rgba(125, 125, 125, 0.25)',
+									backgroundColor: 'rgba(225, 225, 225, 0.25)'
+								},
+*/
                             };
 							
                             annIdx++;
@@ -2626,7 +3009,7 @@ const dicionarioLinhas = {
                             criarAlfinete(chart, index);
                         }, 333); // 250 milissegundos é o tempo padrão universal para separar cliques simples de duplos
                     },
-                    // O NOVO MOTOR: IGNORA O BUG DO PLUGIN E CALCULA A DISTÂNCIA MATEMÁTICA
+                    // O NOVO MOTOR: IGNORA O BUG DO PLUGIN E CALCULA A DISTÂNCIA MATEMÁTICA 2D
                     onHover: function(e, elements, chart) {
                         if (!chart.chartArea) return;
                         const mouseX = e.x;
@@ -2638,29 +3021,91 @@ const dicionarioLinhas = {
                         let needsUpdate = false;
                         const annotations = chart.options.plugins.annotation.annotations;
 
+                        // 1. COLETAR AS ETIQUETAS SOB O MOUSE
+                        let candidatas = [];
+                        
+                        if (!isOutside) {
+                            // Define a fonte no motor do Canvas para a medição ser perfeita
+                            chart.ctx.font = "600 11px 'Segoe UI'"; 
+                            
+                            for (const key in annotations) {
+                                if (!key.startsWith('linha_')) continue;
+                                const ann = annotations[key];
+                                const index = chart.data.labels.indexOf(ann.xMin);
+                                
+                                if (index !== -1) {
+                                    const annX = chart.scales.x.getPixelForValue(index);
+                                    
+                                    // Bateu no eixo X? (Raio de 12 pixels para a linha)
+                                    if (Math.abs(mouseX - annX) <= 12) {
+                                        // Mede a largura do texto, que na verdade é a altura devido à rotação de -90 graus
+                                        const textWidth = chart.ctx.measureText(ann.label.content).width;
+                                        // Adiciona uma folga generosa para os paddings da caixa e o yAdjust
+                                        const labelHeight = textWidth + 30; 
+                                        
+                                        candidatas.push({ key, ann, labelHeight });
+                                    }
+                                }
+                            }
+                        }
+
+                        // 2. O TRUQUE DO Z-INDEX: Ordena da mais curta para a mais longa!
+                        // Assim, a etiqueta pequena ganha prioridade de clique sobre a etiqueta gigante
+                        candidatas.sort((a, b) => a.labelHeight - b.labelHeight);
+
+                        let hoveredKey = null;
+
+                        // 3. AVALIAÇÃO DO EIXO Y
+                        for (const cand of candidatas) {
+                            // Como position é 'end', a etiqueta está ancorada no TOPO do gráfico e desce
+                            const labelTop = chart.chartArea.top;
+                            const labelBottom = chart.chartArea.top + cand.labelHeight;
+
+                            // O mouse está dentro da altura desta caixa específica?
+                            if (mouseY >= labelTop && mouseY <= labelBottom) {
+                                hoveredKey = cand.key;
+                                break; // Encontrou a menor etiqueta que contém o mouse! Para a busca.
+                            }
+                        }
+
+                        // 4. APLICAR AS CORES E ESTADOS
                         for (const key in annotations) {
                             if (!key.startsWith('linha_')) continue;
                             const ann = annotations[key];
+                            
+                            // Define se esta é a etiqueta premiada
+                            const isHovered = (key === hoveredKey);
 
-                            let isHovered = false;
-
-                            // Se o mouse estiver DENTRO do gráfico, fazemos a conta de colisão matemática
-                            if (!isOutside) {
-                                const index = chart.data.labels.indexOf(ann.xMin);
-                                if (index !== -1) {
-                                    const annX = chart.scales.x.getPixelForValue(index);
-                                    isHovered = Math.abs(mouseX - annX) <= 15;
-                                }
+                            if (isHovered && ann.borderWidth === 1) {
+                                // ACENDE E JOGA PARA FRENTE
+                                ann.drawTime = 'afterDraw';
+                                ann.borderWidth = 2;
+                                ann.label.borderWidth = 2;
+                                ann.borderColor = ann._corAtiva;
+                                ann.label.color = ann._corAtiva;
+                                ann.label.borderColor = ann._corAtiva;
+                                ann.label.backgroundColor = ann._bgAtivo;
+                                needsUpdate = true;
+                            } else if (!isHovered && ann.borderWidth === 2) {
+                                // APAGA E JOGA PRO FUNDO
+                                ann.drawTime = 'beforeDraw';
+                                ann.borderWidth = 1;
+                                ann.label.borderWidth = 1;
+                                ann.borderColor = ann._corInativa;
+                                ann.label.color = ann._corInativa;
+                                ann.label.borderColor = ann._corInativa;
+                                ann.label.backgroundColor = ann._bgInativo;
+                                needsUpdate = true;
                             }
-
+/*
                             if (isHovered && ann.borderWidth === 1) {
                                 // ACENDE A ETIQUETA E JOGA PARA FRENTE
                                 ann.drawTime = 'afterDraw';
                                 ann.borderWidth = 2;
                                 ann.label.borderWidth = 2;
-                                ann.borderColor = 'rgba(125, 125, 125, 1)';
-                                ann.label.color = 'rgba(125, 125, 125, 1)';
-                                ann.label.borderColor = 'rgba(125, 125, 125, 1)';
+                                ann.borderColor = 'rgba(25, 25, 25, 1)';
+                                ann.label.color = 'rgba(25, 25, 25, 1)';
+                                ann.label.borderColor = 'rgba(25, 25, 25, 1)';
                                 ann.label.backgroundColor = 'rgba(225, 225, 225, 1)';
                                 needsUpdate = true;
                             } else if (!isHovered && ann.borderWidth === 2) {
@@ -2674,10 +3119,10 @@ const dicionarioLinhas = {
                                 ann.label.backgroundColor = 'rgba(225, 225, 225, 0.25)';
                                 needsUpdate = true;
                             }
+*/
                         }
-
                         if (needsUpdate) {
-                            chart.update('none'); // Repinta a tela inteira com as novas cores
+                            chart.update('none'); // Repinta sem animação
                         }
                     },
                     responsive: true,
