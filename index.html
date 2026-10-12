@@ -3250,7 +3250,7 @@ const dicionarioLinhas = {
                                     if (!window.zoomMarcadorInicio) {
                                         // Marca o Início
                                         window.zoomMarcadorInicio = dataClicada;
-                                        showCustomToast(`📍 <b>Início marcado:</b> ${dataClicada}<br>Dê um <b>triplo clique</b> na data final para aplicar o zoom exato.`, 4500);
+                                        showCustomToast(`📍<b>Início com precisão marcado:</b> ${dataClicada}<br><i>dê um <u>triplo clique</u> na data final</i>`, 4500);
                                         if (typeof playSFX === 'function') playSFX('click_x'); 
                                     } else {
                                         // Marca o Fim e executa o Corte Matemático
@@ -3272,7 +3272,7 @@ const dicionarioLinhas = {
                                         // Como alteramos a escala via código, chamamos o HandleZoomPan para atualizar as fontes inferiores!
                                         handleZoomPan({chart: chart});
                                         
-                                        showCustomToast(`🎯 <b>Zoom Aplicado com Precisão!</b><br>Período isolado: ${dbData.Competencia[startIdx]} a ${dbData.Competencia[endIdx]}.<br><i>Use Shift+0 para resetar a visão global.</i>`, 5000);
+                                        showCustomToast(`🎯<b>ZOOM COM PRECISÃO APLICADO!</b><br>Período: <u>${dbData.Competencia[startIdx]}</u> a <u>${dbData.Competencia[endIdx]}</u>.<br><i><i>use Shift+0 para resetar o zoom</i></i>`, 5000);
                                         if (typeof playSFX === 'function') playSFX('camera'); 
                                     }
                                 }
