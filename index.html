@@ -1529,8 +1529,8 @@ const dicionarioLinhas = {
             // Dá um respiro minúsculo pro navegador processar a saída e re-animar a entrada
             setTimeout(() => {
                 let htmlContent = '<strong style="font-size: 15px;">ATALHOS</strong><br><br>'
-                                + ' Zoom:  <span class="toast-mono">⇧+▲|▼<i>(shift)</i></span><br>'   //⬆|⬇ 
-                                + ' Rolar: <span class="toast-mono">⇧+◀︎|▶︎<i>(shift)</i></span><br>'   //⬅|⮕
+                                + ' Zoom:  <span class="toast-mono">[⌃+]⇧+▲|▼<i>([control+]shift)</i></span><br>'   //⬆|⬇ 
+                                + ' Pan: <span class="toast-mono">[⌃+]⇧+◀︎|▶︎<i>([control+]shift)</i></span><br>'   //⬅|⮕
                                 + ' Escalas: <span class="toast-mono"><u>absoluto</u>:$(⇧+4) <u>relativo</u>:%(⇧+5)</span><br>'
                                 + ' Opções: <span class="toast-mono"><u>desafio</u>:#(⇧+3) <u>rótulos</u>:@(⇧+2) <u>IPCA</u>:&(⇧+6|7)</span><br>';
                 if (isComp) {
@@ -2423,9 +2423,9 @@ const dicionarioLinhas = {
 
             // INJEÇÃO DA LINHA 1: PERÍODO
             document.getElementById('kpi-inicio-val').textContent = formatKPI(valInicial);
-            document.getElementById('kpi-inicio-data').textContent = dataInicial;
+            document.getElementById('kpi-inicio-data').innerHTML = '<i>' + dataInicial + '</i>';
             document.getElementById('kpi-fim-val').textContent = formatKPI(valFinal);
-            document.getElementById('kpi-fim-data').textContent = dataFinal;
+            document.getElementById('kpi-fim-data').innerHTML = '<i>' + dataFinal + '</i>';
 
             const varPeriodo = valInicial !== 0 ? ((valFinal / valInicial) - 1) * 100 : 0;
             const sinalPeriodo = varPeriodo > 0 ? '▲ +' : (varPeriodo < 0 ? '▼ ' : '');
@@ -2434,9 +2434,9 @@ const dicionarioLinhas = {
 
             // INJEÇÃO DA LINHA 2: EXTREMOS
             document.getElementById('kpi-min-val').textContent = formatKPI(minVal);
-            document.getElementById('kpi-min-data').textContent = labels[minIdx];
+            document.getElementById('kpi-min-data').innerHTML = '<i>' + labels[minIdx] + '</i>';
             document.getElementById('kpi-max-val').textContent = formatKPI(maxVal);
-            document.getElementById('kpi-max-data').textContent = labels[maxIdx];
+            document.getElementById('kpi-max-data').innerHTML = '<i>' + labels[maxIdx] + '</i>';
 
             if (minVal !== 0) {
                 const varExtremos = ((maxVal / minVal) - 1) * 100;
@@ -2512,9 +2512,16 @@ const dicionarioLinhas = {
                 let strTempo = `${anos > 0 ? anos + ' ANOS' : ''}${anos > 0 && meses > 0 ? ' E ' : ''}${meses > 0 ? meses + ' MESES' : ''}`;
                 if (spanMeses === 0) strTempo = '0 MESES';
 
+                // NOVO: Captura os rótulos de data reais da interseção podada
+                const dataEffInicio = (effMaxIndex >= effMinIndex) ? labels[effMinIndex] : '-';
+                const dataEffFim    = (effMaxIndex >= effMinIndex) ? labels[effMaxIndex] : '-';
+                const strFaixa      = `<br><span style="font-size: 9px; font-weight: 500; letter-spacing: 0px; text-transform: uppercase;">(DE  <i>${dataEffInicio}</i>  A  <i>${dataEffFim}</i>)</span>`;
+
                 if (isComp && chart.data.datasets.length >= 2) {
                     document.getElementById('kpi-acum-title1').innerHTML = 'ACUMULADO';
-                    document.getElementById('kpi-diff-title').innerHTML = `DIFERENÇA EM <i>${strTempo}</i>`;
+                    
+                    // INJETA O TEXTO COM AS DATAS
+                    document.getElementById('kpi-diff-title').innerHTML = `DIFERENÇA EM <i>${strTempo}</i>${strFaixa}`;
                     
                     const ds0 = chart.data.datasets[0]; // Sempre Desafiante
                     const ds1 = chart.data.datasets[1]; // Sempre Desafiado
@@ -2522,7 +2529,7 @@ const dicionarioLinhas = {
                     let sum0 = 0, sum1 = 0;
                     
                     // SOMA JUSTA (Apenas dentro da interseção)
-                    // Os zeros/nulos que sobraram no *meio* da série não quebram o laço, são apenas ignorados na soma (+)
+					// Os zeros/nulos que sobraram no *meio* da série não quebram o laço, são apenas ignorados na soma (+)
                     for (let i = effMinIndex; i <= effMaxIndex; i++) {
                         if (ds0.absoluteData[i]) sum0 += ds0.absoluteData[i];
                         if (ds1.absoluteData[i]) sum1 += ds1.absoluteData[i];
@@ -2563,7 +2570,9 @@ const dicionarioLinhas = {
                 } else {
                     // MODO AVULSO
                     let sumHover = 0;
-                    document.getElementById('kpi-acum-title1').innerHTML = `ACUMULADO EM <i>${strTempo}</i>`;
+                    
+                    // APLIQUEI NO MODO AVULSO TAMBÉM! 
+                    document.getElementById('kpi-acum-title1').innerHTML = `ACUMULADO EM <i>${strTempo}</i>${strFaixa}`;
                     
                     for (let i = effMinIndex; i <= effMaxIndex; i++) {
                         if (ds.absoluteData[i]) sumHover += ds.absoluteData[i];
@@ -3210,6 +3219,70 @@ const dicionarioLinhas = {
                 options: {
 					onClick: function(event, elements, chart) {
                         if (elements.length === 0) return;
+                        const index = elements[0].index;
+                        
+                        // O Contador de Cliques Rápidos (Reseta após 350ms)
+                        window.clickCount = (window.clickCount || 0) + 1;
+                        
+                        if (window.clickCount === 1) {
+                            window.pinClickTimer = setTimeout(() => {
+                                const totalCliques = window.clickCount;
+                                window.clickCount = 0; // Reseta a contagem
+                                
+                                if (totalCliques === 1) {
+                                    // ==========================================
+                                    // CLIQUE ÚNICO: ALFINETAR ETIQUETA
+                                    // ==========================================
+                                    if (window.pinnedTooltips && window.pinnedTooltips.find(p => p.index === index)) return;
+                                    
+                                    if (window.pinnedTooltips && window.pinnedTooltips.length >= 3) {
+                                        showCustomToast("<strong style='font-size: 15px;'>LIMITE ATINGIDO 📌</strong><br>Três alfinetes já fixados; dê um duplo clique no gráfico para limpar todos.", 4000);
+                                        return;
+                                    }
+                                    criarAlfinete(chart, index);
+                                    
+                                } else if (totalCliques >= 3) {
+                                    // ==========================================
+                                    // TRIPLO CLIQUE: TESOURA DE ZOOM EXATO
+                                    // ==========================================
+                                    const dataClicada = chart.data.labels[index];
+                                    
+                                    if (!window.zoomMarcadorInicio) {
+                                        // Marca o Início
+                                        window.zoomMarcadorInicio = dataClicada;
+                                        showCustomToast(`📍 <b>Início marcado:</b> ${dataClicada}<br>Dê um <b>triplo clique</b> na data final para aplicar o zoom exato.`, 4500);
+                                        if (typeof playSFX === 'function') playSFX('click_x'); 
+                                    } else {
+                                        // Marca o Fim e executa o Corte Matemático
+                                        const dataInicio = window.zoomMarcadorInicio;
+                                        const dataFim = dataClicada;
+                                        window.zoomMarcadorInicio = null; // Reseta a memória
+                                        
+                                        // Pega a posição na base completa (evitando que ele trave se você clicar de trás pra frente)
+                                        const idx1 = dbData.Competencia.indexOf(dataInicio);
+                                        const idx2 = dbData.Competencia.indexOf(dataFim);
+                                        const startIdx = Math.min(idx1, idx2);
+                                        const endIdx = Math.max(idx1, idx2);
+                                        
+                                        // Força os limites na escala X
+                                        chart.options.scales.x.min = dbData.Competencia[startIdx];
+                                        chart.options.scales.x.max = dbData.Competencia[endIdx];
+                                        chart.update();
+                                        
+                                        // Como alteramos a escala via código, chamamos o HandleZoomPan para atualizar as fontes inferiores!
+                                        handleZoomPan({chart: chart});
+                                        
+                                        showCustomToast(`🎯 <b>Zoom Aplicado com Precisão!</b><br>Período isolado: ${dbData.Competencia[startIdx]} a ${dbData.Competencia[endIdx]}.<br><i>Use Shift+0 para resetar a visão global.</i>`, 5000);
+                                        if (typeof playSFX === 'function') playSFX('camera'); 
+                                    }
+                                }
+                                // Obs: O duplo-clique (totalCliques === 2) é capturado pelo ouvinte nativo 'dblclick' do canvas, então não fazemos nada aqui.
+                            }, 350); 
+                        }
+                    },
+/*
+					onClick: function(event, elements, chart) {
+                        if (elements.length === 0) return;
                         
                         // 1. Se já existe um timer rodando, é porque este é o SEGUNDO clique (duplo clique)
                         if (window.pinClickTimer) {
@@ -3235,6 +3308,7 @@ const dicionarioLinhas = {
                             criarAlfinete(chart, index);
                         }, 333); // 250 milissegundos é o tempo padrão universal para separar cliques simples de duplos
                     },
+*/
                     // O NOVO MOTOR: IGNORA O BUG DO PLUGIN E CALCULA A DISTÂNCIA MATEMÁTICA 2D
                     onHover: function(e, elements, chart) {
                         if (!chart.chartArea) return;
@@ -3916,6 +3990,52 @@ const dicionarioLinhas = {
             // CÂMERA E NAVEGAÇÃO TEMPORAL
             // ==========================================
             
+            // ZOOM RESET (Voltar ao original) - Shift + 0
+            else if (e.key === '0') {
+                if (myChart && typeof myChart.resetZoom === 'function') {
+                    myChart.resetZoom();
+                    handleZoomPan({chart: myChart});
+                }
+                e.preventDefault(); 
+            }
+            
+            // ZOOM (Requer Shift)
+            else if (e.key === 'ArrowUp' && e.shiftKey) {
+                // MÁGICA: Se segurar o Ctrl (ou Cmd), o salto cai de 10% para apenas 2% (Ajuste Fino)
+                const factor = (e.ctrlKey || e.metaKey) ? 1.02 : 1.1;
+                if (myChart && typeof myChart.zoom === 'function') myChart.zoom(factor);
+                e.preventDefault(); 
+            }
+            else if (e.key === 'ArrowDown' && e.shiftKey) {
+                const factor = (e.ctrlKey || e.metaKey) ? 0.98 : 0.9;
+                if (myChart && typeof myChart.zoom === 'function') myChart.zoom(factor);
+                e.preventDefault(); 
+            }
+            
+            // PAN E NAVEGAÇÃO DE SÉRIES
+            else if (e.key === 'ArrowLeft') {
+                if (e.shiftKey) {
+                    // MÁGICA: Rolagem suave de 5px em vez do salto gigante de 50px
+                    const step = (e.ctrlKey || e.metaKey) ? 5 : 50; 
+                    if (myChart && typeof myChart.pan === 'function') myChart.pan({x: step}); 
+                    e.preventDefault();
+                } else if (!isComp) {
+                    document.getElementById('btn-prev').click(); 
+                    e.preventDefault();
+                }
+            }
+            else if (e.key === 'ArrowRight') {
+                if (e.shiftKey) {
+                    const step = (e.ctrlKey || e.metaKey) ? -5 : -50; 
+                    if (myChart && typeof myChart.pan === 'function') myChart.pan({x: step}); 
+                    e.preventDefault();
+                } else if (!isComp) {
+                    document.getElementById('btn-next').click(); 
+                    e.preventDefault();
+                }
+            }
+        });
+/*
 			// ZOOM RESET (Voltar ao original) - Shift + 0
             else if (e.key === '0') {
                 if (myChart && typeof myChart.resetZoom === 'function') {
@@ -3955,6 +4075,7 @@ const dicionarioLinhas = {
                 }
             }
         });
+*/
 
 		// ==========================================
         // SINTETIZADOR DE EFEITOS SONOROS (WEB AUDIO API)
