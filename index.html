@@ -276,6 +276,15 @@
             transform: translate(-50%, -105%) scale(1.02) !important;
             background-color: rgba(40, 45, 55, 0.98);
         }
+		
+		@keyframes pulse-record {
+            0% { opacity: 0.9; transform: scale(0.95); }
+            50% { opacity: 1; transform: scale(1); text-shadow: 0 0 3px red; }
+            100% { opacity: 0.9; transform: scale(0.95); }
+        }
+        #btn-active-action.recording-pulse {
+            animation: pulse-record 1.5s infinite;
+        }
     </style>
 </head>
 <body>
@@ -357,9 +366,11 @@
                             <div id="split-menu" style="position: absolute; top: 100%; right: 0; margin-top: 4px; background-color: var(--input-bg); border: 1px solid var(--border); border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); display: none; flex-direction: column; padding: 4px; z-index: 1000; min-width: 40px;">
                                 <button class="split-dropdown-item" data-action="snapshot" 	title="Capturar em PNG" style="background: transparent; border: none; cursor: pointer; padding: 6px 10px; font-size: 25px; transition: background 0.2s; border-radius: 4px; color: var(--text-main);">📷</button>
                                 <button class="split-dropdown-item" data-action="audio" 	title="Áudio em TTS"    style="background: transparent; border: none; cursor: pointer; padding: 6px 10px; font-size: 25px; transition: background 0.2s; border-radius: 4px; color: var(--text-main);">🔈</button>
+								<button class="split-dropdown-item" data-action="record" 	title="Vídeo em WebM/MP4" style="background: transparent; border: none; cursor: pointer; padding: 6px 10px; font-size: 25px; transition: background 0.2s; border-radius: 4px; color: var(--text-main);">🎥</button>
                                 <button class="split-dropdown-item" data-action="prompt" 	title="Prompt para IA"  style="background: transparent; border: none; cursor: pointer; padding: 6px 10px; font-size: 25px; transition: background 0.2s; border-radius: 4px; color: var(--text-main);">🤖</button>
                                 <button class="split-dropdown-item" data-action="summary" 	title="Legenda em MD"   style="background: transparent; border: none; cursor: pointer; padding: 6px 10px; font-size: 25px; transition: background 0.2s; border-radius: 4px; color: var(--text-main);">📋</button>
                                 <button class="split-dropdown-item" data-action="csv" 		title="Extrair em CSV"  style="background: transparent; border: none; cursor: pointer; padding: 6px 10px; font-size: 25px; transition: background 0.2s; border-radius: 4px; color: var(--text-main);">💾</button>
+								<button class="split-dropdown-item" data-action="animate" 	title="Animar etiquetas" style="background: transparent; border: none; cursor: pointer; padding: 6px 10px; font-size: 25px; transition: background 0.2s; border-radius: 4px; color: var(--text-main);" id="item-animacao">🎬</button>
                             </div>
                         </div>
                     </div>
@@ -370,6 +381,7 @@
 		<!-- Botões de Ação Global (Topo Direito) -->
         <div style="position: absolute; top: 10px; left: 25px; display: flex; gap: 12px; align-items: center;">
             <button id="btn-theme" style="background: transparent; border: none; font-size: 24px; cursor: pointer; outline: none; transition: transform 0.2s;" title="Ativar modo ESCURO">🌚</button> <!-- 🌑☀️🔆🔅 -->
+			<button id="btn-sound" style="background: transparent; border: none; font-size: 24px; cursor: pointer; outline: none; transition: transform 0.2s;" title="Ativar efeitos SONOROS"></button>
         </div>
         <div style="position: absolute; top: 10px; right: 25px; display: flex; gap: 12px; align-items: center;">
             <button id="btn-link" style="background: transparent; border: none; font-size: 24px; cursor: pointer; outline: none;" title="Compartilhar link URL">🔗</button>
@@ -519,7 +531,8 @@
         const LOGO = (parametroLogo === 'ASTN' || parametroLogo === 'ASCGU') ? parametroLogo : null;
 
         // NOVA TRAVA MESTRA DE ÁUDIO (Mudo por padrão)
-        const SONS = urlParamsIniciais.get('sons') === '1';
+      //const SONS = urlParamsIniciais.get('sons') === '1';
+		let SONS = urlParamsIniciais.get('sons') === '0';
 
         // 1. Logo ASTN
         const svgASTN = `data:image/svg+xml;utf8,
@@ -548,6 +561,10 @@
         const logoInstitucional = new Image();
         if (LOGO === 'ASTN') logoInstitucional.src = svgASTN;
         if (LOGO === 'ASCGU') logoInstitucional.src = svgASCGU;
+		
+		// NOVO: Parâmetro mandraque de animação automática das etiquetas (em milissegundos)
+        const parametroAnim = parseInt(urlParamsIniciais.get('anim'), 10);
+        const ANIM_MS = (!isNaN(parametroAnim) && parametroAnim > 0) ? parametroAnim : null;
 
         // ==============================================
         // BASES DE DOMÍNIOS (Para otimização de strings)
@@ -846,10 +863,6 @@
 
         const marcosHistoricos = [
             { data: "2000/07", tipo: "x", serie: "CGG", 		evento: "Adoção da GCG em 25% do VB" },
-            { data: "2001/01", tipo: "x", serie: "CGG", 		evento: "Ajuste da GCG para 50% do VB" },
-            { data: "2003/12", tipo: "x", serie: "CGG", 		evento: "Ajuste da GCG para 30% do VB próprio e 25% do cargo" },
-            { data: "2004/08", tipo: "x", serie: "CGG", 		evento: "Ajuste da GCG para 40% do VB próprio e 37,5% do cargo" },
-            { data: "2005/04", tipo: "x", serie: "CGG", 		evento: "Ajuste da GCG para 50% do VB próprio e 50% do cargo" },
 
 		  //{ data: "2000/10", tipo: "+", serie: "CFC", 		evento: "Reajuste no VB para AFC e TFC" },
             { data: "2000/10", tipo: "+", serie: "TFC (base)", 	evento: "Reajuste de +0,3% no VB+GCG para TFC" },
@@ -859,6 +872,8 @@
             { data: "2000/10", tipo: "-", serie: "AFC (meio)", 	evento: "Reajuste de -1,5% no VB+GCG para AFC" },
             { data: "2000/10", tipo: "+", serie: "AFC (topo)", 	evento: "Reajuste de +0,1% no VB+GCG para AFC" },
 
+            { data: "2001/01", tipo: "x", serie: "CGG", 		evento: "Ajuste da GCG para 50% do VB" },
+
 		  //{ data: "2003/12", tipo: "+", serie: "CFC", 		evento: "Reajuste no VB para AFC e TFC" },
             { data: "2003/12", tipo: "+", serie: "TFC (base)", 	evento: "Reajuste de 22,6% no VB+GCG para TFC" },
             { data: "2003/12", tipo: "+", serie: "TFC (meio)", 	evento: "Reajuste de 20,5% no VB+GCG para TFC" },
@@ -867,13 +882,19 @@
             { data: "2003/12", tipo: "+", serie: "AFC (meio)", 	evento: "Reajuste de 15,4% no VB+GCG para AFC" },
             { data: "2003/12", tipo: "+", serie: "AFC (topo)", 	evento: "Reajuste de 3,5% no VB+GCG para AFC" },
 
+            { data: "2003/12", tipo: "x", serie: "CGG", 		evento: "Ajuste da GCG para 30% do VB próprio e 25% do cargo" },
+
           //{ data: "2004/08", tipo: "+", serie: "TFC", 		evento: "Reajuste no VB apenas para TFC" },
             { data: "2004/08", tipo: "+", serie: "TFC", 		evento: "Reajuste de 1% no VB de TFC" },
 			{ data: "2004/08", tipo: "0", serie: "AFC", 		evento: "Reajuste de 0% no VB de AFC" },
 
+            { data: "2004/08", tipo: "x", serie: "CGG", 		evento: "Ajuste da GCG para 40% do VB próprio e 37,5% do cargo" },
+
           //{ data: "2005/04", tipo: "+", serie: "TFC", 		evento: "Reajuste no VB apenas para TFC" },
 			{ data: "2005/04", tipo: "+", serie: "TFC", 		evento: "Reajuste de 15% no VB de TFC" },
 			{ data: "2005/04", tipo: "0", serie: "AFC", 		evento: "Reajuste de 0% no VB de AFC" },
+
+            { data: "2005/04", tipo: "x", serie: "CGG", 		evento: "Ajuste da GCG para 50% do VB próprio e 50% do cargo" },
 		  
           //{ data: "2006/07", tipo: "+", serie: "TFC", 		evento: "Reajuste no VB também para AFC" },
             { data: "2006/07", tipo: "+", serie: "TFC", 		evento: "Reajuste de 20,0% no VB de TFC" },
@@ -881,8 +902,8 @@
             { data: "2006/07", tipo: "+", serie: "AFC", 		evento: "Reajuste de 21,2% no VB de AFC" },
 
             { data: "2007/07", tipo: "+", serie: "CFC", 		evento: "Reajuste de 4% no VB de TFC e AFC" },
-          //{ data: "2008/07", tipo: "+", serie: "CFC", 		evento: "Reajuste de 4% no VB de TFC e AFC" },
-          //{ data: "2009/07", tipo: "+", serie: "CFC", 		evento: "Reajuste de 4% no VB de TFC e AFC" },
+            { data: "2008/07", tipo: "+", serie: "CFC", 		evento: "Reajuste de 4% no VB de TFC e AFC" },
+            { data: "2009/07", tipo: "+", serie: "CFC", 		evento: "Reajuste de 4% no VB de TFC e AFC" },
 
             { data: "2008/06", tipo: "x", serie: "CFC", 		evento: "Abandono do VB pela CFC" },
 			
@@ -1419,11 +1440,18 @@ const dicionarioLinhas = {
         const ctx = document.getElementById('mainChart').getContext('2d');
         let myChart;
         
-        // MÁGICA: Limpa todos os alfinetes se o usuário der duplo clique na área do gráfico
+		// MÁGICA: Limpa todos os alfinetes se o usuário der duplo clique na área do gráfico
         document.getElementById('mainChart').addEventListener('dblclick', () => {
             if (window.pinnedTooltips && window.pinnedTooltips.length > 0) {
                 limparAlfinetes();
                 showCustomToast("<strong style='font-size: 15px;'>🧹 TELA LIMPA</strong><br>Todos os alfinetes foram removidos.", 2000);
+            }
+        });
+        
+        // <--- TRAVA 2: Destrava a pausa de animação assim que o mouse sair fisicamente do quadro!
+        document.getElementById('mainChart').addEventListener('mouseleave', () => {
+            if (typeof isAnimPaused !== 'undefined') {
+                isAnimPaused = false;
             }
         });
         
@@ -1814,6 +1842,10 @@ const dicionarioLinhas = {
             const containerNivel = document.getElementById('container-nivel');
             const containerDatas = document.getElementById('container-datas');
 
+            // NOVO: Pega os elementos do menu da câmera
+            const btnItemAnimacao = document.getElementById('item-animacao');
+            const btnActiveAction = document.getElementById('btn-active-action');
+
             if (isComp) {
                 labelSeries1.textContent = 'Desafiante';
                 containerS1.style.flexGrow = '0';
@@ -1828,6 +1860,23 @@ const dicionarioLinhas = {
                 containerDatas.style.display = 'none';
                 rdVisao[0].disabled = false;
                 rdVisao[1].disabled = false;
+				
+				// MÁGICA: Esconde o botão de animar no menu
+                if (btnItemAnimacao) btnItemAnimacao.style.display = 'none';
+                
+                // NOVO: Mata o timer de vez, independente de qual ferramenta estava ativa no menu
+                if (typeof isAnimationRunning !== 'undefined' && isAnimationRunning) {
+                    if (typeof pararAnimacaoEtiquetas === 'function') pararAnimacaoEtiquetas(myChart);
+                }
+                
+                // Se a animação estava selecionada no menu principal, volta pra câmera
+                if (currentAction === 'animate') {
+                    currentAction = 'snapshot';
+                    btnActiveAction.textContent = '📷';
+                    btnActiveAction.title = 'Capturar em PNG';
+                    btnActiveAction.style.fontSize = '40px';
+                    btnActiveAction.style.paddingBottom = '10px';
+                }
             } else {
                 labelSeries1.textContent = 'Série';
                 containerS1.style.flexGrow = '0';
@@ -1842,6 +1891,17 @@ const dicionarioLinhas = {
                 containerDatas.style.display = 'flex';
                 
                 atualizarTravasUI(); // Chama o validador
+				
+				// MÁGICA: Devolve o botão de animar para o menu no modo avulso
+                if (btnItemAnimacao) {
+                    // Só não mostra se for série do CGPP/CCHA (que também não tem etiqueta)
+                    const s1 = select1.value || '';
+                    if (s1.includes('CGPP') || s1.includes('CCHA')) {
+                        btnItemAnimacao.style.display = 'none';
+                    } else {
+                        btnItemAnimacao.style.display = 'block';
+                    }
+                }
             }
             updateSelectOptions(isInitialization);
             showShortcutsToast(isComp); 
@@ -2208,20 +2268,126 @@ const dicionarioLinhas = {
             }
             return 'rgba(255, 255, 255, 0.95)'; 
         }
+		
+		// ==========================================
+        // MOTOR DE ANIMAÇÃO SEQUENCIAL DE ETIQUETAS (?anim=1234 ou 🎬)
+        // ==========================================
+        let timerAnimacaoEtiquetas = null;
+        let indiceAnimacaoAtual = -1;
+		let isAnimPaused = false; // NOVO: Flag para segurar a animação
+		
+		// Lê a URL, mas se não tiver, o botão da UI usará 1200ms de padrão (velocidade confortável)
+        let isAnimationRunning = (ANIM_MS !== null);
+        let currentAnimInterval = ANIM_MS || 1234;
 
-        // Calcula os dados da série específica sob o mouse
+        function iniciarAnimacaoEtiquetas(chart) {
+			if (!isAnimationRunning || !chart) return;
+
+            // Limpa qualquer temporizador anterior para não duplicar loops
+            if (timerAnimacaoEtiquetas) clearInterval(timerAnimacaoEtiquetas);
+
+            // Isolamos a lógica de avançar um quadro para podermos rodá-la imediatamente
+            const tickFrame = () => {
+                // NOVO: Aborta o avanço se o mouse estiver sobre o gráfico!
+                if (isAnimPaused) return; 
+
+                const annotations = chart.options?.plugins?.annotation?.annotations;
+                if (!annotations) return;
+
+                // Coleta todas as chaves de linhas de etiquetas presentes no gráfico
+                const chaves = Object.keys(annotations).filter(k => k.startsWith('linha_'));
+                if (chaves.length === 0) return;
+
+                // 1. Apaga a etiqueta que estava acesa no ciclo anterior
+                if (indiceAnimacaoAtual >= 0 && indiceAnimacaoAtual < chaves.length) {
+                    const prevAnn = annotations[chaves[indiceAnimacaoAtual]];
+                    if (prevAnn) {
+                        prevAnn.drawTime = 'beforeDraw';
+                        prevAnn.borderWidth = 1;
+                        prevAnn.label.borderWidth = 1;
+                        prevAnn.borderColor = prevAnn._corInativa;
+                        prevAnn.label.color = prevAnn._corInativa;
+                        prevAnn.label.borderColor = prevAnn._corInativa;
+                        prevAnn.label.backgroundColor = prevAnn._bgInativo;
+                    }
+                }
+
+                // 2. Avança para a próxima etiqueta (Loop infinito)
+                indiceAnimacaoAtual = (indiceAnimacaoAtual + 1) % chaves.length;
+
+                // 3. Acende a etiqueta da vez com destaque total e toca o som
+                const nextAnn = annotations[chaves[indiceAnimacaoAtual]];
+                if (nextAnn) {
+                    nextAnn.drawTime = 'afterDraw';
+                    nextAnn.borderWidth = 2;
+                    nextAnn.label.borderWidth = 2;
+                    nextAnn.borderColor = nextAnn._corAtiva;
+                    nextAnn.label.color = nextAnn._corAtiva;
+                    nextAnn.label.borderColor = nextAnn._corAtiva;
+                    nextAnn.label.backgroundColor = nextAnn._bgAtivo;
+
+                    // Opcional: toca o som correspondente lendo a propriedade oculta que criamos
+                    if (typeof playSFX === 'function') {
+                        const tipoSom = nextAnn._tipo || 'o'; // Pega o tipo, ou recai para 'o'
+                        playSFX('click_' + tipoSom);
+                    }
+                }
+                chart.update('none');
+            };
+			
+			// MÁGICA DO SLEEP: Aguarda 666ms antes de disparar o primeiro frame
+            // para não encavalar com o som de "Play" ou "Record"
+            setTimeout(() => {
+                // Se o usuário já tiver clicado no Stop nesse meio segundo, aborta!
+                if (!isAnimationRunning || isAnimPaused) return; 
+                
+                tickFrame(); // Acende a primeira etiqueta
+                timerAnimacaoEtiquetas = setInterval(tickFrame, currentAnimInterval); // Liga o loop
+            }, 666);
+        }
+
+        // NOVO: Função para desligar e limpar a tela
+        function pararAnimacaoEtiquetas(chart) {
+            isAnimationRunning = false;
+            if (timerAnimacaoEtiquetas) {
+                clearInterval(timerAnimacaoEtiquetas);
+                timerAnimacaoEtiquetas = null;
+            }
+            if (chart) {
+                const annotations = chart.options?.plugins?.annotation?.annotations;
+                if (annotations) {
+                    Object.keys(annotations).filter(k => k.startsWith('linha_')).forEach(k => {
+                        const ann = annotations[k];
+                        ann.drawTime = 'beforeDraw';
+                        ann.borderWidth = 1;
+                        ann.label.borderWidth = 1;
+                        ann.borderColor = ann._corInativa;
+                        ann.label.color = ann._corInativa;
+                        ann.label.borderColor = ann._corInativa;
+                        ann.label.backgroundColor = ann._bgInativo;
+                    });
+                }
+                chart.update('none');
+            }
+        }
+		
+		// Calcula os dados da série específica sob o mouse (Sincronizado com ZOOM e PAN)
         function atualizarKPILegenda(datasetIndex, chart) {
             const ds = chart.data.datasets[datasetIndex];
             const labels = chart.data.labels;
             if (!ds || !ds.data || ds.data.length === 0) return;
+
+            // 1. MÁGICA DO ZOOM: Captura os limites atuais da tela primeiro!
+            let minIndex = chart.scales.x.min !== undefined ? Math.max(0, Math.floor(chart.scales.x.min)) : 0;
+            let maxIndex = chart.scales.x.max !== undefined ? Math.min(labels.length - 1, Math.ceil(chart.scales.x.max)) : labels.length - 1;
 
             let valInicial = null, dataInicial = null;
             let valFinal = null, dataFinal = null;
             let minVal = Infinity, maxVal = -Infinity;
             let minIdx = -1, maxIdx = -1;
 
-            // Varre apenas os dados visíveis no gráfico atual para encontrar as pontas e os extremos
-            for (let i = 0; i < ds.data.length; i++) {
+            // 2. Varre APENAS os dados dentro da janela de Zoom para encontrar as pontas e os extremos
+            for (let i = minIndex; i <= maxIndex; i++) {
                 const val = ds.data[i];
                 if (val !== null && val !== undefined) {
                     if (valInicial === null) {
@@ -2236,19 +2402,17 @@ const dicionarioLinhas = {
                 }
             }
 
-            if (valInicial === null) return; // Série abortada (sem dados)
+            if (valInicial === null) return; // Série abortada (sem dados visíveis)
 
             const escala = document.querySelector('input[name="escala"]:checked').value;
             const isRelative = escala === 'percentual';
             
-            // Descobre o tipo de dado lendo o nome da linha que o mouse tocou
             const lbl = ds.label || '';
             const isQtd = lbl.toLowerCase().includes('quantidade') && !lbl.includes('Índice');
             const isCont = lbl.includes('Contagem');
             const isIndice = lbl.includes('Índice') || lbl.includes('Indice');
             const isFator = lbl.includes('IPCA');
 
-            // Usa a sua função oficial de formatação para garantir consistência total!
             const formatKPI = (v) => {
                 if (isRelative) {
                     const dec = (v !== null && v.toFixed(2) === "52.04") ? 2 : 1;
@@ -2263,7 +2427,7 @@ const dicionarioLinhas = {
             document.getElementById('kpi-fim-val').textContent = formatKPI(valFinal);
             document.getElementById('kpi-fim-data').textContent = dataFinal;
 
-            const varPeriodo = ((valFinal / valInicial) - 1) * 100;
+            const varPeriodo = valInicial !== 0 ? ((valFinal / valInicial) - 1) * 100 : 0;
             const sinalPeriodo = varPeriodo > 0 ? '▲ +' : (varPeriodo < 0 ? '▼ ' : '');
             document.getElementById('kpi-var-periodo-val').textContent = sinalPeriodo + varPeriodo.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '%';
             document.getElementById('kpi-var-periodo-val').style.color = varPeriodo > 0 ? '#27ae60' : (varPeriodo < 0 ? '#e74c3c' : 'var(--text-muted)');
@@ -2281,22 +2445,17 @@ const dicionarioLinhas = {
                 document.getElementById('kpi-var-extremos-val').style.color = varExtremos > 0 ? '#27ae60' : (varExtremos < 0 ? '#e74c3c' : 'var(--text-muted)');
             }
 
-            // A MÁGICA VISUAL: Match de Cores (Borda Sólida + Fundo Translúcido 5%)
+            // A MÁGICA VISUAL: Match de Cores
             const container = document.getElementById('kpi-container');
             const borderColor = ds.borderColor;
-            
             container.style.borderColor = borderColor;
-            // Se estiver no tema escuro o fundo branco puro translúcido não funciona bem, então lemos do cartão
             const isDark = document.body.getAttribute('data-theme') === 'dark';
             const baseBg = isDark ? 'rgba(30, 35, 43, 0.95)' : 'rgba(255, 255, 255, 0.95)';
-            
-            // Fundo principal + Película da cor da linha a 6% de opacidade
             container.style.background = `linear-gradient(${baseBg}, ${baseBg}), linear-gradient(${hexToRgba(borderColor, 0.06)}, ${hexToRgba(borderColor, 0.06)})`;
-
             container.style.display = 'flex';
 			
-			// ==========================================
-            // INJEÇÃO DA LINHA 3: CUSTO DE OPORTUNIDADE (ACUMULADO)
+            // ==========================================
+            // INJEÇÃO DA LINHA 3: CUSTO DE OPORTUNIDADE (ACUMULADO E DIFERENÇA)
             // ==========================================
             const isComp = document.getElementById('desafio').checked;
             const isSerieIgnorada = !isComp && (lbl.startsWith('CGPP') || lbl.startsWith('CCHA'));
@@ -2307,55 +2466,92 @@ const dicionarioLinhas = {
             } else {
                 rowAcumulado.style.display = 'flex';
 
-                // MÁGICA DO ZOOM: Captura os limites atuais da tela
-                let minIndex = chart.scales.x.min !== undefined ? Math.floor(chart.scales.x.min) : 0;
-                let maxIndex = chart.scales.x.max !== undefined ? Math.ceil(chart.scales.x.max) : chart.data.labels.length - 1;
-                
-                // Travas de segurança para os índices
-                if (minIndex < 0) minIndex = 0;
-                if (maxIndex >= chart.data.labels.length) maxIndex = chart.data.labels.length - 1;
-                
-                // Contar meses válidos DENTRO da janela de zoom
-                let totalMeses = 0;
-                for (let i = minIndex; i <= maxIndex; i++) {
-                    if (ds.absoluteData[i] !== null && ds.absoluteData[i] !== undefined) totalMeses++;
+                let effMinIndex = minIndex;
+                let effMaxIndex = maxIndex;
+
+                if (isComp && chart.data.datasets.length >= 2) {
+                    const ds0 = chart.data.datasets[0];
+                    const ds1 = chart.data.datasets[1];
+                    
+                    // Avança o início eliminando as pontas nulas/zeradas (Cortina Esquerda)
+                    while (effMinIndex <= maxIndex) {
+                        let v0 = ds0.absoluteData[effMinIndex];
+                        let v1 = ds1.absoluteData[effMinIndex];
+                        let val0 = (v0 !== null && v0 !== undefined && v0 !== 0);
+                        let val1 = (v1 !== null && v1 !== undefined && v1 !== 0);
+                        if (val0 && val1) break; // Achou a interseção real!
+                        effMinIndex++;
+                    }
+                    // Recua o fim eliminando as pontas nulas/zeradas (Cortina Direita)
+                    while (effMaxIndex >= effMinIndex) {
+                        let v0 = ds0.absoluteData[effMaxIndex];
+                        let v1 = ds1.absoluteData[effMaxIndex];
+                        let val0 = (v0 !== null && v0 !== undefined && v0 !== 0);
+                        let val1 = (v1 !== null && v1 !== undefined && v1 !== 0);
+                        if (val0 && val1) break; // Achou a interseção real!
+                        effMaxIndex--;
+                    }
+                } else {
+                    // Modo Avulso: faz a mesma poda nas pontas, mas olhando apenas para a própria série
+                    while (effMinIndex <= maxIndex) {
+                        let v0 = ds.absoluteData[effMinIndex];
+                        if (v0 !== null && v0 !== undefined && v0 !== 0) break;
+                        effMinIndex++;
+                    }
+                    while (effMaxIndex >= effMinIndex) {
+                        let v0 = ds.absoluteData[effMaxIndex];
+                        if (v0 !== null && v0 !== undefined && v0 !== 0) break;
+                        effMaxIndex--;
+                    }
                 }
-                
-                const anos = Math.floor(totalMeses / 12);
-                const meses = totalMeses % 12;
+
+                // Calcula o "Tempo de Interseção" (O período exato em que a soma correu)
+                const spanMeses = (effMaxIndex >= effMinIndex) ? (effMaxIndex - effMinIndex + 1) : 0;
+                const anos = Math.floor(spanMeses / 12);
+                const meses = spanMeses % 12;
                 let strTempo = `${anos > 0 ? anos + ' ANOS' : ''}${anos > 0 && meses > 0 ? ' E ' : ''}${meses > 0 ? meses + ' MESES' : ''}`;
-                if (totalMeses === 0) strTempo = '0 MESES';
-                
+                if (spanMeses === 0) strTempo = '0 MESES';
+
                 if (isComp && chart.data.datasets.length >= 2) {
                     document.getElementById('kpi-acum-title1').innerHTML = 'ACUMULADO';
                     document.getElementById('kpi-diff-title').innerHTML = `DIFERENÇA EM <i>${strTempo}</i>`;
                     
-                    const ds0 = chart.data.datasets[0];
-                    const ds1 = chart.data.datasets[1];
+                    const ds0 = chart.data.datasets[0]; // Sempre Desafiante
+                    const ds1 = chart.data.datasets[1]; // Sempre Desafiado
                     
                     let sum0 = 0, sum1 = 0;
                     
-                    // SOMA ISOLADA PARA O ZOOM ATUAL
-                    for (let i = minIndex; i <= maxIndex; i++) {
-                        if (ds0.absoluteData[i] !== null && ds0.absoluteData[i] !== undefined) sum0 += ds0.absoluteData[i];
-                        if (ds1.absoluteData[i] !== null && ds1.absoluteData[i] !== undefined) sum1 += ds1.absoluteData[i];
+                    // SOMA JUSTA (Apenas dentro da interseção)
+                    // Os zeros/nulos que sobraram no *meio* da série não quebram o laço, são apenas ignorados na soma (+)
+                    for (let i = effMinIndex; i <= effMaxIndex; i++) {
+                        if (ds0.absoluteData[i]) sum0 += ds0.absoluteData[i];
+                        if (ds1.absoluteData[i]) sum1 += ds1.absoluteData[i];
                     }
                     
+                    // POSIÇÃO FIXA: Desafiante sempre na esquerda, Desafiado sempre na direita
                     document.getElementById('kpi-acum-val1').textContent = formatYAxisNumber(sum0, false, false, false, false, false);
-                    document.getElementById('kpi-acum-lbl1').innerHTML = '<u>Desafiante</u>: ' + ds0.label.split(' | ')[0];
+                    document.getElementById('kpi-acum-lbl1').innerHTML = `<u>Desafiante</u>: ` + ds0.label.split(' | ')[0];
                     
                     document.getElementById('kpi-acum-val2').textContent = formatYAxisNumber(sum1, false, false, false, false, false);
-                    document.getElementById('kpi-acum-lbl2').innerHTML = '<u>Desafiado</u>: ' + ds1.label.split(' | ')[0];
+                    document.getElementById('kpi-acum-lbl2').innerHTML = `<u>Desafiado</u>: ` + ds1.label.split(' | ')[0];
                     
-                    // Cálculo da Diferença Absoluta e Proporção (Desafiado / Desafiante)
-                    const diffAbs = sum1 - sum0;
-                    const pctDiff = sum0 !== 0 ? (sum1 / sum0) * 100 : 0;
+                    // A MÁGICA DA INVERSÃO: Quem o mouse toca é o Minuendo (Base), o outro é o Subtraendo (Comp)
+                    let baseSum = datasetIndex === 0 ? sum0 : sum1;
+                    let compSum = datasetIndex === 0 ? sum1 : sum0;
                     
-                    const sinal = diffAbs > 0 ? '▲ +' : (diffAbs < 0 ? '▼ ' : '');
+                    // Diferença Dinâmica = Base(Rato) - Comparação
+                    const diffAbs = baseSum - compSum;
+                    const pctDiff = compSum !== 0 ? (baseSum / compSum) * 100 : 0;
+                    
+                    // Configuração fina dos Sinais e Cores
+                    const sinalSeta = diffAbs > 0 ? '▲ ' : (diffAbs < 0 ? '▼ ' : '');
+                    const sinalMatematico = diffAbs > 0 ? '+' : (diffAbs < 0 ? '-' : '');
                     const colorDiff = diffAbs > 0 ? '#27ae60' : (diffAbs < 0 ? '#e74c3c' : 'var(--text-muted)');
                     
-                    // Espaçamento do R$ ajustado (removido o .replace)
-                    document.getElementById('kpi-acum-diff-val').textContent = sinal + formatYAxisNumber(Math.abs(diffAbs), false, false, false, false, false);
+                    // Formata apenas o número absoluto para podermos injetar o sinal no lugar certo
+                    const valFormatado = new Intl.NumberFormat('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2}).format(Math.abs(diffAbs));
+                    
+                    document.getElementById('kpi-acum-diff-val').textContent = `${sinalSeta}R$ ${sinalMatematico}${valFormatado}`;
                     document.getElementById('kpi-acum-diff-val').style.color = colorDiff;
                     
                     document.getElementById('kpi-acum-diff-pct').textContent = pctDiff.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + '%';
@@ -2367,12 +2563,10 @@ const dicionarioLinhas = {
                 } else {
                     // MODO AVULSO
                     let sumHover = 0;
-                    
                     document.getElementById('kpi-acum-title1').innerHTML = `ACUMULADO EM <i>${strTempo}</i>`;
                     
-                    // SOMA ISOLADA PARA O ZOOM ATUAL (Modo Avulso)
-                    for (let i = minIndex; i <= maxIndex; i++) {
-                        if (ds.absoluteData[i] !== null && ds.absoluteData[i] !== undefined) sumHover += ds.absoluteData[i];
+                    for (let i = effMinIndex; i <= effMaxIndex; i++) {
+                        if (ds.absoluteData[i]) sumHover += ds.absoluteData[i];
                     }
                     
                     document.getElementById('kpi-acum-val1').textContent = formatYAxisNumber(sumHover, false, isQtd, isCont, isIndice, isFator);
@@ -2386,7 +2580,13 @@ const dicionarioLinhas = {
 
 		function updateChart(mode) {
 			limparAlfinetes();
-			
+            
+            // O SEGREDO: Só reseta a animação se a atualização foi pesada (trocou série, nível, etc). 
+            // O mode 'none' é usado apenas para trocar cores e não derruba o laço!
+            if (mode !== 'none') {
+                indiceAnimacaoAtual = -1;
+            }
+            
             const isComp = chkComparativo.checked;
             const escala = document.querySelector('input[name="escala"]:checked').value;
             const isRelative = escala === 'percentual';
@@ -2497,15 +2697,15 @@ const dicionarioLinhas = {
 					let v1_abs = originalV1;
                     let v2_abs = originalV2;
                     if (isIpcaActive) {
-                        if (v1_abs !== null) v1_abs *= fatorIpca[i];
-                        if (v2_abs !== null) v2_abs *= fatorIpca[i];
+                        if (v1_abs !== null) v1_abs = parseFloat((v1_abs * fatorIpca[i]).toFixed(2));
+                        if (v2_abs !== null) v2_abs = parseFloat((v2_abs * fatorIpca[i]).toFixed(2));
                     }
                     absData1.push(v1_abs !== null ? v1_abs : null);
                     absData2.push(v2_abs !== null ? v2_abs : null);
                     
                     if (isIpcaActive && !isRelative) {
-                        if (v1 !== null) v1 *= fatorIpca[i];
-                        if (v2 !== null) v2 *= fatorIpca[i];
+                        if (v1 !== null) v1 = parseFloat((v1 * fatorIpca[i]).toFixed(2));
+                        if (v2 !== null) v2 = parseFloat((v2 * fatorIpca[i]).toFixed(2));
                     }
                     
                     let cv1 = null, cv2 = null;
@@ -2609,14 +2809,14 @@ const dicionarioLinhas = {
                     let originalV = v; 
 
                     if (isIpcaActive && !s1_Qtd && !s1_Cont && !s1_Ind && !s1_Fator) { 
-                        if (v !== null) v *= fatorIpca[i];
-                        if (rV !== null) rV *= fatorIpca[i];
+                        if (v !== null) v = parseFloat((v * fatorIpca[i]).toFixed(2));
+                        if (rV !== null) rV = parseFloat((rV * fatorIpca[i]).toFixed(2));
                     }
-
-                    // NOVO: Captura isolada do valor absoluto para o Acumulado
+					
+					// NOVO: Captura isolada do valor absoluto para o Acumulado
                     let v_abs = originalV;
                     if (isIpcaActive && !s1_Qtd && !s1_Cont && !s1_Ind && !s1_Fator) {
-                        if (v_abs !== null) v_abs *= fatorIpca[i];
+                        if (v_abs !== null) v_abs = parseFloat((v_abs * fatorIpca[i]).toFixed(2));
                     }
                     absData.push(v_abs !== null ? v_abs : null);
 
@@ -2680,7 +2880,8 @@ const dicionarioLinhas = {
                                 if (isNaN(vPrev)) vPrev = null;
                                 
                                 // INJEÇÃO 4A: IPCA NAS LINHAS PONTILHADAS
-                                if (v !== null && isIpcaActive) v *= fatorIpca[i];
+                              //if (v !== null && isIpcaActive) v *= fatorIpca[i];
+								if (v !== null && isIpcaActive) v = parseFloat((v * fatorIpca[i]).toFixed(2));
                                 
                                 let currentValExtra = null;
                                 
@@ -2741,7 +2942,8 @@ const dicionarioLinhas = {
                             let v = dbData[keyCota][i];
                             
                             // INJEÇÃO 4B: IPCA NA COTA ROSA
-                            if (v !== null && isIpcaActive) v *= fatorIpca[i];
+                          //if (v !== null && isIpcaActive) v *= fatorIpca[i];
+							if (v !== null && isIpcaActive) v = parseFloat((v * fatorIpca[i]).toFixed(2));
                             
                             let currentValCota = null;
                             
@@ -2813,7 +3015,7 @@ const dicionarioLinhas = {
 
             // NOVA TRAVA: Oculta no modo comparativo E também bloqueia nas séries puras de apuração (CGPP/CCHA)
             if (!isComp && !contextoPlotado.includes('CGPP') && !contextoPlotado.includes('CCHA')) {
-                
+/*                
                 // TRADUTOR DE ETIQUETAS TEMPORAIS:
                 // Garante que marcos históricos gravados com a sigla antiga também apareçam na série moderna
                 const deParaEtiquetas = {
@@ -2822,7 +3024,7 @@ const dicionarioLinhas = {
                     "TRF": ["TRF", "ATRFB"],
                     "AFRF": ["AFRF", "AFRFB"]
                 };
-
+*/
                 marcosHistoricos.forEach(marco => {
                     let aplicaAoGrafico = false;
                     const alvo = marco.serie.toUpperCase();
@@ -2837,8 +3039,29 @@ const dicionarioLinhas = {
                     } 
                     // Regra C: É um Cargo Específico ou Linha Exata
                     else {
+/*
                         // O PULO DO GATO: Se o alvo for TFC, ele tenta achar "TFC" ou "TFFC" no nome da série plotada
                         const termosParaBusca = deParaEtiquetas[alvo] || [alvo];
+*/
+                        // TRADUTOR BIDIRECIONAL DE ETIQUETAS (Com suporte automático a sufixos como "base", "topo")
+                        let termosParaBusca = [alvo];
+                        
+                        // Troca de TFC <-> TFFC
+                        if (alvo.match(/\bTFC\b/)) termosParaBusca.push(alvo.replace(/\bTFC\b/g, 'TFFC'));
+                        else if (alvo.match(/\bTFFC\b/)) termosParaBusca.push(alvo.replace(/\bTFFC\b/g, 'TFC'));
+                        
+                        // Troca de AFC <-> AFFC
+                        if (alvo.match(/\bAFC\b/)) termosParaBusca.push(alvo.replace(/\bAFC\b/g, 'AFFC'));
+                        else if (alvo.match(/\bAFFC\b/)) termosParaBusca.push(alvo.replace(/\bAFFC\b/g, 'AFC'));
+                        
+                        // Troca de TRF <-> ATRFB
+                        if (alvo.match(/\bTRF\b/)) termosParaBusca.push(alvo.replace(/\bTRF\b/g, 'ATRFB'));
+                        else if (alvo.match(/\bATRFB\b/)) termosParaBusca.push(alvo.replace(/\bATRFB\b/g, 'TRF'));
+                        
+                        // Troca de AFRF <-> AFRFB
+                        if (alvo.match(/\bAFRF\b/)) termosParaBusca.push(alvo.replace(/\bAFRF\b/g, 'AFRFB'));
+                        else if (alvo.match(/\bAFRFB\b/)) termosParaBusca.push(alvo.replace(/\bAFRFB\b/g, 'AFRF'));
+
                         aplicaAoGrafico = termosParaBusca.some(termo => contextoPlotado.includes(termo));
                     }
 
@@ -2902,6 +3125,9 @@ const dicionarioLinhas = {
                                 xMax: marco.data,
                                 
                                 drawTime: 'beforeDraw',
+                                
+                                // NOVO: Guardamos o tipo do marco para o motor de som ler depois!
+                                _tipo: tipo,
                                 
                                 // O PULO DO GATO: Salvamos as cores "cacheadas" dentro do objeto
                                 // O Chart.js ignora atributos com "_", mas eles ficam disponíveis para o hover!
@@ -3018,6 +3244,11 @@ const dicionarioLinhas = {
                         // Verifica se o mouse cruzou a fronteira da área de plotagem
                         const isOutside = (mouseX < chart.chartArea.left || mouseX > chart.chartArea.right || mouseY < chart.chartArea.top || mouseY > chart.chartArea.bottom);
 
+                        // NOVO: Pausa a animação automática se o mouse estiver DENTRO do gráfico
+                        if (typeof isAnimPaused !== 'undefined') {
+                            isAnimPaused = !isOutside;
+                        }
+
                         let needsUpdate = false;
                         const annotations = chart.options.plugins.annotation.annotations;
 
@@ -3086,6 +3317,15 @@ const dicionarioLinhas = {
                                 ann.label.borderColor = ann._corAtiva;
                                 ann.label.backgroundColor = ann._bgAtivo;
                                 needsUpdate = true;
+                                
+                                // MÁGICA DE UX: Sincroniza a memória da animação com o local onde você colocou o mouse!
+                                if (typeof isAnimationRunning !== 'undefined' && isAnimationRunning) {
+                                    const chaves = Object.keys(annotations).filter(k => k.startsWith('linha_'));
+                                    const novoIndice = chaves.indexOf(key);
+                                    if (novoIndice !== -1) {
+                                        indiceAnimacaoAtual = novoIndice;
+                                    }
+                                }
                             } else if (!isHovered && ann.borderWidth === 2) {
                                 // APAGA E JOGA PRO FUNDO
                                 ann.drawTime = 'beforeDraw';
@@ -3419,6 +3659,11 @@ const dicionarioLinhas = {
                 myChart = new Chart(ctx, chartConfig);
             }
 
+			// MANTÉM A ANIMAÇÃO RODANDO SE ELA ESTIVER ATIVA (E ela recomeçará do zero por causa da trava lá em cima)
+            if (isAnimationRunning) {
+                iniciarAnimacaoEtiquetas(myChart);
+            }
+
             // Chama a atualização das fontes passando as chaves selecionadas e os índices do período
             atualizarFontesEspecificas(startIdx, endIdx, select1.value, select2.value);
         }
@@ -3449,6 +3694,48 @@ const dicionarioLinhas = {
             // Atualiza o gráfico instantaneamente para pintar o fundo e textos
             Chart.defaults.color = getComputedStyle(document.body).getPropertyValue('--text-main').trim();
             updateChart('none');
+        });
+		
+		// ==========================================
+        // TOGGLE DE EFEITOS SONOROS (🔔 / 🔕)
+        // ==========================================
+        const btnSound = document.getElementById('btn-sound');
+        
+        // Define a carinha inicial baseada na leitura da URL
+        btnSound.textContent = SONS ? '🔔' : '🔕';
+		btnSound.title = SONS ? "Desativar efeitos SONOROS" : "Ativar efeitos SONOROS";
+        
+        btnSound.addEventListener('click', () => {
+            SONS = !SONS; // Inverte o estado
+            btnSound.textContent = SONS ? '🔔' : '🔕';
+            
+            // Efeito visual elástico no botão
+            btnSound.style.transform = 'scale(1.25)';
+            setTimeout(() => btnSound.style.transform = 'none', 150);
+
+            if (SONS) {
+                // Toca um sonzinho alegre de confirmação (sem depender da função playSFX que avalia a própria variável)
+                try {
+                    const AudioContext = window.AudioContext || window.webkitAudioContext;
+                    const ctx = new AudioContext();
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(800, ctx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(1600, ctx.currentTime + 0.1);
+                    gain.gain.setValueAtTime(0.1, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
+                    osc.connect(gain); gain.connect(ctx.destination);
+                    osc.start(); osc.stop(ctx.currentTime + 0.1);
+                } catch(e) {}
+                
+                showCustomToast("<strong style='font-size: 15px;'>Sons Ativados 🔔</strong>", 2000);
+				btnSound.title = "Desativar efeitos SONOROS";
+            } else {
+                // Opcional: Mostra a notificação rápida
+                showCustomToast("<strong style='font-size: 15px;'>Sons Desativados 🔕</strong>", 2000);
+				btnSound.title = "Ativar efeitos SONOROS";
+            }
         });
 
         chkComparativo.addEventListener('change', handleUI);
@@ -3694,7 +3981,21 @@ const dicionarioLinhas = {
                     const gainNoise = ctx.createGain(); gainNoise.gain.setValueAtTime(0.8, ctx.currentTime);
                     gainNoise.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
                     noise.connect(filter); filter.connect(gainNoise); gainNoise.connect(ctx.destination); noise.start();
-                } 
+                }
+				else if (type === 'record') {
+                    // Som de Filmadora (Dois bipes curtos e agudos)
+                    for (let i = 0; i < 2; i++) {
+                        const osc = ctx.createOscillator();
+                        const gain = ctx.createGain();
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(2000, ctx.currentTime + i * 0.15);
+                        gain.gain.setValueAtTime(0.05, ctx.currentTime + i * 0.15); // Volume baixo
+                        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + i * 0.15 + 0.1);
+                        osc.connect(gain); gain.connect(ctx.destination);
+                        osc.start(ctx.currentTime + i * 0.15);
+                        osc.stop(ctx.currentTime + i * 0.15 + 0.1);
+                    }
+                }
                 else if (type === 'robot') {
                     // 5 bips rápidos com frequências aleatórias (estilo R2-D2)
                     for (let i = 0; i < 5; i++) {
@@ -3814,8 +4115,163 @@ const dicionarioLinhas = {
                         }
                     }
                 }
+                // NOVO: O bip super sutil para a animação das etiquetas
+                else if (type === 'play') {
+                    const osc = ctx.createOscillator(); 
+                    const gain = ctx.createGain();
+                    osc.type = 'sine'; // Onda suave
+                    osc.frequency.setValueAtTime(1230, ctx.currentTime); // Frequência médio-aguda (ligando)
+                    
+                    // Volume seguro (33%)
+                    gain.gain.setValueAtTime(0.33, ctx.currentTime); 
+                    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.05); 
+                    
+                    osc.connect(gain); 
+                    gain.connect(ctx.destination);
+                    osc.start(); 
+                    osc.stop(ctx.currentTime + 0.5);
+                }
+                else if (type === 'stop') {
+                    const osc = ctx.createOscillator(); 
+                    const gain = ctx.createGain();
+                    osc.type = 'sine'; 
+                    osc.frequency.setValueAtTime(321, ctx.currentTime); // Frequência grave (desligando/parando)
+                    
+                    // Volume seguro (33%)
+                    gain.gain.setValueAtTime(0.33, ctx.currentTime); 
+                    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.05); 
+                    
+                    osc.connect(gain); 
+                    gain.connect(ctx.destination);
+                    osc.start(); 
+                    osc.stop(ctx.currentTime + 0.5);
+                }
+				else if (type.startsWith('click_')) {
+                    const osc = ctx.createOscillator(); 
+                    const gain = ctx.createGain();
+                    
+                    let freqInicial = 800;
+                    let freqFinal = 800;
+                    let tipoOnda = 'sine';
+                    let volume = 0.3;
+
+                    // Esculpe o formato do som dependendo do final da string (ex: 'click_+')
+                    if (type === 'click_+') {        										// '+' Verde (Aumento) - 		 Agudo subindo: Frequência aguda que sobe rápido (Onda Sine, indicando elevação/sucesso)
+                        freqInicial = 800; freqFinal = 1600; tipoOnda = 'sine';
+                    } else if (type === 'click_-') { 										// '-' Vermelho (Diminuição) - 	 Grave descendo: Frequência média que desce rápido (Onda Triangle, indicando queda)
+                        freqInicial = 800; freqFinal = 400; tipoOnda = 'triangle';
+                    } else if (type === 'click_0') { 										// '0' Amarelo (Congelamento) -  Seco e monótono: Som seco, monótono e sem variação (Onda Square, indicando platô/congelamento)
+                        freqInicial = 400; freqFinal = 400; tipoOnda = 'square'; volume = 0.15;
+                    } else if (type === 'click_x') { 										// 'x' Azul (Regra Específica) - Ping rápido tipo notificação: Um "ping" bem fininho e agudo (Onda Sine de alta frequência, como uma notificação sistêmica)
+                        freqInicial = 1600; freqFinal = 1600; tipoOnda = 'sine'; volume = 0.2;
+                    } else if (type === 'click_o') { 										// 'o' Cinza (Regra Geral) - 	 Ping macio e abafado: Um "bloop" suave e grave (Onda Sine de baixa frequência, como um som de fundo macio)
+                        freqInicial = 400; freqFinal = 400; tipoOnda = 'sine'; volume = 0.4;
+                    }
+
+                    osc.type = tipoOnda;
+                    osc.frequency.setValueAtTime(freqInicial, ctx.currentTime);
+                    
+                    // Se a nota tiver escorregamento de afinação (glissando), aplica o efeito
+                    if (freqInicial !== freqFinal) {
+                        osc.frequency.exponentialRampToValueAtTime(freqFinal, ctx.currentTime + 0.05);
+                    }
+                    
+                    gain.gain.setValueAtTime(volume, ctx.currentTime); 
+                    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.05); 
+                    
+                    osc.connect(gain); 
+                    gain.connect(ctx.destination);
+                    osc.start(); 
+                    osc.stop(ctx.currentTime + 0.1); // Dura 100ms, super curtinho!
+                }
             } catch (e) {
                 console.log('Áudio não suportado.');
+            }
+        }
+		
+		// ==========================================
+        // MOTOR DE GRAVAÇÃO DE VÍDEO NATIVO (🎥)
+        // ==========================================
+        let mediaRecorder = null;
+        let recordedChunks = [];
+        let isRecording = false;
+
+        function toggleRecording() {
+            if (isRecording) {
+                // PARA A GRAVAÇÃO E A ANIMAÇÃO
+                if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+                    mediaRecorder.stop();
+                }
+                pararAnimacaoEtiquetas(myChart);
+                isRecording = false;
+                btnActiveAction.textContent = '⏺️'; // Trocou de 🎥 para ⏺️
+
+                // ==========================================
+                // REMOVE A PULSAÇÃO QUANDO A GRAVAÇÃO ACABA
+                // ==========================================
+                btnActiveAction.classList.remove('recording-pulse');
+
+                if (typeof playSFX === 'function') playSFX('zip'); // Som de finalização
+            } else {
+                // INICIA A GRAVAÇÃO
+                const canvas = document.getElementById('mainChart');
+                
+                // Tenta capturar a 30 FPS
+                const stream = canvas.captureStream(30); 
+                
+                // Tenta gravar em MP4 (h264) ou WebM (vp9) nativamente
+                let mimeType = 'video/webm;codecs=vp9';
+                if (MediaRecorder.isTypeSupported('video/mp4')) {
+                    mimeType = 'video/mp4';
+                } else if (!MediaRecorder.isTypeSupported(mimeType)) {
+                    mimeType = 'video/webm'; // Fallback
+                }
+
+				// MÁGICA DA QUALIDADE: Forçamos 25 Mbps para a imagem ficar "crisp" (nítida)
+                const options = { mimeType: mimeType, videoBitsPerSecond: 26214400 };
+                mediaRecorder = new MediaRecorder(stream, options);
+                recordedChunks = [];
+
+                mediaRecorder.ondataavailable = function(e) {
+                    if (e.data.size > 0) recordedChunks.push(e.data);
+                };
+
+                mediaRecorder.onstop = function() {
+                    const blob = new Blob(recordedChunks, { type: mimeType });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.style.display = 'none';
+                    a.href = url;
+                    
+                    // Descobre a extensão baseada no MimeType gerado
+                    const ext = mimeType.includes('mp4') ? 'mp4' : 'webm';
+					a.download = 'CGG x CAF x CAJ x CPF (' + new Date().toISOString().slice(0,10).replaceAll('-','_') + ' - ' + new Date().toTimeString().slice(0,8) + ').' + ext;
+                    
+                    document.body.appendChild(a);
+                    a.click();
+                    
+                    setTimeout(() => {
+                        document.body.removeChild(a);
+                        window.URL.revokeObjectURL(url);
+                    }, 100);
+                };
+
+                // Inicia o gravador e a animação simultaneamente!
+                mediaRecorder.start();
+                isRecording = true;
+                btnActiveAction.textContent = '🔴';
+                
+                // ==========================================
+                // INICIA A PULSAÇÃO QUANDO A GRAVAÇÃO COMEÇA
+                // ==========================================
+                btnActiveAction.classList.add('recording-pulse');
+                
+                if (typeof playSFX === 'function') playSFX('record'); // Bip de gravação
+                
+                // Dispara a nossa fita perfurada
+                isAnimationRunning = true;
+                indiceAnimacaoAtual = -1;
+                iniciarAnimacaoEtiquetas(myChart);
             }
         }
 
@@ -3850,9 +4306,25 @@ const dicionarioLinhas = {
             item.addEventListener('click', (e) => {
                 e.stopPropagation();
                 if (isReading) stopAudio(); // Para a fala se mudar de ferramenta
+				
+				// NOVO: Se o usuário trocar de ferramenta (ex: de Animação para Câmera), nós desligamos o motor
+                if (isAnimationRunning && currentAction === 'animate' && item.getAttribute('data-action') !== 'animate') {
+                    pararAnimacaoEtiquetas(myChart);
+                }
+                if (isRecording && currentAction === 'record' && item.getAttribute('data-action') !== 'record') {
+                    toggleRecording(); // Desliga a gravação e salva se trocar de menu
+                }
                 
                 currentAction = item.getAttribute('data-action');
-                btnActiveAction.textContent = item.textContent;
+                
+                // MÁGICA: Intercepta a claquete e injeta o Play/Pause (ou Stop se já estiver rodando via URL)
+                if (currentAction === 'animate') {
+                    btnActiveAction.textContent = isAnimationRunning ? '⏹️' : '⏯️';
+                } else if (currentAction === 'record') {
+                    btnActiveAction.textContent = isRecording ? '🔴' : '⏺️';
+                } else {
+                    btnActiveAction.textContent = item.textContent;
+                }
                 btnActiveAction.title = item.title;
                 
                 // Aplica as proporções específicas da Câmera vs Outros Emojis
@@ -3867,6 +4339,14 @@ const dicionarioLinhas = {
                 splitMenu.style.display = 'none';
                 btnToggleMenu.textContent = '▼';
             });
+        });
+		
+		// Efeitos de Hover para Áudio (A Animação agora tem estado fixo, sem hover)
+        btnActiveAction.addEventListener('mouseenter', () => {
+            if (isReading && currentAction === 'audio') btnActiveAction.textContent = '🔇';
+        });
+        btnActiveAction.addEventListener('mouseleave', () => {
+            if (isReading && currentAction === 'audio') btnActiveAction.textContent = audioToggle ? '🔊' : '🔉';
         });
 
         // ------------------------------------------
@@ -4004,7 +4484,34 @@ const dicionarioLinhas = {
         btnActiveAction.addEventListener('click', () => {
             if (currentAction === 'audio') {
                 toggleAudio();
-            } else if (!myChart || !myChart.data || myChart.data.datasets.length === 0) {
+            } else if (currentAction === 'animate') {
+                // Controle de Liga/Desliga da Animação (Toggle Play/Stop)
+                if (isAnimationRunning) {
+                    pararAnimacaoEtiquetas(myChart);
+                    btnActiveAction.textContent = '⏯️'; // Volta a ficar disponível para tocar 
+                    if (typeof playSFX === 'function') playSFX('stop');
+                } else {
+                    isAnimationRunning = true;
+                    indiceAnimacaoAtual = -1; // Começa sempre da esquerda
+                    
+                    isAnimPaused = false; // <--- TRAVA 1: Garante que o motor não nasce pausado!
+
+                    // A própria função iniciarAnimacaoEtiquetas agora dispara o 1º som e acende a luz imediatamente!
+                    iniciarAnimacaoEtiquetas(myChart);
+                    
+                    btnActiveAction.textContent = '⏹️'; // Vira o botão de Parar 
+                    if (typeof playSFX === 'function') playSFX('play');
+                }
+            } else if (currentAction === 'record') {
+                
+                // NOVO: Gatilho de gravação de vídeo
+                if (!myChart || !myChart.data || myChart.data.datasets.length === 0) {
+                    showCustomToast("<strong style='font-size: 15px;'>Nenhum dado plotado!</strong>", 3000);
+                    return;
+                }
+                toggleRecording();
+
+			} else if (!myChart || !myChart.data || myChart.data.datasets.length === 0) {
                 showCustomToast("<strong style='font-size: 15px;'>Nenhum dado plotado!</strong><br>Selecione ambas as séries 'desafiante' e 'desafiado' ou uma série avulsa, se desmarcada a opção 'desafio'.", 5555);
                 return;
             } else {
