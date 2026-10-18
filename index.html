@@ -224,12 +224,12 @@
         }
 		.chart-container {
             position: relative;
+			z-index: 1; /* Força o gráfico a respeitar a hierarquia do fundo */
             height: calc(100vh - 175px); /* Usa 100% da altura da tela (vh), descontando o tamanho do painel de botões */
             min-height: 425px; /* Garante que nunca fique esmagado em telas pequenas */
             width: 100%;
         }
-        
-        /* Modalzinho de Atalhos (Toast) */
+		/* Modalzinho de Atalhos (Toast) */
         .toast-shortcuts {
             position: fixed;
             bottom: 30px;
@@ -245,7 +245,7 @@
             opacity: 0;
             transform: translateY(20px);
             transition: opacity 0.5s ease, transform 0.5s ease;
-            pointer-events: none; /* Não atrapalha o clique do usuário nas coisas por trás */
+            pointer-events: auto; /* MÁGICA 1: Alterado para "auto" para sentir o mouse */
             z-index: 9999;
         }
         .toast-shortcuts.show {
@@ -359,7 +359,7 @@
                         <label style="display: flex; align-items: center; gap: 3px; cursor: pointer; font-size: 14px; color: var(--text-main); margin: 0;"><input type="checkbox" id="ipca" title="Deflacionar a valor presente"> IPCA</label>
                         
                         <!-- CAMERA SPLIT BUTTON -->
-                        <div class="split-action-container" id="split-container" style="position: relative; display: inline-flex; align-items: center; background-color: var(--input-bg); border: 1px solid var(--border); border-radius: 4px; height: 45px; margin-left: 10px; margin-bottom: 12px; transition: background-color 0.2s, border-color 0.2s;">
+                        <div class="split-action-container" id="split-container" style="position: relative; z-index: 9999; display: inline-flex; align-items: center; background-color: var(--input-bg); border: 1px solid var(--border); border-radius: 4px; height: 45px; margin-left: 10px; margin-bottom: 12px; transition: background-color 0.2s, border-color 0.2s;">
                             <button id="btn-active-action" style="background: transparent; border: none; cursor: pointer; padding: 0 0px; padding-bottom: 10px; line-height: 1; font-size: 40px; height: 100%; display: flex; align-items: center; justify-content: center; color: var(--text-main);" title="Capturar em PNG">📷</button>
                             <button id="btn-toggle-menu" style="background: transparent; border: none; border-left: 1px solid var(--border); cursor: pointer; padding: 0 6px; font-size: 15px; color: var(--text-muted); height: 100%; transition: border-color 0.2s, color 0.2s;" title="Selecionar função">▼</button>
                             
@@ -390,7 +390,7 @@
         <div class="chart-container">
             
             <!-- QUADRO DE KPI DINÂMICO (Oculto por padrão, ativado no hover da legenda) -->
-            <div id="kpi-container" style="position: absolute; top: 50px; left: 50%; transform: translateX(-50%); z-index: 10; display: none; flex-direction: column; gap: 12px; backdrop-filter: blur(4px); border: 2px solid; padding: 12px 18px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); pointer-events: none; transition: opacity 0.2s;">
+            <div id="kpi-container" style="position: absolute; top: 50px; left: 50%; transform: translateX(-50%); z-index: 10000; display: none; flex-direction: column; gap: 12px; backdrop-filter: blur(4px); border: 2px solid; padding: 12px 18px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); pointer-events: none; transition: opacity 0.2s;">
                 
                 <!-- LINHA 1: PERÍODO -->
                 <div style="display: flex; gap: 20px; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(128, 128, 128, 0.2); padding-bottom: 10px;">
@@ -426,7 +426,7 @@
                     </div>
 
                     <div style="text-align: right; min-width: 110px;">
-                        <div style="font-size: 10px; color: var(--text-muted); font-weight: bold; letter-spacing: 0.5px;">TETO NO PERÍODO</div>
+                        <div style="font-size: 10px; color: var(--text-muted); font-weight: bold; letter-spacing: 0.5px;">PICO NO PERÍODO</div>
                         <div id="kpi-max-val" style="font-size: 16px; font-weight: 900; color: var(--text-main); margin-top: 2px;">-</div>
                         <div id="kpi-max-data" style="font-size: 11px; color: var(--text-muted);">-</div>
                     </div>
@@ -452,7 +452,33 @@
                 </div>
             </div>
 
-            <canvas id="mainChart"></canvas>
+			<!-- MENU DE CONTEXTO (BOTÃO DIREITO) DA CALCULADORA TEMPORAL -->
+            <div id="context-menu" style="display: none; position: fixed; background: var(--controls-bg); border: 1px solid var(--border); box-shadow: 0 6px 18px rgba(0,0,0,0.18); padding: 12px; border-radius: 8px; z-index: 9999; flex-direction: column; gap: 10px;">
+                <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+                    <div style="display: flex; gap: 4px;">
+                        <input type="number" id="ctx-ini-ano" title="Ano Inicial" style="width: 58px; padding: 4px; font-size: 13px; border-radius: 4px; border: 1px solid var(--border); background: var(--input-bg); color: var(--text-main); outline: none; text-align: center;">
+                        <input type="number" id="ctx-ini-mes" title="Mês Inicial" style="width: 44px; padding: 4px; font-size: 13px; border-radius: 4px; border: 1px solid var(--border); background: var(--input-bg); color: var(--text-main); outline: none; text-align: center;">
+                    </div>
+                    <button id="ctx-btn-aplicar" title="Aplicar recorte" style="background: transparent; border: none; font-size: 18px; border-radius: 4px; border: 1px solid var(--border); background: var(--input-bg); color: var(--text-main); cursor: pointer; padding: 0 4px; outline: none; transition: transform 0.2s;">✂️</button>
+                    <div style="display: flex; gap: 4px;">
+                        <input type="number" id="ctx-fim-ano" title="Ano Final" style="width: 58px; padding: 4px; font-size: 13px; border-radius: 4px; border: 1px solid var(--border); background: var(--input-bg); color: var(--text-main); outline: none; text-align: center;">
+                        <input type="number" id="ctx-fim-mes" title="Mês Final" style="width: 44px; padding: 4px; font-size: 13px; border-radius: 4px; border: 1px solid var(--border); background: var(--input-bg); color: var(--text-main); outline: none; text-align: center;">
+                    </div>
+                </div>
+                <div style="display: flex; align-items: center; justify-content: center; gap: 6px; padding-top: 8px; border-top: 1px dashed var(--border);">
+                    <button id="ctx-sinal" title="Alternar direção (+ do Início ou - do Fim)" style="width: 26px; height: 26px; padding: 0; font-size: 16px; font-weight: bold; border-radius: 4px; border: 1px solid var(--border); background: var(--input-bg); color: var(--text-main); cursor: pointer; transition: background 0.2s;">+</button>
+                    <input type="number" id="ctx-inc-ano" value="0" style="width: 45px; height: 26px; box-sizing: border-box; text-align: center; font-size: 13px; border-radius: 4px; border: 1px solid var(--border); background: var(--input-bg); color: var(--text-main); outline: none;">
+                    <span style="font-size: 11px; color: var(--text-muted);">anos</span>
+                    <input type="number" id="ctx-inc-mes" value="0" style="width: 40px; height: 26px; box-sizing: border-box; text-align: center; font-size: 13px; border-radius: 4px; border: 1px solid var(--border); background: var(--input-bg); color: var(--text-main); outline: none;">
+                    <span style="font-size: 11px; color: var(--text-muted);">meses</span>
+                </div>
+            </div>
+
+            <!-- BALÕES DE ARRASTO (DRAG-TO-ZOOM) -->
+            <div id="drag-tooltip-start" style="display: none; position: fixed; background: var(--controls-bg); border: 1px solid var(--border); box-shadow: 0 4px 12px rgba(0,0,0,0.15); padding: 4px 10px; border-radius: 6px; z-index: 9999; font-size: 13px; font-weight: bold; color: var(--text-main); pointer-events: none; transform: translate(-50%, -120%); white-space: nowrap;"></div>
+            <div id="drag-tooltip-end" style="display: none; position: fixed; background: var(--controls-bg); border: 1px solid var(--border); box-shadow: 0 4px 12px rgba(0,0,0,0.15); padding: 4px 10px; border-radius: 6px; z-index: 9999; font-size: 13px; font-weight: bold; color: var(--text-main); pointer-events: none; transform: translate(-50%, -120%); white-space: nowrap;"></div>
+			
+			<canvas id="mainChart"></canvas>
         </div>
         
         <div class="footer-container" style="margin-top: 40px; border-top: 1px solid var(--border); padding-top: 20px; width: 100%; font-size: 13px;">
@@ -531,8 +557,8 @@
         const LOGO = (parametroLogo === 'ASTN' || parametroLogo === 'ASCGU') ? parametroLogo : null;
 
         // NOVA TRAVA MESTRA DE ÁUDIO (Mudo por padrão)
-      //const SONS = urlParamsIniciais.get('sons') === '1';
-		let SONS = urlParamsIniciais.get('sons') === '0';
+      //const SONS = urlParamsIniciais.get('sons') === '0';
+		let SONS = urlParamsIniciais.get('sons') === '1';
 
         // 1. Logo ASTN
         const svgASTN = `data:image/svg+xml;utf8,
@@ -1439,15 +1465,7 @@ const dicionarioLinhas = {
 
         const ctx = document.getElementById('mainChart').getContext('2d');
         let myChart;
-        
-		// MÁGICA: Limpa todos os alfinetes se o usuário der duplo clique na área do gráfico
-        document.getElementById('mainChart').addEventListener('dblclick', () => {
-            if (window.pinnedTooltips && window.pinnedTooltips.length > 0) {
-                limparAlfinetes();
-                showCustomToast("<strong style='font-size: 15px;'>🧹 TELA LIMPA</strong><br>Todos os alfinetes foram removidos.", 2000);
-            }
-        });
-        
+
         // <--- TRAVA 2: Destrava a pausa de animação assim que o mouse sair fisicamente do quadro!
         document.getElementById('mainChart').addEventListener('mouseleave', () => {
             if (typeof isAnimPaused !== 'undefined') {
@@ -1458,9 +1476,48 @@ const dicionarioLinhas = {
         let currentLabelFontSize = 15;
         let userFontOverridden = false;
         
-        let toastShownAvulso = false;
+		let toastShownAvulso = false;
         let toastShownDesafio = false;
         let toastTimeout;
+        window.isToastHovered = false; // Flag global para o mouse
+
+        // ==========================================
+        // INTELIGÊNCIA DA "TORRADA" DE ATALHOS
+        // ==========================================
+        const toastElObj = document.getElementById('toast-shortcuts');
+        
+        // Segura o tempo se o mouse entrar
+        toastElObj.addEventListener('mouseenter', () => {
+            window.isToastHovered = true;
+            clearTimeout(toastTimeout);
+        });
+        
+        // Retoma o tempo (rápido) se o mouse sair
+        toastElObj.addEventListener('mouseleave', () => {
+            window.isToastHovered = false;
+            toastTimeout = setTimeout(() => {
+                toastElObj.classList.remove('show');
+            }, 1000); // Some em 1 segundo após tirar o mouse
+        });
+
+        // MÁGICA 2: Some instantaneamente se clicar em qualquer lugar fora dela
+        document.addEventListener('mousedown', (e) => {
+            if (toastElObj.classList.contains('show') && !toastElObj.contains(e.target)) {
+                toastElObj.classList.remove('show');
+                clearTimeout(toastTimeout);
+            }
+        });
+
+        // MÁGICA 3: Some instantaneamente se usar o teclado
+        document.addEventListener('keydown', (e) => {
+            // Ignora teclas modificadoras sozinhas para não sumir se ele só encostar no "Shift"
+            if (['Shift', 'Control', 'Alt', 'Meta'].includes(e.key)) return;
+            
+            if (toastElObj.classList.contains('show')) {
+                toastElObj.classList.remove('show');
+                clearTimeout(toastTimeout);
+            }
+        }, { capture: true }); // "capture: true" garante que roda antes de qualquer atalho ser processado!
 
 		function encontrarLeisDoPeriodo(cargo, dataInicio, dataFim, nivelAtual) {
             
@@ -1525,31 +1582,40 @@ const dicionarioLinhas = {
             // Remove a visibilidade atual e limpa o timer anterior (se houver)
             clearTimeout(toastTimeout);
             toast.classList.remove('show');
-            
-            // Dá um respiro minúsculo pro navegador processar a saída e re-animar a entrada
+			
+			// Dá um respiro minúsculo pro navegador processar a saída e re-animar a entrada
             setTimeout(() => {
-                let htmlContent = '<strong style="font-size: 15px;">ATALHOS</strong><br><br>'
-                                + ' Zoom:  <span class="toast-mono">[⌃+]⇧+▲|▼<i>([control+]shift)</i></span><br>'   //⬆|⬇ 
-                                + ' Pan: <span class="toast-mono">[⌃+]⇧+◀︎|▶︎<i>([control+]shift)</i></span><br>'   //⬅|⮕
-                                + ' Escalas: <span class="toast-mono"><u>absoluto</u>:$(⇧+4) <u>relativo</u>:%(⇧+5)</span><br>'
-                                + ' Opções: <span class="toast-mono"><u>desafio</u>:#(⇧+3) <u>rótulos</u>:@(⇧+2) <u>IPCA</u>:&(⇧+6|7)</span><br>';
+                // Monta um CSS Grid perfeito: Primeira coluna colada na direita (max-content), Segunda fluida na esquerda (1fr)
+                let htmlContent = '<strong style="font-size: 15px; margin-bottom: 10px; display: block;">COMANDOS & ATALHOS</strong>'
+                                + '<div style="display: grid; grid-template-columns: max-content 1fr; gap: 6px 8px; align-items: baseline;">'
+                                + '<div style="text-align: right; white-space: nowrap;">Zoom:</div>		<div><span class="toast-mono">[^+]⇧+▲|▼ <i>([control+]shift)</i></span></div>'
+                                + '<div style="text-align: right; white-space: nowrap;">Pan:</div>		<div><span class="toast-mono">[^+]⇧+◀︎|▶︎ <i>([control+]shift)</i></span></div>'
+                                + '<div style="text-align: right; white-space: nowrap;">Resetar:</div>	<div><span class="toast-mono">0</i></span></div>'
+                                + '<div style="text-align: right; white-space: nowrap;">Escalas:</div>	<div><span class="toast-mono"><u>absoluto</u>: $ (⇧+4) &nbsp;&nbsp;<u>relativo</u>: % (⇧+5)</span></div>'
+                                + '<div style="text-align: right; white-space: nowrap;">Opções:</div>	<div><span class="toast-mono"><u>desafio</u>: # (⇧+3) &nbsp;<u>rótulos</u>: @ (⇧+2) &nbsp;<u>IPCA</u>: & (⇧+6|7)</span></div>';
+                
                 if (isComp) {
-                    htmlContent += ' Inverter: <span class="toast-mono">␣<i>(space)</i></span><br>'
-                                 + ' Níveis: <span class="toast-mono"><u>base</u>:1 <u>meio</u>:2 <u>topo</u>:3</span><br>';
+                    htmlContent += '<div style="text-align: right; white-space: nowrap;">Inverter:</div><div><span class="toast-mono">␣ <i>(space)</i></span></div>'
+                                 + '<div style="text-align: right; white-space: nowrap;">Níveis:</div>	<div><span class="toast-mono"><u>base</u>: 1 &nbsp;<u>meio</u>: 2 &nbsp;<u>topo</u>: 3</span></div>';
                 } else {
-                    htmlContent += ' Navegar: <span class="toast-mono">◀︎|▶︎</span><br>';
+                    htmlContent += '<div style="text-align: right; white-space: nowrap;">Navegar:</div>	<div><span class="toast-mono">◀︎|▶︎</span></div>';
                 }
                 
-                htmlContent += ' Rótulos: <span class="toast-mono">–|+ </span><br>'   //➖|➕
-                             + ' Limpar: <span class="toast-mono">X</span><br>';   //✖️
+                htmlContent += '<div style="text-align: right; white-space: nowrap;">Rótulos:</div>		<div><span class="toast-mono">–|+</span></div>'
+                             + '<div style="text-align: right; white-space: nowrap;">Limpar:</div>		<div><span class="toast-mono">X</span></div>'
+                             + '</div>'; // Fecha o Grid
                     
                 toast.innerHTML = htmlContent;
                 toast.classList.add('show');
     
                 clearTimeout(toastTimeout);
-                toastTimeout = setTimeout(() => {
-                    toast.classList.remove('show');
-                }, 9999); // O modalzinho some sozinho após 10 segundos
+                
+                // Só dispara o cronômetro automático se o mouse já não estiver lá em cima descansando
+                if (!window.isToastHovered) {
+                    toastTimeout = setTimeout(() => {
+                        toast.classList.remove('show');
+                    }, 5000);
+                }
             }, 500);
         }
 		
@@ -2420,17 +2486,23 @@ const dicionarioLinhas = {
                 }
                 return formatYAxisNumber(v, isRelative, isQtd, isCont, isIndice, isFator);
             };
-
-            // INJEÇÃO DA LINHA 1: PERÍODO
+			
+			// INJEÇÃO DA LINHA 1: PERÍODO
             document.getElementById('kpi-inicio-val').textContent = formatKPI(valInicial);
             document.getElementById('kpi-inicio-data').innerHTML = '<i>' + dataInicial + '</i>';
             document.getElementById('kpi-fim-val').textContent = formatKPI(valFinal);
             document.getElementById('kpi-fim-data').innerHTML = '<i>' + dataFinal + '</i>';
 
-            const varPeriodo = valInicial !== 0 ? ((valFinal / valInicial) - 1) * 100 : 0;
-            const sinalPeriodo = varPeriodo > 0 ? '▲ +' : (varPeriodo < 0 ? '▼ ' : '');
-            document.getElementById('kpi-var-periodo-val').textContent = sinalPeriodo + varPeriodo.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '%';
-            document.getElementById('kpi-var-periodo-val').style.color = varPeriodo > 0 ? '#27ae60' : (varPeriodo < 0 ? '#e74c3c' : 'var(--text-muted)');
+            const varPeriodoEl = document.getElementById('kpi-var-periodo-val');
+            if (valInicial !== 0 && valInicial !== null) {
+                const varPeriodo = ((valFinal / valInicial) - 1) * 100;
+                const sinalPeriodo = varPeriodo > 0 ? '▲ +' : (varPeriodo < 0 ? '▼ ' : '');
+                varPeriodoEl.textContent = sinalPeriodo + varPeriodo.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '%';
+                varPeriodoEl.style.color = varPeriodo > 0 ? '#27ae60' : (varPeriodo < 0 ? '#e74c3c' : 'var(--text-muted)');
+            } else {
+                varPeriodoEl.textContent = '-';
+                varPeriodoEl.style.color = 'var(--text-muted)';
+            }
 
             // INJEÇÃO DA LINHA 2: EXTREMOS
             document.getElementById('kpi-min-val').textContent = formatKPI(minVal);
@@ -2438,11 +2510,15 @@ const dicionarioLinhas = {
             document.getElementById('kpi-max-val').textContent = formatKPI(maxVal);
             document.getElementById('kpi-max-data').innerHTML = '<i>' + labels[maxIdx] + '</i>';
 
-            if (minVal !== 0) {
+            const varExtremosEl = document.getElementById('kpi-var-extremos-val');
+            if (minVal !== 0 && minVal !== Infinity && minVal !== null) {
                 const varExtremos = ((maxVal / minVal) - 1) * 100;
                 const sinalExtremos = varExtremos > 0 ? '▲ +' : (varExtremos < 0 ? '▼ ' : '');
-                document.getElementById('kpi-var-extremos-val').textContent = sinalExtremos + varExtremos.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '%';
-                document.getElementById('kpi-var-extremos-val').style.color = varExtremos > 0 ? '#27ae60' : (varExtremos < 0 ? '#e74c3c' : 'var(--text-muted)');
+                varExtremosEl.textContent = sinalExtremos + varExtremos.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '%';
+                varExtremosEl.style.color = varExtremos > 0 ? '#27ae60' : (varExtremos < 0 ? '#e74c3c' : 'var(--text-muted)');
+            } else {
+                varExtremosEl.textContent = '-';
+                varExtremosEl.style.color = 'var(--text-muted)';
             }
 
             // A MÁGICA VISUAL: Match de Cores
@@ -3208,6 +3284,14 @@ const dicionarioLinhas = {
                     const idxInicio = dbData.Competencia.indexOf(labelInicio);
                     const idxFim = dbData.Competencia.indexOf(labelFim);
                     
+                    // NOVO: Sincroniza os selects do "Modo Avulso" para acompanharem a tela
+                    const sIni = document.getElementById('data-inicio');
+                    const sFim = document.getElementById('data-fim');
+                    if (sIni && sFim) {
+                        sIni.value = labelInicio;
+                        sFim.value = labelFim;
+                    }
+                    
                     // Dispara a atualização do painel inferior!
                     atualizarFontesEspecificas(idxInicio, idxFim, select1.value, select2.value);
                 }
@@ -3218,97 +3302,81 @@ const dicionarioLinhas = {
                 data: { labels: chartLabels, datasets: datasets },
                 options: {
 					onClick: function(event, elements, chart) {
-                        if (elements.length === 0) return;
-                        const index = elements[0].index;
-                        
-                        // O Contador de Cliques Rápidos (Reseta após 350ms)
+                        // ==========================================
+                        // MODO TESOURA (ALT + CLIQUE LIVRE NO EIXO Y)
+                        // ==========================================
+                        if (event.native.altKey) {
+                            // Mágica: Pega o mês exato baseado na posição horizontal do mouse (ignora a altura/Y)
+                            const indiceX = chart.scales.x.getValueForPixel(event.x);
+                            
+                            if (indiceX >= 0 && indiceX < chart.data.labels.length) {
+                                const dataClicada = chart.data.labels[indiceX];
+                                
+                                if (!window.zoomMarcadorInicio) {
+                                    window.zoomMarcadorInicio = dataClicada;
+                                    showCustomToast(`<span style="font-size: 15px;">📍 <strong>Início com precisão marcado:</strong> ${dataClicada}</span><br><span style="font-size: 14px;"><em>segure Alt e dê um <u>clique</u> na data final</em></span>`, 4500);
+                                } else {
+                                    const dataInicio = window.zoomMarcadorInicio;
+                                    const dataFim = dataClicada;
+                                    window.zoomMarcadorInicio = null; 
+                                    
+                                    const idx1 = dbData.Competencia.indexOf(dataInicio);
+                                    const idx2 = dbData.Competencia.indexOf(dataFim);
+                                    
+                                    // Organiza automaticamente independente de qual lado o usuário clicou primeiro
+                                    const startIdx = Math.min(idx1, idx2);
+                                    const endIdx = Math.max(idx1, idx2);
+                                    
+                                    chart.options.scales.x.min = dbData.Competencia[startIdx];
+                                    chart.options.scales.x.max = dbData.Competencia[endIdx];
+                                    chart.update();
+                                    
+                                    handleZoomPan({chart: chart});
+                                    
+                                    showCustomToast(`<span style="font-size: 15px;">🎯 <strong>ZOOM COM PRECISÃO APLICADO!</strong></span><br><span style="font-size: 14px;">Período: <u>${dbData.Competencia[startIdx]}</u> a <u>${dbData.Competencia[endIdx]}</u>.</span><br><span style="font-size: 14px;"><em>use Shift+0 para resetar a visão global</em></span>`, 5000);
+                                }
+                            }
+                            return; // Aborta o resto da função para não criar alfinete acidental!
+                        }
+
+                        // ==========================================
+                        // CLIQUE ÚNICO E DUPLO (Balões e Limpeza)
+                        // ==========================================
                         window.clickCount = (window.clickCount || 0) + 1;
-                        
                         if (window.clickCount === 1) {
                             window.pinClickTimer = setTimeout(() => {
                                 const totalCliques = window.clickCount;
-                                window.clickCount = 0; // Reseta a contagem
+                                window.clickCount = 0; 
                                 
-                                if (totalCliques === 1) {
-                                    // ==========================================
-                                    // CLIQUE ÚNICO: ALFINETAR ETIQUETA
-                                    // ==========================================
+                                // LIMPEZA UNIVERSAL NO DUPLO CLIQUE (Ignora se pegou na linha ou no fundo)
+                                if (totalCliques >= 2) {
+                                    if (window.pinnedTooltips && window.pinnedTooltips.length > 0) {
+                                        limparAlfinetes();
+                                        window.zoomMarcadorInicio = null; 
+                                        showCustomToast("<strong style='font-size: 15px;'>🧹 TELA LIMPA</strong><br>Todos os alfinetes foram removidos.", 2000);
+                                        if (typeof playSFX === 'function') playSFX('floppy'); 
+                                    }
+                                } 
+                                // CLIQUE ÚNICO NA LINHA (Cria alfinete)
+                                else if (totalCliques === 1 && elements.length > 0) {
+                                    const index = elements[0].index;
                                     if (window.pinnedTooltips && window.pinnedTooltips.find(p => p.index === index)) return;
-                                    
                                     if (window.pinnedTooltips && window.pinnedTooltips.length >= 3) {
-                                        showCustomToast("<strong style='font-size: 15px;'>LIMITE ATINGIDO 📌</strong><br>Três alfinetes já fixados; dê um duplo clique no gráfico para limpar todos.", 4000);
+                                        showCustomToast("<strong style='font-size: 15px;'>LIMITE ATINGIDO 📌</strong><br>Três alfinetes já fixados; dê um <b>duplo clique</b> para limpar todos.", 4000);
                                         return;
                                     }
                                     criarAlfinete(chart, index);
-                                    
-                                } else if (totalCliques >= 3) {
-                                    // ==========================================
-                                    // TRIPLO CLIQUE: TESOURA DE ZOOM EXATO
-                                    // ==========================================
-                                    const dataClicada = chart.data.labels[index];
-                                    
-                                    if (!window.zoomMarcadorInicio) {
-                                        // Marca o Início
-                                        window.zoomMarcadorInicio = dataClicada;
-                                        showCustomToast(`📍<b>Início com precisão marcado:</b> ${dataClicada}<br><i>dê um <u>triplo clique</u> na data final</i>`, 4500);
-                                        if (typeof playSFX === 'function') playSFX('click_x'); 
-                                    } else {
-                                        // Marca o Fim e executa o Corte Matemático
-                                        const dataInicio = window.zoomMarcadorInicio;
-                                        const dataFim = dataClicada;
-                                        window.zoomMarcadorInicio = null; // Reseta a memória
-                                        
-                                        // Pega a posição na base completa (evitando que ele trave se você clicar de trás pra frente)
-                                        const idx1 = dbData.Competencia.indexOf(dataInicio);
-                                        const idx2 = dbData.Competencia.indexOf(dataFim);
-                                        const startIdx = Math.min(idx1, idx2);
-                                        const endIdx = Math.max(idx1, idx2);
-                                        
-                                        // Força os limites na escala X
-                                        chart.options.scales.x.min = dbData.Competencia[startIdx];
-                                        chart.options.scales.x.max = dbData.Competencia[endIdx];
-                                        chart.update();
-                                        
-                                        // Como alteramos a escala via código, chamamos o HandleZoomPan para atualizar as fontes inferiores!
-                                        handleZoomPan({chart: chart});
-                                        
-                                        showCustomToast(`🎯<b>ZOOM COM PRECISÃO APLICADO!</b><br>Período: <u>${dbData.Competencia[startIdx]}</u> a <u>${dbData.Competencia[endIdx]}</u>.<br><i><i>use Shift+0 para resetar o zoom</i></i>`, 5000);
-                                        if (typeof playSFX === 'function') playSFX('camera'); 
+                                } 
+                                // CLIQUE NO VAZIO (Cancela MODO TESOURA)
+                                else if (totalCliques === 1 && elements.length === 0) {
+                                    if (window.zoomMarcadorInicio) {
+                                        window.zoomMarcadorInicio = null;
+                                        showCustomToast("<span style='font-size: 14px;'>📍 <em>Marcação de precisão cancelada.</em></span>", 2500);
                                     }
                                 }
-                                // Obs: O duplo-clique (totalCliques === 2) é capturado pelo ouvinte nativo 'dblclick' do canvas, então não fazemos nada aqui.
-                            }, 350); 
+                            }, 250); 
                         }
                     },
-/*
-					onClick: function(event, elements, chart) {
-                        if (elements.length === 0) return;
-                        
-                        // 1. Se já existe um timer rodando, é porque este é o SEGUNDO clique (duplo clique)
-                        if (window.pinClickTimer) {
-                            clearTimeout(window.pinClickTimer); // Aborta a criação do alfinete
-                            window.pinClickTimer = null;
-                            return; // Sai da função sem fazer nada
-                        }
-                        
-                        const index = elements[0].index;
-                        
-                        // 2. Inicia o Timer para o primeiro clique (espera 250ms)
-                        window.pinClickTimer = setTimeout(() => {
-                            window.pinClickTimer = null; // Reseta o timer para os próximos cliques
-                            
-                            // 3. A lógica original que crava o alfinete
-                            if (window.pinnedTooltips && window.pinnedTooltips.find(p => p.index === index)) return;
-                            
-                            if (window.pinnedTooltips && window.pinnedTooltips.length >= 3) {
-                                showCustomToast("<strong style='font-size: 15px;'>LIMITE ATINGIDO 📌</strong><br>Três alfinetes já fixados; dê um duplo clique no gráfico para limpar todos.", 4000);
-                                return;
-                            }
-                            
-                            criarAlfinete(chart, index);
-                        }, 333); // 250 milissegundos é o tempo padrão universal para separar cliques simples de duplos
-                    },
-*/
                     // O NOVO MOTOR: IGNORA O BUG DO PLUGIN E CALCULA A DISTÂNCIA MATEMÁTICA 2D
                     onHover: function(e, elements, chart) {
                         if (!chart.chartArea) return;
@@ -3487,6 +3555,7 @@ const dicionarioLinhas = {
 					},
                     plugins: {
                         datalabels: {
+							clip: true,
 							display: function(context) {
 								if (!document.getElementById('rotulos').checked) return false;
 								
@@ -3677,9 +3746,19 @@ const dicionarioLinhas = {
                             },
                             zoom: {
                                 wheel: { enabled: true }, // Rodinha do mouse
-                                drag: { enabled: true },  // Clicar e arrastar um retângulo para zoom
+                              //drag: { enabled: true },  // Clicar e arrastar um retângulo para zoom
                                 pinch: { enabled: true }, // Pinça no mobile
                                 mode: 'x', // Zoom apenas no tempo
+								
+								// A MÁGICA DA CORTINA: Segure ALT, clique e arraste para desenhar o período!
+                                drag: { 
+                                    enabled: true,
+                                  //modifierKey: 'alt', // Usa a mesma tecla do Sniper Mode para criar consistência
+                                    backgroundColor: 'rgba(123, 123, 0, 0.33)', // Cortina azul translúcida
+                                    borderColor: 'rgba(123, 123, 0, 1)',
+                                    borderWidth: 1
+                                },
+								
                                 onZoom: handleZoomPan // <--- E NOVA CHAMADA AQUI
                             }
                         },
@@ -3803,11 +3882,11 @@ const dicionarioLinhas = {
                     osc.start(); osc.stop(ctx.currentTime + 0.1);
                 } catch(e) {}
                 
-                showCustomToast("<strong style='font-size: 15px;'>Sons Ativados 🔔</strong>", 2000);
+                showCustomToast("<strong style='font-size: 15px;'>Sons ativados 🔔</strong>", 2000);
 				btnSound.title = "Desativar efeitos SONOROS";
             } else {
                 // Opcional: Mostra a notificação rápida
-                showCustomToast("<strong style='font-size: 15px;'>Sons Desativados 🔕</strong>", 2000);
+                showCustomToast("<strong style='font-size: 15px;'>Sons desativados 🔕</strong>", 2000);
 				btnSound.title = "Ativar efeitos SONOROS";
             }
         });
@@ -3989,25 +4068,65 @@ const dicionarioLinhas = {
             // ==========================================
             // CÂMERA E NAVEGAÇÃO TEMPORAL
             // ==========================================
-            
-            // ZOOM RESET (Voltar ao original) - Shift + 0
+
+            // ZOOM RESET (Voltar ao original) - Tecla 0
             else if (e.key === '0') {
-                if (myChart && typeof myChart.resetZoom === 'function') {
-                    myChart.resetZoom();
-                    handleZoomPan({chart: myChart});
+                if (myChart) {
+                    // 1. Limpa o estado interno do plugin de zoom PRIMEIRO
+                    if (typeof myChart.resetZoom === 'function') {
+                        myChart.resetZoom('none');
+                    }
+                    
+                    // 2. Agora arranca as travas manuais (Alt+Clique / Menu de Contexto)
+                    myChart.options.scales.x.min = undefined;
+                    myChart.options.scales.x.max = undefined;
+                    
+                    // 3. No Modo Avulso, restaura os selects de período antes de atualizar
+                    const sIni = document.getElementById('data-inicio');
+                    const sFim = document.getElementById('data-fim');
+                    if (!isComp && sIni && sFim && sIni.options.length > 0) {
+                        sIni.selectedIndex = 0;
+                        sFim.selectedIndex = sFim.options.length - 1;
+                        updateChart('default');
+                    } else {
+                        myChart.update('default');
+                    }
+                    
+                    // 4. Sincroniza os selects com os extremos reais da série plotada
+                    const lbls = myChart.data.labels;
+                    if (sIni && sFim && lbls && lbls.length > 0) {
+                        sIni.value = lbls[0];
+                        sFim.value = lbls[lbls.length - 1];
+                    }
+                    
+                    // 5. Limpa memórias, atualiza textos de rodapé e alfinetes
+                    window.zoomMarcadorInicio = null;
+                    limparAlfinetes();
+                    if (lbls && lbls.length > 0) {
+                        const idxIni = dbData.Competencia.indexOf(lbls[0]);
+                        const idxFim = dbData.Competencia.indexOf(lbls[lbls.length - 1]);
+                        atualizarFontesEspecificas(
+                            idxIni !== -1 ? idxIni : 0,
+                            idxFim !== -1 ? idxFim : dbData.Competencia.length - 1,
+                            select1.value,
+                            select2.value
+                        );
+                    }
+                    showCustomToast("<strong style='font-size: 15px;'>🌍 VISÃO GLOBAL RESTAURADA</strong>", 2500);
+                    if (typeof playSFX === 'function') playSFX('zip');
                 }
                 e.preventDefault(); 
             }
             
             // ZOOM (Requer Shift)
             else if (e.key === 'ArrowUp' && e.shiftKey) {
-                // MÁGICA: Se segurar o Ctrl (ou Cmd), o salto cai de 10% para apenas 2% (Ajuste Fino)
-                const factor = (e.ctrlKey || e.metaKey) ? 1.02 : 1.1;
+                // MÁGICA: Se segurar o Ctrl (ou Cmd), o salto cai de 10% para apenas 0,1% (Ajuste Fino)
+                const factor = (e.ctrlKey || e.metaKey) ? 1.001 : 1.1;
                 if (myChart && typeof myChart.zoom === 'function') myChart.zoom(factor);
                 e.preventDefault(); 
             }
             else if (e.key === 'ArrowDown' && e.shiftKey) {
-                const factor = (e.ctrlKey || e.metaKey) ? 0.98 : 0.9;
+                const factor = (e.ctrlKey || e.metaKey) ? 0.999 : 0.9;
                 if (myChart && typeof myChart.zoom === 'function') myChart.zoom(factor);
                 e.preventDefault(); 
             }
@@ -4035,47 +4154,6 @@ const dicionarioLinhas = {
                 }
             }
         });
-/*
-			// ZOOM RESET (Voltar ao original) - Shift + 0
-            else if (e.key === '0') {
-                if (myChart && typeof myChart.resetZoom === 'function') {
-                    myChart.resetZoom();
-					handleZoomPan({chart: myChart});
-                }
-                e.preventDefault(); 
-            }
-			
-            // ZOOM (Requer Shift)
-            else if (e.key === 'ArrowUp' && e.shiftKey) {
-                if (myChart && typeof myChart.zoom === 'function') myChart.zoom(1.1);
-                e.preventDefault(); 
-            }
-            else if (e.key === 'ArrowDown' && e.shiftKey) {
-                if (myChart && typeof myChart.zoom === 'function') myChart.zoom(0.9);
-                e.preventDefault(); 
-            }
-            
-            // PAN E NAVEGAÇÃO DE SÉRIES
-            else if (e.key === 'ArrowLeft') {
-                if (e.shiftKey) {
-                    if (myChart && typeof myChart.pan === 'function') myChart.pan({x: 50}); 
-                    e.preventDefault();
-                } else if (!isComp) {
-                    document.getElementById('btn-prev').click(); 
-                    e.preventDefault();
-                }
-            }
-            else if (e.key === 'ArrowRight') {
-                if (e.shiftKey) {
-                    if (myChart && typeof myChart.pan === 'function') myChart.pan({x: -50}); 
-                    e.preventDefault();
-                } else if (!isComp) {
-                    document.getElementById('btn-next').click(); 
-                    e.preventDefault();
-                }
-            }
-        });
-*/
 
 		// ==========================================
         // SINTETIZADOR DE EFEITOS SONOROS (WEB AUDIO API)
@@ -4707,6 +4785,245 @@ const dicionarioLinhas = {
             atualizarTravasUI();   // Garante que o checkbox do IPCA fique no estado correto
             updateChart('none');   // Desenha o gráfico inicial
         }
+
+		// ==========================================
+        // MENU DE CONTEXTO MATEMÁTICO (Inputs Number)
+        // ==========================================
+        const contextMenu = document.getElementById('context-menu');
+        const ctxIniAno = document.getElementById('ctx-ini-ano'); const ctxIniMes = document.getElementById('ctx-ini-mes');
+        const ctxFimAno = document.getElementById('ctx-fim-ano'); const ctxFimMes = document.getElementById('ctx-fim-mes');
+        const ctxIncAno = document.getElementById('ctx-inc-ano'); const ctxIncMes = document.getElementById('ctx-inc-mes');
+        const ctxSinal  = document.getElementById('ctx-sinal');
+        const btnAplicar = document.getElementById('ctx-btn-aplicar');
+
+        let ctxMenuTimeout = null;
+
+        const parseComp = (comp) => { const [y, m] = comp.split('/'); return parseInt(y) * 12 + parseInt(m); };
+        const formatComp = (absM) => { const y = Math.floor((absM - 1) / 12); const m = ((absM - 1) % 12) + 1; return `${y}/${m.toString().padStart(2, '0')}`; };
+        
+        // Puxa para a data válida mais próxima da série plotada (ignora buracos)
+        const snapToValidDate = (comp) => {
+            if (myChart.data.labels.includes(comp)) return comp;
+            const targetAbs = parseComp(comp); let closest = myChart.data.labels[0]; let minDiff = Infinity;
+            for (const c of myChart.data.labels) { const diff = Math.abs(parseComp(c) - targetAbs); if (diff < minDiff) { minDiff = diff; closest = c; } }
+            return closest;
+        };
+
+        const canvasElMenu = document.getElementById('mainChart');
+        canvasElMenu.addEventListener('contextmenu', (e) => {
+            e.preventDefault(); 
+            if (!myChart || !myChart.data.labels.length) return;
+
+            const anosValidos = myChart.data.labels.map(c => parseInt(c.split('/')[0], 10));
+            const minAno = Math.min(...anosValidos); const maxAno = Math.max(...anosValidos);
+            ctxIniAno.min = minAno; ctxIniAno.max = maxAno; ctxFimAno.min = minAno; ctxFimAno.max = maxAno;
+
+            // MÁGICA 1: Lê as bordas FÍSICAS da tela (Mata o bug dos 6 meses)
+            let minIndex = myChart.scales.x.min !== undefined ? Math.max(0, Math.floor(myChart.scales.x.min)) : 0;
+            let maxIndex = myChart.scales.x.max !== undefined ? Math.min(myChart.data.labels.length - 1, Math.ceil(myChart.scales.x.max)) : myChart.data.labels.length - 1;
+            
+            let minStr = myChart.data.labels[minIndex];
+            let maxStr = myChart.data.labels[maxIndex];
+
+            window.isProgrammaticUpdateMenu = true;
+            ctxIniAno.value = minStr.split('/')[0]; 
+            ctxIniMes.value = minStr.split('/')[1]; 
+            ctxFimAno.value = maxStr.split('/')[0]; 
+            ctxFimMes.value = maxStr.split('/')[1]; 
+            
+            let diff = parseComp(maxStr) - parseComp(minStr);
+            ctxIncAno.value = Math.floor(diff / 12); 
+            ctxIncMes.value = diff % 12; 
+            window.isProgrammaticUpdateMenu = false;
+
+            const menuWidth = 320;
+            const leftPos = (e.clientX + menuWidth > window.innerWidth) ? (window.innerWidth - menuWidth - 15) : e.clientX;
+            contextMenu.style.left = `${leftPos}px`; contextMenu.style.top = `${e.clientY}px`; contextMenu.style.display = 'flex';
+            
+            clearTimeout(ctxMenuTimeout);
+            setTimeout(() => ctxIniAno.focus(), 50);
+            if (typeof playSFX === 'function') playSFX('click_o');
+        });
+
+        contextMenu.addEventListener('mouseleave', () => {
+            ctxMenuTimeout = setTimeout(() => {
+                if (!contextMenu.querySelector('input:focus')) {
+                    contextMenu.style.display = 'none';
+                }
+            }, 1234);
+        });
+        contextMenu.addEventListener('mouseenter', () => clearTimeout(ctxMenuTimeout));
+
+        const formatarEMatarMeses = (inputAno, inputMes, isLinhaSuperior) => {
+            let ano = parseInt(inputAno.value, 10);
+            let mes = parseInt(inputMes.value, 10);
+            if (isNaN(ano) || isNaN(mes)) return;
+
+            if (isLinhaSuperior) {
+                while (mes > 12) { mes -= 12; ano += 1; }
+                while (mes < 1) { mes += 12; ano -= 1; }
+            } else { 
+                while (mes > 11) { mes -= 12; ano += 1; }
+                while (mes < 0) { mes += 12; ano -= 1; }
+                if (ano < 0) { ano = 0; mes = 0; }
+            }
+            
+            inputAno.value = ano;
+            inputMes.value = isLinhaSuperior ? String(mes).padStart(2, '0') : String(mes);
+        };
+
+        const rebalancearLinha1 = () => {
+            if (window.isProgrammaticUpdateMenu) return;
+            formatarEMatarMeses(ctxIniAno, ctxIniMes, true);
+            formatarEMatarMeses(ctxFimAno, ctxFimMes, true);
+
+            let iniSnap = snapToValidDate(`${ctxIniAno.value}/${ctxIniMes.value.padStart(2,'0')}`);
+            let fimSnap = snapToValidDate(`${ctxFimAno.value}/${ctxFimMes.value.padStart(2,'0')}`);
+
+            let iniAbs = parseComp(iniSnap);
+            let fimAbs = parseComp(fimSnap);
+            
+            if (iniAbs > fimAbs) {
+                let tAbs = iniAbs; iniAbs = fimAbs; fimAbs = tAbs;
+                let tStr = iniSnap; iniSnap = fimSnap; fimSnap = tStr;
+            }
+
+            window.isProgrammaticUpdateMenu = true;
+            ctxIniAno.value = iniSnap.split('/')[0];
+            ctxIniMes.value = iniSnap.split('/')[1];
+            ctxFimAno.value = fimSnap.split('/')[0];
+            ctxFimMes.value = fimSnap.split('/')[1];
+
+            let diff = fimAbs - iniAbs;
+            ctxIncAno.value = Math.floor(diff / 12); 
+            ctxIncMes.value = diff % 12;
+            window.isProgrammaticUpdateMenu = false;
+        };
+
+        const rebalancearLinha2 = () => {
+            if (window.isProgrammaticUpdateMenu) return;
+            formatarEMatarMeses(ctxIncAno, ctxIncMes, false);
+            
+            const totalOffset = (parseInt(ctxIncAno.value) || 0) * 12 + (parseInt(ctxIncMes.value) || 0);
+            let iniAbs = parseComp(`${ctxIniAno.value}/${ctxIniMes.value.padStart(2,'0')}`);
+            let fimAbs = parseComp(`${ctxFimAno.value}/${ctxFimMes.value.padStart(2,'0')}`);
+            
+            window.isProgrammaticUpdateMenu = true;
+            if (ctxSinal.textContent === '+') {
+                let novoFim = formatComp(iniAbs + totalOffset);
+                ctxFimAno.value = novoFim.split('/')[0]; 
+                ctxFimMes.value = novoFim.split('/')[1].padStart(2, '0');
+            } else {
+                let novoIni = formatComp(fimAbs - totalOffset);
+                ctxIniAno.value = novoIni.split('/')[0]; 
+                ctxIniMes.value = novoIni.split('/')[1].padStart(2, '0');
+            }
+            window.isProgrammaticUpdateMenu = false;
+            
+            rebalancearLinha1();
+        };
+
+        [ctxIniAno, ctxIniMes, ctxFimAno, ctxFimMes].forEach(el => el.addEventListener('input', rebalancearLinha1));
+        [ctxIncAno, ctxIncMes].forEach(el => el.addEventListener('input', rebalancearLinha2));
+        
+        ctxSinal.addEventListener('click', () => { 
+            ctxSinal.textContent = ctxSinal.textContent === '+' ? '-' : '+'; 
+            rebalancearLinha2();
+            if (typeof playSFX === 'function') playSFX('click_o'); 
+        });
+
+        // MÁGICA 2: Tesoura agora aciona a filtragem perfeitamente
+        btnAplicar.addEventListener('click', () => {
+            btnAplicar.style.transform = 'scale(1.2)';
+            setTimeout(() => btnAplicar.style.transform = 'none', 150);
+
+            let iniSnap = snapToValidDate(`${ctxIniAno.value}/${ctxIniMes.value.padStart(2, '0')}`);
+            let fimSnap = snapToValidDate(`${ctxFimAno.value}/${ctxFimMes.value.padStart(2, '0')}`);
+
+            let idx1 = dbData.Competencia.indexOf(iniSnap);
+            let idx2 = dbData.Competencia.indexOf(fimSnap);
+            
+            myChart.options.scales.x.min = dbData.Competencia[Math.min(idx1, idx2)];
+            myChart.options.scales.x.max = dbData.Competencia[Math.max(idx1, idx2)];
+            myChart.update();
+            handleZoomPan({chart: myChart}); // Dispara a sincronia da central visual
+
+            if (typeof playSFX === 'function') playSFX('click_x');
+            contextMenu.style.display = 'none';
+        });
+
+        document.addEventListener('mousedown', (e) => {
+            if (contextMenu.style.display === 'flex' && !contextMenu.contains(e.target)) contextMenu.style.display = 'none';
+        });
+        
+        contextMenu.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') { contextMenu.style.display = 'none'; window.focus(); e.stopPropagation(); }
+            if (e.key === 'Enter') { btnAplicar.click(); e.stopPropagation(); }
+        });
+		
+		// ==========================================
+        // BALÕES DE ARRASTO COM EMOJIS (Drag Nativo)
+        // ==========================================
+		const canvasEl = document.getElementById('mainChart');
+        let isDraggingArea = false;
+        let dragStartX = null;
+        let dragStartY = null;
+        let dragStartValX = null; // <-- MÁGICA: Memória do índice inicial
+        const dtStart = document.getElementById('drag-tooltip-start');
+        const dtEnd = document.getElementById('drag-tooltip-end');
+
+        canvasEl.addEventListener('mousedown', (e) => {
+            // Aceita apenas o clique esquerdo (0)
+            if (e.button !== 0 || e.altKey || e.shiftKey || e.ctrlKey || e.metaKey) return;
+            
+            const valX = myChart.scales.x.getValueForPixel(e.offsetX);
+            if (valX >= 0 && valX < myChart.data.labels.length) {
+                isDraggingArea = true;
+                dragStartX = e.clientX;
+                dragStartY = e.clientY;
+                dragStartValX = valX; // Guarda onde a seleção começou
+            }
+        });
+
+        canvasEl.addEventListener('mousemove', (e) => {
+            if (!isDraggingArea) return;
+            
+            // Só libera os balões se arrastar mais de 10 pixels horizontais 
+            if (Math.abs(e.clientX - dragStartX) > 10) {
+                const currentValX = myChart.scales.x.getValueForPixel(e.offsetX);
+                if (currentValX >= 0 && currentValX < myChart.data.labels.length) {
+                    
+                    let labelStart = myChart.data.labels[dragStartValX]; 
+                    let labelEnd = myChart.data.labels[currentValX];
+                    
+                    // Inversão Dinâmica de Bandeiras (Sempre 🚩 à esquerda e 🏁 à direita da caixa)
+                    if (e.clientX >= dragStartX) { 
+                        dtStart.innerHTML = `🚩 ${labelStart}`; 
+                        dtEnd.innerHTML = `${labelEnd} 🏁`; 
+                    } else { 
+                        dtStart.innerHTML = `${labelStart} 🏁`; 
+                        dtEnd.innerHTML = `🚩 ${labelEnd}`; 
+                    }
+                    
+                    dtStart.style.left = dragStartX + 'px'; 
+                    dtStart.style.top = dragStartY + 'px'; 
+                    dtStart.style.display = 'block';
+                    
+                    dtEnd.style.left = e.clientX + 'px'; 
+                    dtEnd.style.top = dragStartY + 'px'; 
+                    dtEnd.style.display = 'block';
+                }
+            }
+        });
+
+        window.addEventListener('mouseup', () => {
+            if (isDraggingArea) {
+                isDraggingArea = false;
+                dtStart.style.display = 'none';
+                dtEnd.style.display = 'none';
+                if (typeof playSFX === 'function') playSFX('click_x');
+            }
+        });
     </script>
 </body>
 </html>
