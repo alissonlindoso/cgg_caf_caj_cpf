@@ -3343,7 +3343,7 @@ const dicionarioLinhas = {
                                     window.zoomMarcadorInicioX = event.native.clientX;
                                     window.zoomMarcadorInicioY = event.native.clientY;
 
-                                    showCustomToast(`<span style="font-size: 15px;"><strong>RECORTE TEMPORAL 📍</strong></span><br><span style="font-size: 14px;"><u>Início:</u> ${dataClicada}<br/><em>clique com <u>Alt</u> para completar</em></span>`, 4321);
+                                  //showCustomToast(`<span style="font-size: 15px;"><strong>RECORTE TEMPORAL 📍</strong></span><br><span style="font-size: 14px;"><u>Início:</u> ${dataClicada}<br/><em>clique com <u>Alt</u> para completar</em></span>`, 4321);
                                 } else {
                                     const dataInicio = window.zoomMarcadorInicio;
                                     const dataFim = dataClicada;
@@ -3364,7 +3364,7 @@ const dicionarioLinhas = {
                                     
                                     handleZoomPan({chart: chart});
                                     
-                                    showCustomToast(`<span style="font-size: 15px;"><strong>RECORTE TEMPORAL 🎯</strong></span><br><span style="font-size: 14px;"><u>Início:</u> ${dbData.Competencia[startIdx]}<br/><u>Término:</u> ${dbData.Competencia[endIdx]}<br/><em>tecle <u>zero</u> para resetar</em></span>`, 4321);
+                                  //showCustomToast(`<span style="font-size: 15px;"><strong>RECORTE TEMPORAL 🎯</strong></span><br><span style="font-size: 14px;"><u>Início:</u> ${dbData.Competencia[startIdx]}<br/><u>Término:</u> ${dbData.Competencia[endIdx]}<br/><em>tecle <u>zero</u> para resetar</em></span>`, 4321);
 									
 									// MÁGICA 3: O Pequeno Delay! Só apaga os balões 800ms após o clique
                                     setTimeout(() => {
@@ -3421,7 +3421,7 @@ const dicionarioLinhas = {
                                         window.zoomMarcadorInicio = null;
                                         document.getElementById('drag-tooltip-start').style.display = 'none';
                                         document.getElementById('drag-tooltip-end').style.display = 'none';
-                                        showCustomToast(`<span style='font-size: 15px;'><strong>RECORTE TEMPORAL ✘</strong></span><br><span style="font-size: 14px;"><em>cancelado</em></span>`, 1234);
+                                      //showCustomToast(`<span style='font-size: 15px;'><strong>RECORTE TEMPORAL ✘</strong></span><br><span style="font-size: 14px;"><em>cancelado</em></span>`, 1234);
                                     }
                                 }
                             }, 250); 
