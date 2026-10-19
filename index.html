@@ -1588,46 +1588,23 @@ const dicionarioLinhas = {
                 // Monta um CSS Grid perfeito: Primeira coluna colada na direita (max-content), Segunda fluida na esquerda (1fr)
                 let htmlContent = '<strong style="font-size: 15px; margin-bottom: 10px; display: block;">COMANDOS & ATALHOS</strong>'
                                 + '<div style="display: grid; grid-template-columns: max-content 1fr; gap: 6px 8px; align-items: baseline;">'
-                                + '<div style="text-align: right; white-space: nowrap;">Zoom:</div>		<div><span class="toast-mono">[^+]⇧+▲|▼ <i>([control+]shift)</i></span></div>'
-                                + '<div style="text-align: right; white-space: nowrap;">Pan:</div>		<div><span class="toast-mono">[^+]⇧+◀︎|▶︎ <i>([control+]shift)</i></span></div>'
-                                + '<div style="text-align: right; white-space: nowrap;">Resetar:</div>	<div><span class="toast-mono">0</i></span></div>'
+                                + '<div style="text-align: right; white-space: nowrap;">Zoom/Pan:</div>	<div><span class="toast-mono">[Control +] Shift + setas <i>(^+⇧+🡄|🡆|🡇|🡅)</i></span></div>'
+                                + '<div style="text-align: right; white-space: nowrap;">Recorte:</div>	<div><span class="toast-mono">Alt + clique <i>(⎇+🡼)</i></span></div>'
+                                + '<div style="text-align: right; white-space: nowrap;">Cálculo:</div>	<div><span class="toast-mono">clique direito <i>(menu de contexto)</i></span></div>'
+                                + '<div style="text-align: right; white-space: nowrap;">Resetar:</div>	<div><span class="toast-mono">tecla zero <i>(0)</i></span></div>'
                                 + '<div style="text-align: right; white-space: nowrap;">Escalas:</div>	<div><span class="toast-mono"><u>absoluto</u>: $ (⇧+4) &nbsp;&nbsp;<u>relativo</u>: % (⇧+5)</span></div>'
-                                + '<div style="text-align: right; white-space: nowrap;">Opções:</div>	<div><span class="toast-mono"><u>desafio</u>: # (⇧+3) &nbsp;<u>rótulos</u>: @ (⇧+2) &nbsp;<u>IPCA</u>: & (⇧+6|7)</span></div>';
+                                + '<div style="text-align: right; white-space: nowrap;">Opções:</div>	<div><span class="toast-mono"><u>desafio</u>: # (⇧+3) &nbsp;<u>rótulos</u>: @ (⇧+2) &nbsp;<u>IPCA</u>: & (⇧+6|7)</span></div>'
+                                + '<div style="text-align: right; white-space: nowrap;">Notas:</div>	<div><span class="toast-mono"><u>afixar</u>: clique esquerdo &nbsp;<u>desafixar</u>: duplo-clique</span></div>';
                 if (isComp) {
-                    htmlContent += '<div style="text-align: right; white-space: nowrap;">Inverter:</div><div><span class="toast-mono">␣ <i>(space)</i></span></div>'
+                    htmlContent += '<div style="text-align: right; white-space: nowrap;">Inverter:</div><div><span class="toast-mono">barra de espaço <i>(␣)</i></span></div>'
                                  + '<div style="text-align: right; white-space: nowrap;">Níveis:</div>	<div><span class="toast-mono"><u>base</u>: 1 &nbsp;<u>meio</u>: 2 &nbsp;<u>topo</u>: 3</span></div>';
                 } else {
                     htmlContent += '<div style="text-align: right; white-space: nowrap;">Navegar:</div>	<div><span class="toast-mono">◀︎|▶︎</span></div>';
                 }
                 
                 htmlContent += '<div style="text-align: right; white-space: nowrap;">Rótulos:</div>		<div><span class="toast-mono">–|+</span></div>'
-                             + '<div style="text-align: right; white-space: nowrap;">Limpar:</div>		<div><span class="toast-mono">X</span></div>'
-                             + '</div>'; // Fecha o Grid
-
-
-
-/*
-                let htmlContent = '<strong style="font-size: 15px; margin-bottom: 10px; display: block;">COMANDOS & ATALHOS</strong>'
-                                + '<div style="display: grid; grid-template-columns: max-content 1fr; gap: 6px 8px; align-items: baseline;">'
-                                + '<div style="text-align: right; white-space: nowrap;">Zoom/Pan:</div>	<div><span class="toast-mono">[^+]⇧+Setas <i>ou</i> Arrastar Mouse</span></div>'
-                                + '<div style="text-align: right; white-space: nowrap;">Recorte:</div>	<div><span class="toast-mono">Alt+Clique <i>(nas datas das pontas)</i></span></div>'
-                                + '<div style="text-align: right; white-space: nowrap;">Calculadora:</div><div><span class="toast-mono">Botão Direito <i>no gráfico</i></span></div>'
-                                + '<div style="text-align: right; white-space: nowrap;">Resetar:</div>	<div><span class="toast-mono">0</span></div>'
-                                + '<div style="text-align: right; white-space: nowrap;">Escalas:</div>	<div><span class="toast-mono"><u>abs.</u>: $ (⇧+4) &nbsp;&nbsp;<u>rel.</u>: % (⇧+5)</span></div>'
-                                + '<div style="text-align: right; white-space: nowrap;">Opções:</div>	<div><span class="toast-mono"><u>desafio</u>: # &nbsp;<u>rótulos</u>: @ &nbsp;<u>IPCA</u>: &</span></div>';
-                if (isComp) {
-                    htmlContent += '<div style="text-align: right; white-space: nowrap;">Inverter:</div><div><span class="toast-mono">␣ <i>(space)</i></span></div>'
-                                 + '<div style="text-align: right; white-space: nowrap;">Níveis:</div>	<div><span class="toast-mono"><u>base</u>: 1 &nbsp;<u>meio</u>: 2 &nbsp;<u>topo</u>: 3</span></div>';
-                } else {
-                    htmlContent += '<div style="text-align: right; white-space: nowrap;">Navegar:</div>	<div><span class="toast-mono">◀︎|▶︎</span></div>';
-                }
-                
-                htmlContent += '<div style="text-align: right; white-space: nowrap;">Fonte/Lupa:</div>	<div><span class="toast-mono">–|+</span></div>'
-                             + '<div style="text-align: right; white-space: nowrap;">Alfinetes:</div>	<div><span class="toast-mono"><u>fixar</u>: Clique &nbsp;<u>limpar</u>: Duplo-Clique</span></div>'
-                             + '<div style="text-align: right; white-space: nowrap;">Limpar Tudo:</div><div><span class="toast-mono">X</span></div>'
-                             + '</div>'; 
-*/
-
+                             + '<div style="text-align: right; white-space: nowrap;">Limpar:</div>		<div><span class="toast-mono">✖</span></div>'
+                             + '</div>';
                     
                 toast.innerHTML = htmlContent;
                 toast.classList.add('show');
@@ -3149,7 +3126,7 @@ const dicionarioLinhas = {
                     // Regra C: É um Cargo Específico ou Linha Exata
                     else {
 /*
-                        // O PULO DO GATO: Se o alvo for TFC, ele tenta achar "TFC" ou "TFFC" no nome da série plotada
+                        // Se o alvo for TFC, ele tenta achar "TFC" ou "TFFC" no nome da série plotada
                         const termosParaBusca = deParaEtiquetas[alvo] || [alvo];
 */
                         // TRADUTOR BIDIRECIONAL DE ETIQUETAS (Com suporte automático a sufixos como "base", "topo")
@@ -3343,7 +3320,7 @@ const dicionarioLinhas = {
                                     window.zoomMarcadorInicioX = event.native.clientX;
                                     window.zoomMarcadorInicioY = event.native.clientY;
 
-                                  //showCustomToast(`<span style="font-size: 15px;"><strong>RECORTE TEMPORAL 📍</strong></span><br><span style="font-size: 14px;"><u>Início:</u> ${dataClicada}<br/><em>clique com <u>Alt</u> para completar</em></span>`, 4321);
+                                    showCustomToast(`<span style="font-size: 15px;"><strong>RECORTE TEMPORAL 📍</strong></span><br><span style="font-size: 14px;"><u>Início:</u> ${dataClicada}<br/><em>clique com <u>Alt</u> para completar</em></span>`, 4321);
                                 } else {
                                     const dataInicio = window.zoomMarcadorInicio;
                                     const dataFim = dataClicada;
@@ -3364,7 +3341,7 @@ const dicionarioLinhas = {
                                     
                                     handleZoomPan({chart: chart});
                                     
-                                  //showCustomToast(`<span style="font-size: 15px;"><strong>RECORTE TEMPORAL 🎯</strong></span><br><span style="font-size: 14px;"><u>Início:</u> ${dbData.Competencia[startIdx]}<br/><u>Término:</u> ${dbData.Competencia[endIdx]}<br/><em>tecle <u>zero</u> para resetar</em></span>`, 4321);
+                                    showCustomToast(`<span style="font-size: 15px;"><strong>RECORTE TEMPORAL 🎯</strong></span><br><span style="font-size: 14px;"><u>Início:</u> ${dbData.Competencia[startIdx]}<br/><u>Término:</u> ${dbData.Competencia[endIdx]}<br/><em>tecle <u>zero</u> para resetar</em></span>`, 4321);
 									
 									// MÁGICA 3: O Pequeno Delay! Só apaga os balões 800ms após o clique
                                     setTimeout(() => {
@@ -3421,7 +3398,7 @@ const dicionarioLinhas = {
                                         window.zoomMarcadorInicio = null;
                                         document.getElementById('drag-tooltip-start').style.display = 'none';
                                         document.getElementById('drag-tooltip-end').style.display = 'none';
-                                      //showCustomToast(`<span style='font-size: 15px;'><strong>RECORTE TEMPORAL ✘</strong></span><br><span style="font-size: 14px;"><em>cancelado</em></span>`, 1234);
+                                        showCustomToast(`<span style='font-size: 15px;'><strong>RECORTE TEMPORAL ✘</strong></span><br><span style="font-size: 14px;"><em>cancelado</em></span>`, 1234);
                                     }
                                 }
                             }, 250); 
