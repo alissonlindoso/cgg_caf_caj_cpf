@@ -1593,7 +1593,6 @@ const dicionarioLinhas = {
                                 + '<div style="text-align: right; white-space: nowrap;">Resetar:</div>	<div><span class="toast-mono">0</i></span></div>'
                                 + '<div style="text-align: right; white-space: nowrap;">Escalas:</div>	<div><span class="toast-mono"><u>absoluto</u>: $ (⇧+4) &nbsp;&nbsp;<u>relativo</u>: % (⇧+5)</span></div>'
                                 + '<div style="text-align: right; white-space: nowrap;">Opções:</div>	<div><span class="toast-mono"><u>desafio</u>: # (⇧+3) &nbsp;<u>rótulos</u>: @ (⇧+2) &nbsp;<u>IPCA</u>: & (⇧+6|7)</span></div>';
-                
                 if (isComp) {
                     htmlContent += '<div style="text-align: right; white-space: nowrap;">Inverter:</div><div><span class="toast-mono">␣ <i>(space)</i></span></div>'
                                  + '<div style="text-align: right; white-space: nowrap;">Níveis:</div>	<div><span class="toast-mono"><u>base</u>: 1 &nbsp;<u>meio</u>: 2 &nbsp;<u>topo</u>: 3</span></div>';
@@ -1604,6 +1603,31 @@ const dicionarioLinhas = {
                 htmlContent += '<div style="text-align: right; white-space: nowrap;">Rótulos:</div>		<div><span class="toast-mono">–|+</span></div>'
                              + '<div style="text-align: right; white-space: nowrap;">Limpar:</div>		<div><span class="toast-mono">X</span></div>'
                              + '</div>'; // Fecha o Grid
+
+
+
+/*
+                let htmlContent = '<strong style="font-size: 15px; margin-bottom: 10px; display: block;">COMANDOS & ATALHOS</strong>'
+                                + '<div style="display: grid; grid-template-columns: max-content 1fr; gap: 6px 8px; align-items: baseline;">'
+                                + '<div style="text-align: right; white-space: nowrap;">Zoom/Pan:</div>	<div><span class="toast-mono">[^+]⇧+Setas <i>ou</i> Arrastar Mouse</span></div>'
+                                + '<div style="text-align: right; white-space: nowrap;">Recorte:</div>	<div><span class="toast-mono">Alt+Clique <i>(nas datas das pontas)</i></span></div>'
+                                + '<div style="text-align: right; white-space: nowrap;">Calculadora:</div><div><span class="toast-mono">Botão Direito <i>no gráfico</i></span></div>'
+                                + '<div style="text-align: right; white-space: nowrap;">Resetar:</div>	<div><span class="toast-mono">0</span></div>'
+                                + '<div style="text-align: right; white-space: nowrap;">Escalas:</div>	<div><span class="toast-mono"><u>abs.</u>: $ (⇧+4) &nbsp;&nbsp;<u>rel.</u>: % (⇧+5)</span></div>'
+                                + '<div style="text-align: right; white-space: nowrap;">Opções:</div>	<div><span class="toast-mono"><u>desafio</u>: # &nbsp;<u>rótulos</u>: @ &nbsp;<u>IPCA</u>: &</span></div>';
+                if (isComp) {
+                    htmlContent += '<div style="text-align: right; white-space: nowrap;">Inverter:</div><div><span class="toast-mono">␣ <i>(space)</i></span></div>'
+                                 + '<div style="text-align: right; white-space: nowrap;">Níveis:</div>	<div><span class="toast-mono"><u>base</u>: 1 &nbsp;<u>meio</u>: 2 &nbsp;<u>topo</u>: 3</span></div>';
+                } else {
+                    htmlContent += '<div style="text-align: right; white-space: nowrap;">Navegar:</div>	<div><span class="toast-mono">◀︎|▶︎</span></div>';
+                }
+                
+                htmlContent += '<div style="text-align: right; white-space: nowrap;">Fonte/Lupa:</div>	<div><span class="toast-mono">–|+</span></div>'
+                             + '<div style="text-align: right; white-space: nowrap;">Alfinetes:</div>	<div><span class="toast-mono"><u>fixar</u>: Clique &nbsp;<u>limpar</u>: Duplo-Clique</span></div>'
+                             + '<div style="text-align: right; white-space: nowrap;">Limpar Tudo:</div><div><span class="toast-mono">X</span></div>'
+                             + '</div>'; 
+*/
+
                     
                 toast.innerHTML = htmlContent;
                 toast.classList.add('show');
@@ -1619,7 +1643,7 @@ const dicionarioLinhas = {
             }, 500);
         }
 		
-		function showCustomToast(htmlMessage, duration = 6000) {
+		function showCustomToast(htmlMessage, duration = 4321) {
             const toast = document.getElementById('toast-shortcuts');
             clearTimeout(toastTimeout);
             toast.classList.remove('show');
@@ -1811,7 +1835,7 @@ const dicionarioLinhas = {
             }, 222);            
 
             navigator.clipboard.writeText(urlFinal).then(() => {
-                showCustomToast("<strong style='font-size: 15px;'>Link copiado para a área de transferência!</strong><br>Cole para compartilhar a parametrização selecionada.", 4444);
+                showCustomToast("<strong style='font-size: 15px;'>LINK COPIADO PARA ÁREA DE TRANSFERÊNCIA 🌍</strong><br><i>Cole para compartilhar a parametrização selecionada</i>", 4321);
             }).catch(err => {
                 console.error('❌ Erro ao copiar o link.', err);
 				showToast('❌ Erro ao copiar o link.');
@@ -2121,7 +2145,7 @@ const dicionarioLinhas = {
             pinDiv.style.top = (y - 15) + 'px'; // Sobe 15px para ficar acima da bolinha
             pinDiv.style.transform = 'translate(-50%, -100%)'; // Centraliza e joga para cima
             
-            pinDiv.innerHTML = `<div style="font-weight:bold; margin-bottom:8px; font-family: 'Segoe UI', sans-serif;">${dateLabel} <span style="float:right; opacity:0.6; font-size:12px; margin-left:15px;" title="Clique para remover">📌✖</span></div>
+            pinDiv.innerHTML = `<div style="font-weight:bold; margin-bottom:8px; font-family: 'Segoe UI', sans-serif;">📌 ${dateLabel} <span style="float:right; opacity:0.6; font-size:12px; margin-left:15px;" title="Clique para remover">✖</span></div>
                                 ${bodyHtml}
                                 ${footerHtml}`;
 
@@ -3314,11 +3338,18 @@ const dicionarioLinhas = {
                                 
                                 if (!window.zoomMarcadorInicio) {
                                     window.zoomMarcadorInicio = dataClicada;
-                                    showCustomToast(`<span style="font-size: 15px;">📍 <strong>Início com precisão marcado:</strong> ${dataClicada}</span><br><span style="font-size: 14px;"><em>segure Alt e dê um <u>clique</u> na data final</em></span>`, 4500);
+                                    
+                                    // MÁGICA 1: Ancora fisicamente a posição na tela para o balão não sair do lugar
+                                    window.zoomMarcadorInicioX = event.native.clientX;
+                                    window.zoomMarcadorInicioY = event.native.clientY;
+
+                                    showCustomToast(`<span style="font-size: 15px;"><strong>RECORTE TEMPORAL 📍</strong></span><br><span style="font-size: 14px;"><u>Início:</u> ${dataClicada}<br/><em>clique com <u>Alt</u> para completar</em></span>`, 4321);
                                 } else {
                                     const dataInicio = window.zoomMarcadorInicio;
                                     const dataFim = dataClicada;
-                                    window.zoomMarcadorInicio = null; 
+                                    
+                                    // MÁGICA 2: Congela os balões de acompanharem o mouse durante o "delay"
+                                    window.sniperZooming = true;
                                     
                                     const idx1 = dbData.Competencia.indexOf(dataInicio);
                                     const idx2 = dbData.Competencia.indexOf(dataFim);
@@ -3333,7 +3364,15 @@ const dicionarioLinhas = {
                                     
                                     handleZoomPan({chart: chart});
                                     
-                                    showCustomToast(`<span style="font-size: 15px;">🎯 <strong>ZOOM COM PRECISÃO APLICADO!</strong></span><br><span style="font-size: 14px;">Período: <u>${dbData.Competencia[startIdx]}</u> a <u>${dbData.Competencia[endIdx]}</u>.</span><br><span style="font-size: 14px;"><em>use Shift+0 para resetar a visão global</em></span>`, 5000);
+                                    showCustomToast(`<span style="font-size: 15px;"><strong>RECORTE TEMPORAL 🎯</strong></span><br><span style="font-size: 14px;"><u>Início:</u> ${dbData.Competencia[startIdx]}<br/><u>Término:</u> ${dbData.Competencia[endIdx]}<br/><em>tecle <u>zero</u> para resetar</em></span>`, 4321);
+									
+									// MÁGICA 3: O Pequeno Delay! Só apaga os balões 800ms após o clique
+                                    setTimeout(() => {
+                                        document.getElementById('drag-tooltip-start').style.display = 'none';
+                                        document.getElementById('drag-tooltip-end').style.display = 'none';
+                                        window.zoomMarcadorInicio = null;
+                                        window.sniperZooming = false; // Descongela
+                                    }, 800);
                                 }
                             }
                             return; // Aborta o resto da função para não criar alfinete acidental!
@@ -3349,12 +3388,21 @@ const dicionarioLinhas = {
                                 window.clickCount = 0; 
                                 
                                 // LIMPEZA UNIVERSAL NO DUPLO CLIQUE (Ignora se pegou na linha ou no fundo)
-                                if (totalCliques >= 2) {
+								if (totalCliques >= 2) {
+                                    let limpouAlgo = false;
+									
                                     if (window.pinnedTooltips && window.pinnedTooltips.length > 0) {
                                         limparAlfinetes();
-                                        window.zoomMarcadorInicio = null; 
-                                        showCustomToast("<strong style='font-size: 15px;'>🧹 TELA LIMPA</strong><br>Todos os alfinetes foram removidos.", 2000);
-                                        if (typeof playSFX === 'function') playSFX('floppy'); 
+                                        limpouAlgo = true;
+                                    }
+                                    if (window.zoomMarcadorInicio) {
+                                        window.zoomMarcadorInicio = null;
+                                        document.getElementById('drag-tooltip-start').style.display = 'none';
+                                        document.getElementById('drag-tooltip-end').style.display = 'none';
+                                        limpouAlgo = true;
+                                    }
+                                    if (limpouAlgo) {
+                                        showCustomToast("<strong style='font-size: 15px;'>ANOTAÇÕES DESAFIXADAS 🧹</strong>", 1234);
                                     }
                                 } 
                                 // CLIQUE ÚNICO NA LINHA (Cria alfinete)
@@ -3362,7 +3410,7 @@ const dicionarioLinhas = {
                                     const index = elements[0].index;
                                     if (window.pinnedTooltips && window.pinnedTooltips.find(p => p.index === index)) return;
                                     if (window.pinnedTooltips && window.pinnedTooltips.length >= 3) {
-                                        showCustomToast("<strong style='font-size: 15px;'>LIMITE ATINGIDO 📌</strong><br>Três alfinetes já fixados; dê um <b>duplo clique</b> para limpar todos.", 4000);
+                                        showCustomToast("<strong style='font-size: 15px;'>LIMITE DE TRÊS ANOTAÇÕES AFIXADAS 📌</strong><br><i>Dê um <u>duplo clique</u> para limpar</i>", 4321);
                                         return;
                                     }
                                     criarAlfinete(chart, index);
@@ -3371,7 +3419,9 @@ const dicionarioLinhas = {
                                 else if (totalCliques === 1 && elements.length === 0) {
                                     if (window.zoomMarcadorInicio) {
                                         window.zoomMarcadorInicio = null;
-                                        showCustomToast("<span style='font-size: 14px;'>📍 <em>Marcação de precisão cancelada.</em></span>", 2500);
+                                        document.getElementById('drag-tooltip-start').style.display = 'none';
+                                        document.getElementById('drag-tooltip-end').style.display = 'none';
+                                        showCustomToast(`<span style='font-size: 15px;'><strong>RECORTE TEMPORAL ✘</strong></span><br><span style="font-size: 14px;"><em>cancelado</em></span>`, 1234);
                                     }
                                 }
                             }, 250); 
@@ -3882,11 +3932,11 @@ const dicionarioLinhas = {
                     osc.start(); osc.stop(ctx.currentTime + 0.1);
                 } catch(e) {}
                 
-                showCustomToast("<strong style='font-size: 15px;'>Sons ativados 🔔</strong>", 2000);
+                showCustomToast("<strong style='font-size: 15px;'>SONS ATIVADOS 🔔</strong>", 1234);
 				btnSound.title = "Desativar efeitos SONOROS";
             } else {
                 // Opcional: Mostra a notificação rápida
-                showCustomToast("<strong style='font-size: 15px;'>Sons desativados 🔕</strong>", 2000);
+                showCustomToast("<strong style='font-size: 15px;'>SONS DESATIVADOS 🔕</strong>", 1234);
 				btnSound.title = "Ativar efeitos SONOROS";
             }
         });
@@ -3962,9 +4012,6 @@ const dicionarioLinhas = {
         // RESET TOTAL (Clique no Título)
         // ==========================================
         document.querySelector('.header-title').addEventListener('click', () => {
-            // Toca um sonzinho rápido de feedback (opcional)
-            playSFX('zip'); 
-            
             // Redireciona para o caminho base do arquivo, matando os parâmetros (?s1=...) da URL
             window.location.href = window.location.pathname; 
         });
@@ -4112,8 +4159,6 @@ const dicionarioLinhas = {
                             select2.value
                         );
                     }
-                    showCustomToast("<strong style='font-size: 15px;'>🌍 VISÃO GLOBAL RESTAURADA</strong>", 2500);
-                    if (typeof playSFX === 'function') playSFX('zip');
                 }
                 e.preventDefault(); 
             }
@@ -4410,7 +4455,7 @@ const dicionarioLinhas = {
                 // ==========================================
                 btnActiveAction.classList.remove('recording-pulse');
 
-                if (typeof playSFX === 'function') playSFX('zip'); // Som de finalização
+                if (typeof playSFX === 'function') playSFX('record'); // Som de finalização
             } else {
                 // INICIA A GRAVAÇÃO
                 const canvas = document.getElementById('mainChart');
@@ -4705,13 +4750,13 @@ const dicionarioLinhas = {
                 
                 // NOVO: Gatilho de gravação de vídeo
                 if (!myChart || !myChart.data || myChart.data.datasets.length === 0) {
-                    showCustomToast("<strong style='font-size: 15px;'>Nenhum dado plotado!</strong>", 3000);
+                    showCustomToast("<strong style='font-size: 15px;'>NENHUM DADO PLOTADO 🎲</strong>", 1234);
                     return;
                 }
                 toggleRecording();
 
 			} else if (!myChart || !myChart.data || myChart.data.datasets.length === 0) {
-                showCustomToast("<strong style='font-size: 15px;'>Nenhum dado plotado!</strong><br>Selecione ambas as séries 'desafiante' e 'desafiado' ou uma série avulsa, se desmarcada a opção 'desafio'.", 5555);
+                showCustomToast("<strong style='font-size: 15px;'>NENHUM DADO PLOTADO 🎲</strong><br><i>Selecione ambas as séries <u>'desafiante'</u> e <u>'desafiado'</u> ou uma série avulsa, se desmarcada a opção <u>'desafio'</u></i>", 4321);
                 return;
             } else {
 				if (currentAction === 'snapshot') {
@@ -4735,7 +4780,7 @@ const dicionarioLinhas = {
 					btnActiveAction.textContent = '💬';
 					playSFX('robot'); // <-- SOM DO ROBÔ
 					navigator.clipboard.writeText(generateIAPrompt()).then(() => {
-						showCustomToast("<strong style='font-size: 15px;'>Prompt copiado para a área de transferência!</strong><br>Cole num assistente de IA (ChatGPT, Claude, Gemini etc) para melhor interpretar os dados.", 6666);
+						showCustomToast("<strong style='font-size: 15px;'><u>PROMPT</u> COPIADO PARA ÁREA DE TRANSFERÊNCIA 🧠</strong><br><i>Cole num assistente de IA (ChatGPT, Claude, Gemini etc) para melhor interpretar os dados</i>", 4321);
 						setTimeout(() => { btnActiveAction.textContent = '🤖'; }, 999);
 					});
 				}
@@ -4743,7 +4788,7 @@ const dicionarioLinhas = {
 					btnActiveAction.textContent = '📝';
 					playSFX('typing'); // <-- SOM DO TECLADO (Pode trocar por 'scribble' se preferir)
 					navigator.clipboard.writeText(generateFakeAISummary()).then(() => {
-						showCustomToast("<strong style='font-size: 15px;'>Resumo copiado para a área de transferência!</strong><br>Cole como legenda da imagem do gráfico ao compartilhar via WhatsApp.", 6666);
+						showCustomToast("<strong style='font-size: 15px;'><u>RESUMO</u> COPIADO PARA ÁREA DE TRANSFERÊNCIA 📑</strong><br><i>Cole como legenda da imagem do gráfico ao compartilhar via WhatsApp</i>", 4321);
 						setTimeout(() => { btnActiveAction.textContent = '📋'; }, 999);
 					});
 				}
@@ -4790,13 +4835,21 @@ const dicionarioLinhas = {
         // MENU DE CONTEXTO MATEMÁTICO (Inputs Number)
         // ==========================================
         const contextMenu = document.getElementById('context-menu');
-        const ctxIniAno = document.getElementById('ctx-ini-ano'); const ctxIniMes = document.getElementById('ctx-ini-mes');
-        const ctxFimAno = document.getElementById('ctx-fim-ano'); const ctxFimMes = document.getElementById('ctx-fim-mes');
-        const ctxIncAno = document.getElementById('ctx-inc-ano'); const ctxIncMes = document.getElementById('ctx-inc-mes');
+        const ctxIniAno = document.getElementById('ctx-ini-ano');
+		const ctxIniMes = document.getElementById('ctx-ini-mes');
+        const ctxFimAno = document.getElementById('ctx-fim-ano');
+		const ctxFimMes = document.getElementById('ctx-fim-mes');
+        const ctxIncAno = document.getElementById('ctx-inc-ano');
+		const ctxIncMes = document.getElementById('ctx-inc-mes');
         const ctxSinal  = document.getElementById('ctx-sinal');
         const btnAplicar = document.getElementById('ctx-btn-aplicar');
 
         let ctxMenuTimeout = null;
+
+        // ISOLAMENTO TOTAL: Impede que os cliques no menu "vazem" e ativem as funções do gráfico no fundo
+        ['mousedown', 'mouseup', 'click', 'dblclick', 'contextmenu', 'wheel', 'touchstart', 'touchend', 'touchmove', 'pointerdown', 'pointerup', 'pointermove'].forEach(evt => {
+            contextMenu.addEventListener(evt, (e) => e.stopPropagation());
+        });
 
         const parseComp = (comp) => { const [y, m] = comp.split('/'); return parseInt(y) * 12 + parseInt(m); };
         const formatComp = (absM) => { const y = Math.floor((absM - 1) / 12); const m = ((absM - 1) % 12) + 1; return `${y}/${m.toString().padStart(2, '0')}`; };
@@ -4815,15 +4868,19 @@ const dicionarioLinhas = {
             if (!myChart || !myChart.data.labels.length) return;
 
             const anosValidos = myChart.data.labels.map(c => parseInt(c.split('/')[0], 10));
-            const minAno = Math.min(...anosValidos); const maxAno = Math.max(...anosValidos);
-            ctxIniAno.min = minAno; ctxIniAno.max = maxAno; ctxFimAno.min = minAno; ctxFimAno.max = maxAno;
+            const minAno = Math.min(...anosValidos);
+			const maxAno = Math.max(...anosValidos);
+            ctxIniAno.min = minAno;
+			ctxIniAno.max = maxAno;
+			ctxFimAno.min = minAno;
+			ctxFimAno.max = maxAno;
+            ctxIncAno.max = maxAno - minAno;
 
             // MÁGICA 1: Lê as bordas FÍSICAS da tela (Mata o bug dos 6 meses)
-            let minIndex = myChart.scales.x.min !== undefined ? Math.max(0, Math.floor(myChart.scales.x.min)) : 0;
-            let maxIndex = myChart.scales.x.max !== undefined ? Math.min(myChart.data.labels.length - 1, Math.ceil(myChart.scales.x.max)) : myChart.data.labels.length - 1;
-            
-            let minStr = myChart.data.labels[minIndex];
-            let maxStr = myChart.data.labels[maxIndex];
+            let minStr = myChart.options.scales.x.min !== undefined ? myChart.options.scales.x.min : myChart.data.labels[0];
+            let maxStr = myChart.options.scales.x.max !== undefined ? myChart.options.scales.x.max : myChart.data.labels[myChart.data.labels.length - 1];
+            if (typeof minStr === 'number') minStr = dbData.Competencia[Math.floor(minStr)] || myChart.data.labels[0];
+            if (typeof maxStr === 'number') maxStr = dbData.Competencia[Math.ceil(maxStr)] || myChart.data.labels[myChart.data.labels.length - 1];
 
             window.isProgrammaticUpdateMenu = true;
             ctxIniAno.value = minStr.split('/')[0]; 
@@ -4842,14 +4899,14 @@ const dicionarioLinhas = {
             
             clearTimeout(ctxMenuTimeout);
             setTimeout(() => ctxIniAno.focus(), 50);
-            if (typeof playSFX === 'function') playSFX('click_o');
         });
 
         contextMenu.addEventListener('mouseleave', () => {
             ctxMenuTimeout = setTimeout(() => {
-                if (!contextMenu.querySelector('input:focus')) {
-                    contextMenu.style.display = 'none';
-                }
+//              if (!contextMenu.querySelector('input:focus')) {
+					contextMenu.style.display = 'none';
+					window.focus(); // Devolve a escuta para os atalhos de teclado!
+//              }
             }, 1234);
         });
         contextMenu.addEventListener('mouseenter', () => clearTimeout(ctxMenuTimeout));
@@ -4866,6 +4923,9 @@ const dicionarioLinhas = {
                 while (mes > 11) { mes -= 12; ano += 1; }
                 while (mes < 0) { mes += 12; ano -= 1; }
                 if (ano < 0) { ano = 0; mes = 0; }
+				
+				const maxAnosSerie = parseInt(inputAno.max, 10) || 30;
+                if (ano > maxAnosSerie) { ano = maxAnosSerie; mes = 11; }
             }
             
             inputAno.value = ano;
@@ -4929,7 +4989,6 @@ const dicionarioLinhas = {
         ctxSinal.addEventListener('click', () => { 
             ctxSinal.textContent = ctxSinal.textContent === '+' ? '-' : '+'; 
             rebalancearLinha2();
-            if (typeof playSFX === 'function') playSFX('click_o'); 
         });
 
         // MÁGICA 2: Tesoura agora aciona a filtragem perfeitamente
@@ -4948,32 +5007,29 @@ const dicionarioLinhas = {
             myChart.update();
             handleZoomPan({chart: myChart}); // Dispara a sincronia da central visual
 
-            if (typeof playSFX === 'function') playSFX('click_x');
             contextMenu.style.display = 'none';
         });
 
-        document.addEventListener('mousedown', (e) => {
-            if (contextMenu.style.display === 'flex' && !contextMenu.contains(e.target)) contextMenu.style.display = 'none';
-        });
-        
         contextMenu.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') { contextMenu.style.display = 'none'; window.focus(); e.stopPropagation(); }
             if (e.key === 'Enter') { btnAplicar.click(); e.stopPropagation(); }
         });
 		
 		// ==========================================
-        // BALÕES DE ARRASTO COM EMOJIS (Drag Nativo)
+        // BALÕES DE ARRASTO COM EMOJIS (Drag e Sniper Mode)
         // ==========================================
 		const canvasEl = document.getElementById('mainChart');
         let isDraggingArea = false;
         let dragStartX = null;
         let dragStartY = null;
-        let dragStartValX = null; // <-- MÁGICA: Memória do índice inicial
+        let dragStartValX = null; 
         const dtStart = document.getElementById('drag-tooltip-start');
         const dtEnd = document.getElementById('drag-tooltip-end');
+        
+        let lastMouseE = null; // Memória da posição do mouse para ativar no Alt sem mover o braço
 
         canvasEl.addEventListener('mousedown', (e) => {
-            // Aceita apenas o clique esquerdo (0)
+            // Aceita apenas o clique esquerdo (0) e ABORTA o Drag se o Alt estiver ativado (Sniper Mode assume)
             if (e.button !== 0 || e.altKey || e.shiftKey || e.ctrlKey || e.metaKey) return;
             
             const valX = myChart.scales.x.getValueForPixel(e.offsetX);
@@ -4981,38 +5037,92 @@ const dicionarioLinhas = {
                 isDraggingArea = true;
                 dragStartX = e.clientX;
                 dragStartY = e.clientY;
-                dragStartValX = valX; // Guarda onde a seleção começou
+                dragStartValX = valX;
             }
         });
 
         canvasEl.addEventListener('mousemove', (e) => {
-            if (!isDraggingArea) return;
+            lastMouseE = e; // Atualiza a memória
+            if (window.sniperZooming) return; // Congela os balões exatamente onde estão durante o Delay de 800ms
             
-            // Só libera os balões se arrastar mais de 10 pixels horizontais 
-            if (Math.abs(e.clientX - dragStartX) > 10) {
-                const currentValX = myChart.scales.x.getValueForPixel(e.offsetX);
-                if (currentValX >= 0 && currentValX < myChart.data.labels.length) {
-                    
-                    let labelStart = myChart.data.labels[dragStartValX]; 
-                    let labelEnd = myChart.data.labels[currentValX];
-                    
-                    // Inversão Dinâmica de Bandeiras (Sempre 🚩 à esquerda e 🏁 à direita da caixa)
-                    if (e.clientX >= dragStartX) { 
-                        dtStart.innerHTML = `🚩 ${labelStart}`; 
-                        dtEnd.innerHTML = `${labelEnd} 🏁`; 
-                    } else { 
-                        dtStart.innerHTML = `${labelStart} 🏁`; 
-                        dtEnd.innerHTML = `🚩 ${labelEnd}`; 
+            // ----------------------------------------------------
+            // 1. MODO ARRASTO LIGADO (Sem tecla pressionada)
+            // ----------------------------------------------------
+            if (isDraggingArea) {
+                if (Math.abs(e.clientX - dragStartX) > 10) {
+                    const currentValX = myChart.scales.x.getValueForPixel(e.offsetX);
+                    if (currentValX >= 0 && currentValX < myChart.data.labels.length) {
+                        let labelStart = myChart.data.labels[dragStartValX]; 
+                        let labelEnd = myChart.data.labels[currentValX];
+                        
+                        if (e.clientX >= dragStartX) { 
+                            dtStart.innerHTML = `🚩 ${labelStart}`; 
+                            dtEnd.innerHTML = `${labelEnd} 🏁`; 
+                        } else { 
+                            dtStart.innerHTML = `${labelStart} 🏁`; 
+                            dtEnd.innerHTML = `🚩 ${labelEnd}`; 
+                        }
+                        
+                        dtStart.style.left = dragStartX + 'px'; 
+                        dtStart.style.top = dragStartY + 'px'; 
+                        dtStart.style.display = 'block';
+                        
+                        dtEnd.style.left = e.clientX + 'px'; 
+                        dtEnd.style.top = dragStartY + 'px'; 
+                        dtEnd.style.display = 'block';
                     }
-                    
-                    dtStart.style.left = dragStartX + 'px'; 
-                    dtStart.style.top = dragStartY + 'px'; 
-                    dtStart.style.display = 'block';
-                    
-                    dtEnd.style.left = e.clientX + 'px'; 
-                    dtEnd.style.top = dragStartY + 'px'; 
-                    dtEnd.style.display = 'block';
                 }
+                return;
+            }
+
+            // ----------------------------------------------------
+            // 2. MODO SNIPER (Hover visual apenas segurando ALT)
+            // ----------------------------------------------------
+            if (e.altKey && myChart) {
+                const valX = myChart.scales.x.getValueForPixel(e.offsetX);
+                if (valX >= 0 && valX < myChart.data.labels.length) {
+                    const hoverLabel = myChart.data.labels[valX];
+
+                    if (!window.zoomMarcadorInicio) {
+                        // Estágio 1: Caçando o primeiro ponto
+                        dtStart.innerHTML = `🚩 ${hoverLabel}`;
+                        dtStart.style.left = e.clientX + 'px';
+                        dtStart.style.top = e.clientY + 'px';
+                        dtStart.style.display = 'block';
+                        dtEnd.style.display = 'none';
+                    } else {
+                        // Estágio 2: O primeiro ponto já foi clicado e ancorado
+                        const startLabel = window.zoomMarcadorInicio;
+                        const startIdx = dbData.Competencia.indexOf(startLabel);
+
+                        // Inversão Dinâmica de Bandeiras calculada ao vivo
+                        if (valX >= startIdx) {
+                            dtStart.innerHTML = `🚩 ${startLabel}`;
+                            dtEnd.innerHTML = `${hoverLabel} 🏁`;
+                        } else {
+                            dtStart.innerHTML = `${startLabel} 🏁`;
+                            dtEnd.innerHTML = `🚩 ${hoverLabel}`;
+                        }
+
+                        // Ancora o primeiro balão cirurgicamente no pixel salvo do 1º clique
+                        dtStart.style.left = window.zoomMarcadorInicioX + 'px';
+                        dtStart.style.top = window.zoomMarcadorInicioY + 'px';
+                        dtStart.style.display = 'block';
+
+                        // O segundo balão voa livremente com o ponteiro do mouse
+                        dtEnd.style.left = e.clientX + 'px';
+                        dtEnd.style.top = e.clientY + 'px';
+                        dtEnd.style.display = 'block';
+                    }
+                } else {
+                    // Fora dos limites da linha do tempo
+                    if (!window.zoomMarcadorInicio) dtStart.style.display = 'none';
+                    dtEnd.style.display = 'none';
+                }
+            } else {
+                // Soltou o Alt e não está arrastando (Esconde de forma automática)
+                dtStart.style.display = 'none';
+                dtEnd.style.display = 'none';
             }
         });
 
@@ -5022,6 +5132,27 @@ const dicionarioLinhas = {
                 dtStart.style.display = 'none';
                 dtEnd.style.display = 'none';
                 if (typeof playSFX === 'function') playSFX('click_x');
+            }
+        });
+
+        // ----------------------------------------------------
+        // 3. LISTENERS GLOBAIS DE TECLADO (Ativação Instantânea)
+        // ----------------------------------------------------
+        
+        // Esconde imediatamente ao soltar o Alt (mesmo com o mouse parado)
+        window.addEventListener('keyup', (e) => {
+            if (e.key === 'Alt') {
+                if (!isDraggingArea && !window.sniperZooming) {
+                    dtStart.style.display = 'none';
+                    dtEnd.style.display = 'none';
+                }
+            }
+        });
+
+        // Mostra imediatamente ao apertar o Alt (Forçando o MouseMove Fantasma)
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Alt' && lastMouseE && lastMouseE.target === canvasEl && !window.sniperZooming) {
+                canvasEl.dispatchEvent(new MouseEvent('mousemove', lastMouseE));
             }
         });
     </script>
