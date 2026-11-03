@@ -245,12 +245,13 @@
             opacity: 0;
             transform: translateY(20px);
             transition: opacity 0.5s ease, transform 0.5s ease;
-            pointer-events: auto; /* MÁGICA 1: Alterado para "auto" para sentir o mouse */
+            pointer-events: none; /* CORREÇÃO: O fantasma não bloqueia mais o mouse */
             z-index: 9999;
         }
         .toast-shortcuts.show {
             opacity: 1;
             transform: translateY(0);
+            pointer-events: auto; /* CORREÇÃO: Só ganha colisão física quando aparece */
         }
         .toast-mono {
             font-family: 'Consolas', 'Courier New', monospace;
@@ -1000,6 +1001,11 @@
             { data: "2014/01", tipo: "+", serie: "CARFB", 		 evento: "Reajuste de 4,8% no subsídio para CARFB" },
             { data: "2015/01", tipo: "+", serie: "CARFB", 		 evento: "Reajuste de 5,2% no subsídio para CARFB" },
 
+            { data: "2016/09", tipo: "x", serie: "ATRFB (meio)", evento: "Parcelas antecipadas do BEP (R$ 7.500 × 2 = 3.000 × 5)" },
+            { data: "2016/09", tipo: "x", serie: "ATRFB (topo)", evento: "Parcelas antecipadas do BEP (R$ 7.500 × 2 = 3.000 × 5)" },
+            { data: "2016/09", tipo: "x", serie: "AFRFB (meio)", evento: "Parcelas antecipadas do BEP (R$ 4.500 × 2 = 1.800 × 5)" },
+            { data: "2016/09", tipo: "x", serie: "AFRFB (topo)", evento: "Parcelas antecipadas do BEP (R$ 4.500 × 2 = 1.800 × 5)" },
+
             { data: "2016/11", tipo: "x", serie: "CTARFB", 		 evento: "Abandono do subsídio pela CTARFB" },
 
             { data: "2016/12", tipo: "+", serie: "ATRFB (base)", evento: "Readoção do VB com +9,83% para ATRFB" },
@@ -1010,27 +1016,17 @@
             { data: "2016/12", tipo: "+", serie: "AFRFB (topo)", evento: "Readoção do VB com +5,50% para AFRFB" },
 
             { data: "2017/01", tipo: "+", serie: "CTARFB", 		 evento: "Reajuste de 5,00% no VB para CTARFB" },
-            { data: "2018/01", tipo: "+", serie: "CTARFB", 		 evento: "Reajuste de 4,75% no VB para CTARFB" },
-            { data: "2019/01", tipo: "+", serie: "CTARFB", 		 evento: "Reajuste de 4,50% no VB para CTARFB" },
-
-            { data: "2023/05", tipo: "+", serie: "CTARFB", 		 evento: "Reajuste de 9% no VB para CTARFB" },
-
-            { data: "2026/04", tipo: "0", serie: "ATRFB (base)", evento: "Reajuste de 0,00% no VB de ATRFB" },
-            { data: "2026/04", tipo: "0", serie: "AFRFB (base)", evento: "Reajuste de 0,00% no VB de AFRFB" },
-            { data: "2026/04", tipo: "0", serie: "ATRFB (meio)", evento: "Reajuste de 0,00% no VB de ATRFB" },
-            { data: "2026/04", tipo: "0", serie: "AFRFB (meio)", evento: "Reajuste de 0,00% no VB de AFRFB" },
-            { data: "2026/04", tipo: "+", serie: "ATRFB (topo)", evento: "Reajuste de 9,22% no VB de ATRFB" },
-            { data: "2026/04", tipo: "+", serie: "AFRFB (topo)", evento: "Reajuste de 9,22% no VB de AFRFB" },
-
-            { data: "2016/09", tipo: "x", serie: "ATRFB (meio)", evento: "Parcelas antecipadas do BEP (R$ 7.500 × 2 = 3.000 × 5)" },
-            { data: "2016/09", tipo: "x", serie: "ATRFB (topo)", evento: "Parcelas antecipadas do BEP (R$ 7.500 × 2 = 3.000 × 5)" },
-            { data: "2016/09", tipo: "x", serie: "AFRFB (meio)", evento: "Parcelas antecipadas do BEP (R$ 4.500 × 2 = 1.800 × 5)" },
-            { data: "2016/09", tipo: "x", serie: "AFRFB (topo)", evento: "Parcelas antecipadas do BEP (R$ 4.500 × 2 = 1.800 × 5)" },
 
             { data: "2017/02", tipo: "x", serie: "ATRFB (meio)", evento: "Pagamento não-regulamentado do BEP (R$ 3.000)" },
             { data: "2017/02", tipo: "x", serie: "ATRFB (topo)", evento: "Pagamento não-regulamentado do BEP (R$ 3.000)" },
             { data: "2017/02", tipo: "x", serie: "AFRFB (meio)", evento: "Pagamento não-regulamentado do BEP (R$ 1.800)" },
             { data: "2017/02", tipo: "x", serie: "AFRFB (topo)", evento: "Pagamento não-regulamentado do BEP (R$ 1.800)" },
+
+            { data: "2018/01", tipo: "+", serie: "CTARFB", 		 evento: "Reajuste de 4,75% no VB para CTARFB" },
+
+            { data: "2019/01", tipo: "+", serie: "CTARFB", 		 evento: "Reajuste de 4,50% no VB para CTARFB" },
+
+            { data: "2023/05", tipo: "+", serie: "CTARFB", 		 evento: "Reajuste de 9% no VB para CTARFB" },
 
             { data: "2024/03", tipo: "x", serie: "ATRFB (meio)", evento: "Pagamento regulamentado do BEP (R$ 4.500)" },
             { data: "2024/03", tipo: "x", serie: "ATRFB (topo)", evento: "Pagamento regulamentado do BEP (R$ 4.500)" },
@@ -1056,6 +1052,15 @@
             { data: "2026/02", tipo: "x", serie: "ATRFB (topo)", evento: "Quarto incremento do BEP (R$ 11.500)" },
             { data: "2026/02", tipo: "x", serie: "AFRFB (meio)", evento: "Quarto incremento do BEP (R$ 6.900)" },
             { data: "2026/02", tipo: "x", serie: "AFRFB (topo)", evento: "Quarto incremento do BEP (R$ 6.900)" },
+
+            { data: "2026/04", tipo: "0", serie: "ATRFB (base)", evento: "Reajuste de 0,00% no VB de ATRFB", escopo: "ativo" },
+            { data: "2026/04", tipo: "0", serie: "AFRFB (base)", evento: "Reajuste de 0,00% no VB de AFRFB", escopo: "ativo" },
+            { data: "2026/04", tipo: "0", serie: "ATRFB (meio)", evento: "Reajuste de 0,00% no VB de ATRFB", escopo: "ativo" },
+            { data: "2026/04", tipo: "0", serie: "AFRFB (meio)", evento: "Reajuste de 0,00% no VB de AFRFB", escopo: "ativo" },
+            { data: "2026/04", tipo: "+", serie: "ATRFB (topo)", evento: "Reajuste de 9,22% no VB de ATRFB", escopo: "ativo" },
+            { data: "2026/04", tipo: "+", serie: "AFRFB (topo)", evento: "Reajuste de 9,22% no VB de AFRFB", escopo: "ativo" },
+            { data: "2026/04", tipo: "+", serie: "CTARFB",		 evento: "Reajuste de 9,22% no VB da CTARFB", escopo: "inativo" },
+            { data: "2026/04", tipo: "x", serie: "CTARFB",		 evento: "Mudança de 35% para 52,04% na \"escadinha\" do BEP", escopo: "inativo" },
 
             { data: "2027/02", tipo: "x", serie: "ATRFB (meio)", evento: "Correção inflacionária do BEP (R$ 12.042,80 = 11.500 + 4,72%)" },
             { data: "2027/02", tipo: "x", serie: "ATRFB (topo)", evento: "Correção inflacionária do BEP (R$ 12.042,80 = 11.500 + 4,72%)" },
@@ -1091,58 +1096,70 @@
             { data: "2015/01", tipo: "+", serie: "CPFN", 	   evento: "Reajuste de 5,1% no subsídio de PFN" },
 
             { data: "2016/08", tipo: "+", serie: "CPFN", 	   evento: "Reajuste de 5,50% no subsídio de PFN" },
+            { data: "2016/08", tipo: "x", serie: "PFN (meio)", evento: "Pagamento não-regulamentado do HAS (R$ 3.000)", escopo: "ativo" },
+            { data: "2016/08", tipo: "x", serie: "PFN (topo)", evento: "Pagamento não-regulamentado do HAS (R$ 3.000)", escopo: "ativo" },
+            { data: "2016/08", tipo: "x", serie: "CPFN", 	   evento: "Pagamento não-regulamentado do HAS (R$ 1.110)", escopo: "inativo" },
+
             { data: "2017/01", tipo: "+", serie: "CPFN", 	   evento: "Reajuste de 5,00% no subsídio de PFN" },
+            { data: "2017/01", tipo: "x", serie: "PFN (meio)", evento: "Pagamento regulamentado do HAS (R$ 3.744,01)", escopo: "ativo" },
+            { data: "2017/01", tipo: "x", serie: "PFN (topo)", evento: "Pagamento regulamentado do HAS (R$ 3.744,01)", escopo: "ativo" },
+            { data: "2017/01", tipo: "x", serie: "CPFN", 	   evento: "Pagamento regulamentado do HAS (R$ 1.385,28)", escopo: "inativo" },
+
             { data: "2018/01", tipo: "+", serie: "CPFN", 	   evento: "Reajuste de 4,75% no subsídio de PFN" },
+
             { data: "2019/01", tipo: "+", serie: "CPFN", 	   evento: "Reajuste de 4,50% no subsídio de PFN" },
 
+            { data: "2022/11", tipo: "x", serie: "PFN",		   evento: "Começo do \"13º salário\" via CCHA (rateio extraordiário)" },
+
+            { data: "2022/12", tipo: "x", serie: "PFN",		   evento: "Última \"escadinha\" do HAS em 37% = (100% - 7% × 9)", escopo: "inativo" },
+
+          //{ data: "2023/01", tipo: "x", serie: "PFN",		   evento: "Mudança de 37% para 52% na \"escadinha\" do HAS", escopo: "inativo" },
+            { data: "2023/01", tipo: "x", serie: "PFN",		   evento: "Primeira \"escadinha\" do HAS em 52% ≈ (100% - 7%)⁹", escopo: "inativo" },
+
+            { data: "2023/02", tipo: "x", serie: "PFN",		   evento: "Começo do \"abate-teto\" no HAS (R$ -1,84)", escopo: "ativo" },
+
             { data: "2023/05", tipo: "+", serie: "CPFN", 	   evento: "Reajuste de 9% no subsídio de PFN" },
+
+            { data: "2024/05", tipo: "x", serie: "PFN",		   evento: "Reembolso de anuidade da OAB via CCHA (R$ 12.600)", escopo: "ativo" },
+
+            { data: "2024/10", tipo: "x", serie: "PFN",		   evento: "Começo do \"suplemento-alimentação\" via CCHA (R$ 393,11)", escopo: "ativo" },
+          //{ data: "2024/10", tipo: "x", serie: "PFN",		   evento: "Começo do \"suplemento-saúde\" via CCHA (R$ 3.000)" },
+          //{ data: "2024/10", tipo: "x", serie: "PFN",		   evento: "Começo do \"suplemento-saúde\" via CCHA (R$ 3.000 para ativos e R$ 3.500 para inativos)" },
+          //{ data: "2024/10", tipo: "x", serie: "PFN",		   evento: "Começo do \"suplemento-saúde\" via CCHA (Ativos: R$ 3.000; Inativos: R$ 3.500)" },
+            { data: "2024/10", tipo: "x", serie: "PFN",		   evento: "Começo do \"suplemento-saúde\" via CCHA (R$ 3.000)", escopo: "ativo" },
+            { data: "2024/10", tipo: "x", serie: "PFN",		   evento: "Começo do \"suplemento-saúde\" via CCHA (R$ 3.500)", escopo: "inativo" },
 
             { data: "2025/01", tipo: "+", serie: "PFN (base)", evento: "Reajuste de 9% no subsídio de PFN" },
             { data: "2025/01", tipo: "0", serie: "PFN (meio)", evento: "Reajuste de 0% no subsídio de PFN" },
             { data: "2025/01", tipo: "0", serie: "PFN (topo)", evento: "Reajuste de 0% no subsídio de PFN" },
+            { data: "2025/01", tipo: "x", serie: "PFN",		   evento: "Primeiros retroativos via CCHA (alimentação & saúde)" },
+
+            { data: "2025/02", tipo: "x", serie: "PFN",		   evento: "Equalização do \"suplemento-alimentação\" via CCHA (R$ 784,42)", escopo: "ativo" },
 
             { data: "2025/06", tipo: "0", serie: "PFN (base)", evento: "Reajuste de 0% no subsídio de PFN" },
             { data: "2025/06", tipo: "+", serie: "PFN (meio)", evento: "Reajuste de 9% no subsídio de PFN" },
             { data: "2025/06", tipo: "+", serie: "PFN (topo)", evento: "Reajuste de 9% no subsídio de PFN" },
+            { data: "2025/06", tipo: "x", serie: "PFN",		   evento: "Fixação do \"suplemento-alimentação\" via CCHA (R$ 1.000)", escopo: "ativo" },
+          //{ data: "2025/06", tipo: "x", serie: "PFN",		   evento: "Incremento do \"suplemento-saúde\" via CCHA (R$ 4.200)" },
+          //{ data: "2025/06", tipo: "x", serie: "PFN",		   evento: "Incremento do \"suplemento-saúde\" via CCHA (R$ 4.200 para ativos e R$ 4.600 para inativos)" },
+          //{ data: "2025/06", tipo: "x", serie: "PFN",		   evento: "Incremento do \"suplemento-saúde\" via CCHA (Ativos: R$ 4.200; Inativos: R$ 4.600)" },
+            { data: "2025/06", tipo: "x", serie: "PFN",		   evento: "Incremento do \"suplemento-saúde\" via CCHA (R$ 4.200)", escopo: "ativo" },
+            { data: "2025/06", tipo: "x", serie: "PFN",		   evento: "Incremento do \"suplemento-saúde\" via CCHA (R$ 4.600)", escopo: "inativo" },
+
+            { data: "2025/07", tipo: "x", serie: "PFN",		   evento: "Começo do \"⅓ de férias\" via CCHA", escopo: "ativo" },
+            { data: "2025/07", tipo: "x", serie: "PFN",		   evento: "Segundos retroativos via CCHA (férias)", escopo: "ativo" },
+
+            { data: "2025/12", tipo: "x", serie: "PFN",		   evento: "Limitação do \"reembolso-saúde\" via CCHA a 10% do teto (R$ 4.636,62)" },
+
+            { data: "2026/01", tipo: "x", serie: "PFN",		   evento: "Hibridização do \"suplemento-alimentação\" via CCHA (R$ 1.784,42)", escopo: "ativo" },
 
             { data: "2026/04", tipo: "+", serie: "CPFN", 	   evento: "Reajuste de 9,2% no subsídio de PFN" },
 
-            { data: "2016/08", tipo: "x", serie: "PFN (meio)", evento: "Pagamento não-regulamentado do HAS (R$ 3.000)" },
-            { data: "2016/08", tipo: "x", serie: "PFN (topo)", evento: "Pagamento não-regulamentado do HAS (R$ 3.000)" },
-
-            { data: "2017/01", tipo: "x", serie: "PFN (meio)", evento: "Pagamento regulamentado do HAS (R$ 3.744,01)" },
-            { data: "2017/01", tipo: "x", serie: "PFN (topo)", evento: "Pagamento regulamentado do HAS (R$ 3.744,01)" },
-
-            { data: "2022/11", tipo: "x", serie: "PFN",		   evento: "Começo do \"13º salário\" via CCHA (rateio extraordiário)" },
-
-            { data: "2022/12", tipo: "x", serie: "PFN",		   evento: "Última \"escadinha\" do HAS em 37% = (100% - 7% × 9)" },
-          //{ data: "2023/01", tipo: "x", serie: "PFN",		   evento: "Mudança de  para 52% na \"escadinha\" do HAS" },
-            { data: "2023/01", tipo: "x", serie: "PFN",		   evento: "Primeira \"escadinha\" do HAS em 52% ≈ (100% - 7%)⁹" },
-
-            { data: "2023/02", tipo: "x", serie: "PFN",		   evento: "Começo do \"abate-teto\" no HAS (R$ -1,84)" },
-
-            { data: "2024/05", tipo: "x", serie: "PFN",		   evento: "Reembolso de anuidade da OAB via CCHA (R$ 12.600)" },
-
-            { data: "2024/10", tipo: "x", serie: "PFN",		   evento: "Começo do \"suplemento-saúde\" via CCHA (R$ 3.000)" },
-            { data: "2024/10", tipo: "x", serie: "PFN",		   evento: "Começo do \"suplemento-alimentação\" via CCHA (R$ 393,11)" },
-
-            { data: "2025/01", tipo: "x", serie: "PFN",		   evento: "Primeiros retroativos via CCHA (alimentação & saúde)" },
-
-            { data: "2025/02", tipo: "x", serie: "PFN",		   evento: "Equalização do \"suplemento-alimentação\" via CCHA (R$ 784,42)" },
-
-            { data: "2025/06", tipo: "x", serie: "PFN",		   evento: "Fixação do \"suplemento-alimentação\" via CCHA (R$ 1.000)" },
-            { data: "2025/06", tipo: "x", serie: "PFN",		   evento: "Incremento do \"suplemento-saúde\" via CCHA (R$ 4.200)" },
-
-            { data: "2025/07", tipo: "x", serie: "PFN",		   evento: "Começo do \"⅓ de férias\" via CCHA" },
-            { data: "2025/07", tipo: "x", serie: "PFN",		   evento: "Segundos retroativos via CCHA (férias)" },
-
-            { data: "2025/12", tipo: "x", serie: "PFN",		   evento: "Limitação do \"reembolso-saúde\" a 10% do teto (R$ 4.636,62)" },
-
-            { data: "2026/01", tipo: "x", serie: "PFN",		   evento: "Hibridização do \"suplemento-alimentação\" via CCHA (R$ 1.784,42)" },
-
-            { data: "2026/05", tipo: "x", serie: "PFN",		   evento: "Limitação do \"reembolso-saúde\" a 15% do teto (R$ 6.954,93)" },
+            { data: "2026/05", tipo: "x", serie: "PFN",		   evento: "Elevação do \"reembolso-saúde\" via CCHA a 15% do teto (R$ 6.954,93)" },
 			
-			{ data: "2026/07", tipo: "x", serie: "PFN",		   evento: "Arredondamento do \"suplemento-alimentação\" via CCHA (R$ 2.000)" },
+			{ data: "2026/07", tipo: "x", serie: "PFN",		   evento: "Arredondamento do \"suplemento-alimentação\" via CCHA (R$ 2.000)", escopo: "ativo" },
+
+			{ data: "2026/09", tipo: "x", serie: "PFN",		   evento: "Equiparação do \"suplemento-alimentação\" via CCHA (R$ 4.636,62)", escopo: "ativo" },
 
 
             { data: "2006/06", tipo: "x", serie: "CPF", 	           evento: "Abandono do VB pela CPF" },
@@ -3150,6 +3167,19 @@ const dicionarioLinhas = {
 
                         aplicaAoGrafico = termosParaBusca.some(termo => contextoPlotado.includes(termo));
                     }
+					
+					// NOVA TRAVA DE ESCOPO: Ativo vs Inativo
+                    if (aplicaAoGrafico && marco.escopo) {
+                        // Verifica se o nome da série plotada carrega o status de inatividade
+                        const isSerieInativa = contextoPlotado.includes('INATIVO') || contextoPlotado.includes('APOSENTADO') || contextoPlotado.includes('RETIRADO');
+                        const escopoExigido = marco.escopo.toLowerCase();
+                        
+                        if (escopoExigido === 'ativo' && isSerieInativa) {
+                            aplicaAoGrafico = false;
+                        } else if (escopoExigido === 'inativo' && !isSerieInativa) {
+                            aplicaAoGrafico = false;
+                        }
+                    }
 
                     // Se passou no filtro do Cargo, verificamos se a data está na janela de Zoom
                     if (aplicaAoGrafico) {
@@ -3174,7 +3204,7 @@ const dicionarioLinhas = {
                             } 
                             else if (tipo === '+') { // Verde (mantém G; zera R e B)
                                 r125 = 0; b125 = 0; 
-                                r25  = 0;  b25 = 0; 
+                                r25  = 0;  b25 = 0;
                                 r225 = 0; b225 = 0;
 								
 								g125 = 125;
@@ -4987,9 +5017,18 @@ const dicionarioLinhas = {
             contextMenu.style.display = 'none';
         });
 
+		// Escuta o Enter apenas dentro do menu (para aplicar o recorte)
         contextMenu.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') { contextMenu.style.display = 'none'; window.focus(); e.stopPropagation(); }
+          //if (e.key === 'Escape') { contextMenu.style.display = 'none'; window.focus(); e.stopPropagation(); }
             if (e.key === 'Enter') { btnAplicar.click(); e.stopPropagation(); }
+        });
+        
+        // Escuta o ESC globalmente (fecha o menu na hora, mesmo sem foco nos inputs)
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && contextMenu.style.display === 'flex') {
+                contextMenu.style.display = 'none';
+                window.focus();
+            }
         });
 		
 		// ==========================================
